@@ -4,7 +4,6 @@ description: "How to really choose between stuct and class? Understand them and 
 pubDate: "Apr 20 2025"
 heroImage: "/post_img.webp"
 badge: "Demo Badge"
-tags: 
 ---
 
 # Swift recommends `struct` by default — but why?
