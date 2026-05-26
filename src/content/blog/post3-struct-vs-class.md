@@ -3,7 +3,7 @@ title: "Struct vs Class in Swift: Understanding the Real Tradeoffs Behind the Re
 description: "How to really choose between stuct and class? Understand them and you always know"
 pubDate: "Apr 20 2025"
 heroImage: "/post_img.webp"
-badge: "Demo badge"
+badge: "iOS in 1 Sentence"
 tags: ["rust","tokio"]
 ---
 
