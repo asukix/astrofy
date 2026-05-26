@@ -6,7 +6,7 @@ heroImage: "/post_img.webp"
 tags: ["iOS in 1 Sentence"]
 ---
 
-# The System behind Feynman's techniques
+# The Open Sentence Method
 
 Richard Feynman was a great thinker. I like his attitude and aspects about thinking and learning. In this article I would like to organize his system from my own perspective. In my approach I separated his technics for 3 part:
 
