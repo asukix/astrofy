@@ -1,9 +1,9 @@
 ---
-title: "The System behind Feynman's techniques"
+title: "The Open Sentence Method"
 description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
 pubDate: "Jul 8 2026"
 heroImage: "/post_img.webp"
-tags: ["tokio"]
+tags: ["iOS in 1 Sentence"]
 ---
 
 # The System behind Feynman's techniques
