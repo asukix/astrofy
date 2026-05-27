@@ -39,7 +39,6 @@ Let's look at the lifecycle changes and their corresponding functions together:
 
 You can see that we have functions for each lifecycle change. We can look at this as a **state machine**, where the lifecycle states are handled by transition functions. When the OS changes the state of the application, it notifies our app through these delegate callbacks, giving us the opportunity to run our code during the transition.
 
-<!-- TODO: replace the image path below with the final URL/path before publishing -->
 <Image format="png" width={300} height={300} src="/lifecycle-flow.png" alt="Profile image" />
 
 ## A simple example of how it could work
