@@ -1,6 +1,6 @@
 ---
-title: "Memory Management - iOS in 1 Sentence"
-description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+title: "iOS Memory Management in 1 Sentence"
+description: "This is the first element of the iOS in 1 Sentence where we see the dependency of the references"
 pubDate: "Jul 8 2026"
 heroImage: "/post_img.webp"
 tags: ["iOS in 1 Sentence"]
