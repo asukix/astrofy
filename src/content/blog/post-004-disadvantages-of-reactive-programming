@@ -1,6 +1,6 @@
 ---
 title: "Disadvantages of reactive programming"
-description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+description: "This is good when we need to react to an event, but it comes at a price."
 pubDate: "Sep 20 2025"
 heroImage: "/post_img.webp"
 ---
