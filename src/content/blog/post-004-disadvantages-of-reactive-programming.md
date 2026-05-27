@@ -1,6 +1,6 @@
 ---
 title: "Disadvantages of reactive programming"
-description: "This is good when we need to react to an event, but it comes at a price."
+description: "The Observer is good when we need to react to an event, but it comes at a price."
 pubDate: "Sep 20 2025"
 heroImage: "/post_img.webp"
 ---
