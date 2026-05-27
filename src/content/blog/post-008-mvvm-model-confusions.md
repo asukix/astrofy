@@ -1,7 +1,7 @@
 ---
 title: "MVVM Model confusions"
 description: "I had some confusions in MVVM around models."
-pubDate: "Mar 15 2026"
+pubDate: "Mar 16 2026"
 heroImage: "/post_img.webp"
 ---
 
