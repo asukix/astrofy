@@ -3,6 +3,7 @@
 <div class="extra-block" data-extra data-open="false">
   <div class="extra-content">
     <div class="extra-inner">
+      <p class="extra-label">→ Keep thinking</p>
       <slot />
     </div>
   </div>
@@ -11,13 +12,11 @@
 <style>
   .extra-block {
     margin-top: 2.5rem;
-    padding-top: 2rem;
-    border-top: 2px solid oklch(var(--bc) / 0.2);
   }
   .extra-content {
     display: grid;
     grid-template-rows: 0fr;
-    transition: grid-template-rows 200ms ease;
+    transition: grid-template-rows 220ms ease;
   }
   .extra-inner {
     overflow: hidden;
@@ -26,6 +25,18 @@
     grid-template-rows: 1fr;
   }
   [data-extra][data-open="true"] .extra-inner {
-    padding-top: 0.5rem;
+    padding: 1.25rem 1.5rem;
+    background: oklch(var(--b2));
+    border-left: 4px solid oklch(var(--p));
+    border-radius: 0 0.625rem 0.625rem 0;
+    margin-top: 1rem;
+  }
+  .extra-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    opacity: 0.55;
+    margin-bottom: 0.75rem;
+    margin-top: 0;
   }
 </style>
