@@ -1,3 +1,52 @@
 ---
 ---
-<slot />
+<div class="mine" data-mine data-open="false">
+  <button
+    class="mine-toggle btn btn-sm btn-ghost"
+    type="button"
+    data-mine-toggle
+    aria-expanded="false"
+  >
+    Show my thought
+  </button>
+  <div class="mine-content" data-mine-content>
+    <div class="mine-content-inner">
+      <slot />
+    </div>
+  </div>
+</div>
+
+<script>
+  function initMine(mine) {
+    const toggle = mine.querySelector('[data-mine-toggle]');
+    if (!toggle) return;
+    toggle.addEventListener('click', () => {
+      const isOpen = mine.dataset.open === 'true';
+      const next = !isOpen;
+      mine.dataset.open = String(next);
+      toggle.setAttribute('aria-expanded', String(next));
+      toggle.textContent = next ? 'Hide' : 'Show my thought';
+    });
+  }
+  document.querySelectorAll('[data-mine]').forEach(initMine);
+</script>
+
+<style>
+  .mine {
+    margin: 1.25rem 0;
+  }
+  .mine-content {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 180ms ease;
+  }
+  .mine-content-inner {
+    overflow: hidden;
+  }
+  [data-mine][data-open="true"] .mine-content {
+    grid-template-rows: 1fr;
+  }
+  [data-mine][data-open="true"] .mine-content-inner {
+    padding-top: 0.5rem;
+  }
+</style>
