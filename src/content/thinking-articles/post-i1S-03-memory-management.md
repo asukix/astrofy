@@ -6,5 +6,5 @@ heroImage: "/post_img.webp"
 tags: ["iOS in 1 Sentence"]
 ---
 
-# Memory Management
+# Memory Management - TA
 This article will be released when sengdev.com starts
