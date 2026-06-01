@@ -1,13 +1,5 @@
 ---
 title: "Reference semantics in 1 sentence"
-description: "Demo for thinking articles"
-pubDate: "Jul 15 2026"
-tags: ["iOS in 1 Sentence"]
-thinking: true
----
-
----
-title: "Reference semantics in 1 sentence"
 description: "Two names pointing at the same thing — and what we keep forgetting about that."
 pubDate: "Jul 15 2026"
 heroImage: "/post_img.webp"
