@@ -44,8 +44,9 @@ const { Content } = await entry.render();
 </PostLayout>
 
 <script>
-  const btn = document.getElementById('reveal-all-btn');
-  if (btn) {
+  function setupRevealAll() {
+    const btn = document.getElementById('reveal-all-btn');
+    if (!btn) return;
     btn.addEventListener('click', () => {
       document.querySelectorAll('[data-mine]').forEach(mine => {
         mine.dataset.open = 'true';
@@ -61,6 +62,8 @@ const { Content } = await entry.render();
       if (container) container.style.display = 'none';
     });
   }
+
+  document.addEventListener('astro:page-load', setupRevealAll);
 </script>
 
 <style>

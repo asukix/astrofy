@@ -54,7 +54,11 @@
     });
   }
 
-  document.querySelectorAll('[data-mine]').forEach(initMine);
+  function setup() {
+    document.querySelectorAll('[data-mine]').forEach(initMine);
+  }
+
+  document.addEventListener('astro:page-load', setup);
 </script>
 
 <style>
