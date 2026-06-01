@@ -1,6 +1,6 @@
 ---
 title: "iOS App lifecycle & State Machines"
-description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+description: iOS App lifecycle works as a state machine
 pubDate: "Marc 13 2026"
 heroImage: "/post_img.webp"
 ---

@@ -1,6 +1,6 @@
 ---
 title: "The Open Sentence Method"
-description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+description: Be courious like a chile, understand the topic as a professional and give curiousity to others
 pubDate: "Jul 8 2026"
 heroImage: "/post_img.webp"
 tags: ["iOS in 1 Sentence"]

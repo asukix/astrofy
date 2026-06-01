@@ -1,6 +1,6 @@
 ---
 title: "Questions and reusability"
-description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+description: When you design a system questions are important. But the way of questioning also important
 pubDate: "Dec 23 2025"
 heroImage: "/post_img.webp"
 ---
