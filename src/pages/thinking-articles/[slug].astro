@@ -1,11 +1,15 @@
 ---
 import { CollectionEntry, getCollection } from "astro:content";
-import { BlogSchema } from "../../content/config";
 import PostLayout from "../../layouts/PostLayout.astro";
-import createSlug from "../../lib/createSlug"
+import createSlug from "../../lib/createSlug";
+
+import Thought from "../../components/Thought.astro";
+import Q from "../../components/Q.astro";
+import Mine from "../../components/Mine.astro";
+import Extra from "../../components/Extra.astro";
 
 export async function getStaticPaths() {
-  const postEntries = await getCollection("blog");
+  const postEntries = await getCollection("thinking-articles");
   return postEntries.map((entry) => ({
     params: { slug: createSlug(entry.data.title, entry.slug) },
     props: { entry },
@@ -13,11 +17,11 @@ export async function getStaticPaths() {
 }
 
 interface Props {
-  entry: CollectionEntry<"blog">;
+  entry: CollectionEntry<"thinking-articles">;
 }
 
 const { entry } = Astro.props;
-const post: BlogSchema = entry.data;
+const post = entry.data;
 const { Content } = await entry.render();
 ---
 
@@ -30,5 +34,5 @@ const { Content } = await entry.render();
   badge={post.badge}
   tags={post.tags}
 >
-  <Content />
+  <Content components={{ Thought, Q, Mine, Extra }} />
 </PostLayout>
