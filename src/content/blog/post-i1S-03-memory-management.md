@@ -4,6 +4,7 @@ description: "This is the first element of the iOS in 1 Sentence where we see th
 pubDate: "Jul 8 2026"
 heroImage: "/post_img.webp"
 tags: ["iOS in 1 Sentence"]
+thinkingArticle: "/thinking-articles/ios-memory-management"
 ---
 
 # Memory Management
