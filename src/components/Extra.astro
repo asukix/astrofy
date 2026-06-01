@@ -1,3 +1,31 @@
 ---
-// Thinking-only. Blog-experience-ben nem renderel semmit.
 ---
+<div class="extra-block" data-extra data-open="false">
+  <div class="extra-content">
+    <div class="extra-inner">
+      <slot />
+    </div>
+  </div>
+</div>
+
+<style>
+  .extra-block {
+    margin-top: 2.5rem;
+    padding-top: 2rem;
+    border-top: 2px solid oklch(var(--bc) / 0.2);
+  }
+  .extra-content {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 200ms ease;
+  }
+  .extra-inner {
+    overflow: hidden;
+  }
+  [data-extra][data-open="true"] .extra-content {
+    grid-template-rows: 1fr;
+  }
+  [data-extra][data-open="true"] .extra-inner {
+    padding-top: 0.5rem;
+  }
+</style>

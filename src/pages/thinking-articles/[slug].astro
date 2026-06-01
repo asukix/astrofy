@@ -35,4 +35,38 @@ const { Content } = await entry.render();
   tags={post.tags}
 >
   <Content components={{ Thought, Q, Mine, Extra }} />
+
+  <div id="reveal-all-container" class="reveal-all-container">
+    <button id="reveal-all-btn" class="btn btn-primary btn-wide" type="button">
+      See my thoughts
+    </button>
+  </div>
 </PostLayout>
+
+<script>
+  const btn = document.getElementById('reveal-all-btn');
+  if (btn) {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('[data-mine]').forEach(mine => {
+        mine.dataset.open = 'true';
+        const toggle = mine.querySelector('[data-mine-toggle]');
+        if (toggle) {
+          toggle.setAttribute('aria-expanded', 'true');
+          toggle.textContent = 'Hide';
+        }
+      });
+      const extra = document.querySelector('[data-extra]');
+      if (extra) extra.dataset.open = 'true';
+      const container = document.getElementById('reveal-all-container');
+      if (container) container.style.display = 'none';
+    });
+  }
+</script>
+
+<style>
+  .reveal-all-container {
+    display: flex;
+    justify-content: center;
+    margin: 3rem 0 1rem;
+  }
+</style>

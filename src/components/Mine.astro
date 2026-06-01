@@ -1,22 +1,46 @@
 ---
 ---
-<div class="mine" data-mine data-open="false">
-  <button
-    class="mine-toggle btn btn-sm btn-ghost"
-    type="button"
-    data-mine-toggle
-    aria-expanded="false"
-  >
-    Show my thought
-  </button>
+<div class="mine-block" data-mine data-open="false">
+
+  <textarea
+    class="textarea textarea-bordered w-full mine-reader"
+    placeholder="What do you think?"
+    data-reader-box
+    rows="3"
+    autocomplete="off"
+  ></textarea>
+
+  <div class="mine-footer">
+    <button
+      class="btn btn-sm btn-ghost"
+      type="button"
+      data-mine-toggle
+      aria-expanded="false"
+    >
+      Show my thought
+    </button>
+  </div>
+
   <div class="mine-content" data-mine-content>
     <div class="mine-content-inner">
       <slot />
     </div>
   </div>
+
 </div>
 
 <script>
+  function checkAllOpen() {
+    const allMines = document.querySelectorAll('[data-mine]');
+    const allOpen = Array.from(allMines).every(m => m.dataset.open === 'true');
+    if (allOpen) {
+      const extra = document.querySelector('[data-extra]');
+      if (extra) extra.dataset.open = 'true';
+      const revealContainer = document.getElementById('reveal-all-container');
+      if (revealContainer) revealContainer.style.display = 'none';
+    }
+  }
+
   function initMine(mine) {
     const toggle = mine.querySelector('[data-mine-toggle]');
     if (!toggle) return;
@@ -26,14 +50,30 @@
       mine.dataset.open = String(next);
       toggle.setAttribute('aria-expanded', String(next));
       toggle.textContent = next ? 'Hide' : 'Show my thought';
+      if (next) checkAllOpen();
     });
   }
+
   document.querySelectorAll('[data-mine]').forEach(initMine);
 </script>
 
 <style>
-  .mine {
-    margin: 1.25rem 0;
+  .mine-block {
+    margin: 1.5rem 0;
+    padding: 1rem 1.25rem;
+    border-left: 3px solid oklch(var(--bc) / 0.15);
+    border-radius: 0 0.5rem 0.5rem 0;
+  }
+  .mine-reader {
+    width: 100%;
+    resize: vertical;
+    min-height: 72px;
+    margin-bottom: 0.5rem;
+  }
+  .mine-footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 0.25rem;
   }
   .mine-content {
     display: grid;
@@ -47,6 +87,6 @@
     grid-template-rows: 1fr;
   }
   [data-mine][data-open="true"] .mine-content-inner {
-    padding-top: 0.5rem;
+    padding-top: 0.75rem;
   }
 </style>
