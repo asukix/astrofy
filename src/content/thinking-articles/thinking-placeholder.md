@@ -6,14 +6,6 @@ tags: ["iOS in 1 Sentence"]
 thinking: true
 ---
 
----
-title: "Reference semantics in 1 sentence"
-description: "..."
-pubDate: "Jul 15 2026"
-tags: ["iOS in 1 Sentence"]
-thinking: true
----
-
 You pass a class instance into a function, the function mutates it — and the change is visible outside too.
 
 <Thought>
