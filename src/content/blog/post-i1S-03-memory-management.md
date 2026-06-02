@@ -8,6 +8,6 @@ thinkingArticle: "reference-semantics-in-1-sentence"
 ---
 
 # Memory Management
-# My 1 Sentence for iOS Memory Management
+## My 1 Sentence for iOS Memory Management
 
-** Handle dependencies with time constraint. **
+**Handle dependencies with time constraint.**
