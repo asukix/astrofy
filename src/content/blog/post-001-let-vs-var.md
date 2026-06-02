@@ -1,6 +1,6 @@
 ---
 title: "Swift's Let vs var:  Beyond immutable vs mutable"
-description: "The let and var is much more then mutable and immutable. They are important in performance safity and memory management as well"
+description: "The let and var is much more than mutable and immutable. They are important in performance safety and memory management as well"
 pubDate: "Apr 19 2025"
 heroImage: "/post_img.webp"
 ---
