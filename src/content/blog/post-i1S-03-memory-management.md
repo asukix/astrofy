@@ -8,4 +8,5 @@ thinkingArticle: "reference-semantics-in-1-sentence"
 ---
 
 # Memory Management
-This article will be released when sengdev.com starts
+# My 1 Sentence for iOS Memory Management
+**Handle dependencies with time constraint.**
