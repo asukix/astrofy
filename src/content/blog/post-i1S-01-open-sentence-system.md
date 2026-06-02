@@ -12,6 +12,6 @@ Richard Feynman was a great thinker. I like his attitude and aspects about think
 - **Validating:** simple sentence
 - **Teaching:** open sentence
 
-In my opinion this can be a whole system because it start from learning something new
+In my opinion this can be a whole system because it starts from learning something new
 
-## Full article will be published when sendev.com starts
+## Full article will be published when sengdev.com starts
