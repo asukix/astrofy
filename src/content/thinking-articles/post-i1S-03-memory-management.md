@@ -6,5 +6,70 @@ heroImage: "/post_img.webp"
 tags: ["iOS in 1 Sentence"]
 ---
 
-# Memory Management - TA
+# Memory Management
 This article will be released when sengdev.com starts
+
+# Demo content
+<Thought>
+
+<Q>
+
+The ARC has a side table for reference counting. When a reference reach the 0, the system can release it. When you add a reference type as part of an other that is the strong reference.
+What does mean the strong reference really and what is the trade off it's usage?
+
+</Q>
+
+<Mine>
+
+The strong reference in dependency aspect with time constraints means to me: 2 elements has circular dependency to each other. if none of them have a time constraint they are held mutually dependent on each other.
+// ...
+
+</Mine>
+
+</Thought>
+
+
+<Thought>
+
+<Q>
+
+
+Some context about weak reference
+
+
+</Q>
+
+<Mine>
+
+Some thought about weak reference
+
+</Mine>
+
+</Thought>
+
+<Thought>
+
+<Q>
+
+
+Some context in other aspect
+
+</Q>
+
+<Mine>
+
+My own solution with trade off
+
+</Mine>
+
+</Thought>
+
+## Summary
+Summary
+
+<Extra>
+
+Some context about inner buffer and unowned(unsafe) in value type
+This is a non answered question?
+
+</Extra>
