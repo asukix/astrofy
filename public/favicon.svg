@@ -1,18 +1,19 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 32">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
   <style>
-    text {
-      font-family: 'JetBrains Mono', ui-monospace, 'Cascadia Code', monospace;
-      font-weight: 700;
-      font-size: 22px;
-      letter-spacing: -0.5px;
-    }
     @media (prefers-color-scheme: dark) {
-      .main { fill: #ffffff; }
-      .arrow { fill: #ffffff; opacity: 0.4; }
+      .bg { fill: #ffffff; }
+      .t1 { fill: #000000; }
+      .t2 { fill: #000000; opacity: 0.45; }
     }
-    .main { fill: #000000; }
-    .arrow { fill: #000000; opacity: 0.4; }
+    .bg { fill: #000000; }
+    .t1 { fill: #ffffff; }
+    .t2 { fill: #ffffff; opacity: 0.45; }
+    text {
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-weight: 700;
+    }
   </style>
-  <text x="2" y="24" class="main">SENGDEV</text>
-  <text x="130" y="24" class="arrow">&gt;</text>
+  <rect width="100" height="100" rx="12" class="bg"/>
+  <text x="50" y="44" text-anchor="middle" font-size="22" class="t1">SENG</text>
+  <text x="50" y="70" text-anchor="middle" font-size="22" class="t1">DEV<tspan class="t2">&gt;</tspan></text>
 </svg>
