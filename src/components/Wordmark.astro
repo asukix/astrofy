@@ -1,0 +1,38 @@
+---
+const { size = "md" } = Astro.props;
+---
+
+<a href="/" class={`wordmark wordmark--${size}`} aria-label="SENGDEV home">
+  <span class="wordmark-text">SENGDEV</span><span class="wordmark-arrow">&gt;</span>
+</a>
+
+<style>
+  .wordmark {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: baseline;
+    line-height: 1;
+    color: inherit;
+  }
+
+  .wordmark--sm  { font-size: 1rem; }
+  .wordmark--md  { font-size: 1.25rem; }
+  .wordmark--lg  { font-size: 1.6rem; }
+
+  .wordmark-text {
+    opacity: 0.9;
+  }
+
+  .wordmark-arrow {
+    opacity: 0.4;
+    margin-left: 0.05em;
+    font-size: 0.9em;
+  }
+
+  .wordmark:hover .wordmark-arrow {
+    opacity: 1;
+  }
+</style>
