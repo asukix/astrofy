@@ -4,6 +4,35 @@ import TimeLineElement from "../components/cv/TimeLine.astro";
 ---
 
 <BaseLayout title="Resume" sideBarActiveItemID="cv">
+
+  <!-- Print-only header (hidden on screen) -->
+  <div class="print-header">
+    <img src="/profile.webp" alt="Profile" class="print-avatar" />
+    <div class="print-header-info">
+      <h1 class="print-name">Sengpraseuth Phrakonkham</h1>
+      <p class="print-title">iOS Engineer</p>
+      <div class="print-contacts">
+        <span>contact: asukix@gmail.com</span>
+        <span>github: <a href="https://github.com/asukix">github.com/asukix</a></span>
+        <span>linkedin: <a href="https://www.linkedin.com/in/sengpraseuth-phrakonkham-b1b85290/">linkedin.com/in/sengpraseuth-phrakonkham</a></span>
+        <span>blog: <a href="https://sengdev.com/blog">sengdev.com/blog</a></span>
+        <span>thinking: <a href="https://sengdev.com/thinking-articles">sengdev.com/thinking-articles</a></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Export button (hidden on print) -->
+  <div class="no-print flex justify-end mb-6">
+    <button onclick="window.print()" class="btn btn-sm btn-outline gap-2">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="7 10 12 15 17 10"/>
+        <line x1="12" y1="15" x2="12" y2="3"/>
+      </svg>
+      Export PDF
+    </button>
+  </div>
+
   <div class="mb-5">
     <div class="text-3xl w-full font-bold">Profile</div>
   </div>
@@ -36,7 +65,7 @@ import TimeLineElement from "../components/cv/TimeLine.astro";
       <!-- job desc here -->
     </TimeLineElement>
     <TimeLineElement
-      title="Android Engineer "
+      title="Android Engineer"
       subtitle="From [Jun 2022] to [Dec 2022] at [RDI Hungary Kft.], [Hungary]"
     >
       <!-- job desc here -->
@@ -47,14 +76,12 @@ import TimeLineElement from "../components/cv/TimeLine.astro";
     >
       <!-- job desc here -->
     </TimeLineElement>
-
     <TimeLineElement
       title="HANA SQL Developer"
       subtitle="From [Apr 2017] to [Dec 2018] at [Alföldi Nyomda Zrt.], [Hungary]"
     >
       <!-- job desc here -->
     </TimeLineElement>
-
     <TimeLineElement
       title="System Administrator"
       subtitle="From [Mar 2015] to [Dec 2018] at [Alföldi Nyomda Zrt.], [Hungary]"
@@ -62,7 +89,6 @@ import TimeLineElement from "../components/cv/TimeLine.astro";
       <!-- job desc here -->
     </TimeLineElement>
   </div>
-
 
   <div class="mb-5">
     <div class="text-3xl w-full font-bold">Education</div>
@@ -75,41 +101,87 @@ import TimeLineElement from "../components/cv/TimeLine.astro";
     />
   </div>
 
-<!--
-  <div class="mb-5">
-    <div class="text-3xl w-full font-bold">Certifications</div>
-  </div>
-
-  <ul class="list-disc mx-6 mb-10 grid gap-2">
-    <li>
-      <a href="#" target="_blank"> Certification Name (with link)</a>
-    </li>
-    <li>
-      <a href="#" target="_blank"> Certification Name (with link)</a>
-    </li>
-  </ul> 
--->
-<!--
-  <div class="mb-5">
-    <div class="text-3xl w-full font-bold">Skills</div>
-  </div>
-
-  <ul class="list-disc md:columns-5 columns-2 mx-6">
-    <li>Skill Name</li>
-    <li>Skill Name</li>
-    <li>Skill Name</li>
-    <li>Skill Name</li>
-    <li>Skill Name</li>
-    <li>Skill Name</li>
-    <li>Skill Name</li>
-    <li>Skill Name</li>
-    <li>Skill Name</li>
-    <li>Skill Name</li>
-    <li>Skill Name</li>
-    <li>Skill Name</li>
-    <li>Skill Name</li>
-    <li>Skill Name</li>
-    <li>Skill Name</li>
-  </ul>
--->
 </BaseLayout>
+
+<style>
+  /* --- Print header: hidden on screen --- */
+  .print-header {
+    display: none;
+  }
+
+  /* --- Export button: visible on screen only --- */
+  @media print {
+    .no-print {
+      display: none !important;
+    }
+
+    /* Show print header */
+    .print-header {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 2px solid #ccc;
+    }
+
+    .print-avatar {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+
+    .print-name {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin: 0 0 0.2rem 0;
+    }
+
+    .print-title {
+      font-size: 0.95rem;
+      color: #555;
+      margin: 0 0 0.6rem 0;
+    }
+
+    .print-contacts {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+      font-size: 0.8rem;
+      color: #333;
+    }
+
+    .print-contacts a {
+      color: #333;
+      text-decoration: underline;
+    }
+
+    /* Hide sidebar, header, footer */
+    .drawer-side,
+    .drawer-toggle,
+    .drawer-overlay,
+    header,
+    footer {
+      display: none !important;
+    }
+
+    /* Full width content */
+    .drawer-content {
+      margin-left: 0 !important;
+    }
+
+    /* Page setup */
+    @page {
+      size: A4;
+      margin: 1.5cm 2cm;
+    }
+
+    body {
+      font-size: 11pt;
+      color: #000;
+      background: #fff !important;
+    }
+  }
+</style>
