@@ -2,7 +2,6 @@
 title: "Questions and reusability"
 description: When you design a system questions are important. But the way of questioning also important
 pubDate: "Dec 23 2025"
-heroImage: "/post_img.webp"
 ---
 
 

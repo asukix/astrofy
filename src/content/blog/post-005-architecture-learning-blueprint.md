@@ -2,7 +2,6 @@
 title: "Blueprint for Learning any Architecture"
 description: "When you have a system for learning architecture, it becomes easier to understand."
 pubDate: "Oct 28 2025"
-heroImage: "/post_img.webp"
 ---
 
 # A simple skeleton for learning software architectures

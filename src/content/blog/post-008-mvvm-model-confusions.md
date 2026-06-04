@@ -2,7 +2,6 @@
 title: "MVVM Model confusions"
 description: "I had some confusions in MVVM around models."
 pubDate: "Mar 16 2026"
-heroImage: "/post_img.webp"
 ---
 
 I'd like to share some misunderstandings I had about the Model in MVVM. These are my own misconceptions — maybe they'll help you too.

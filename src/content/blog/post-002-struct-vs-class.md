@@ -2,7 +2,6 @@
 title: "Struct vs Class in Swift: Understanding the Real Tradeoffs Behind the Recommendation"
 description: "How to really choose between struct and class? Understand them and you always will know"
 pubDate: "Apr 20 2025"
-heroImage: "/post_img.webp"
 badge: "Memory Management"
 ---
 

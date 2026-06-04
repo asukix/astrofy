@@ -2,7 +2,6 @@
 title: "iOS App lifecycle & State Machines"
 description: iOS App lifecycle works as a state machine
 pubDate: "Marc 13 2026"
-heroImage: "/post_img.webp"
 ---
 
 In this article I try to understand the behaviour and system behind the iOS App lifecycle. I'll draw a parallel between the iOS App Lifecycle and state machines.
