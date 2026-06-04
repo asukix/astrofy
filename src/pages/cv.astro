@@ -176,16 +176,16 @@ import TimeLineElement from "../components/cv/TimeLine.astro";
     }
 
     /* Hide sidebar, mobile header, footer */
-    .drawer-side,
-    .drawer-toggle,
-    .drawer-overlay,
-    footer,
-    .sticky.lg\:hidden {
+    :global(.drawer-side),
+    :global(.drawer-toggle),
+    :global(.drawer-overlay),
+    :global(footer),
+    :global(.sticky.top-0.z-30) {
       display: none !important;
     }
 
     /* Full width content */
-    .drawer-content {
+    :global(.drawer-content) {
       margin-left: 0 !important;
     }
 
