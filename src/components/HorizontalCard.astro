@@ -19,7 +19,7 @@ const tag_url = url.split("/").slice(0, -1).join("/") + "/tag";
   <a href={url} target={target} class="grow">
     <div class="hero-content w-full justify-start flex-col md:flex-row">
       {
-        img && (
+        img ? (
           <Image
             src={img}
             width={750}
@@ -28,6 +28,10 @@ const tag_url = url.split("/").slice(0, -1).join("/") + "/tag";
             alt={title}
             class="max-w-full md:max-w-[13rem] rounded-lg"
           />
+        ) : (
+          <div class="wordmark-placeholder max-w-full md:max-w-[13rem] rounded-lg flex items-center justify-center shrink-0">
+            <span class="wm-text">SENGDEV<span class="wm-arrow">&gt;</span></span>
+          </div>
         )
       }
       <div class="grow w-full">
@@ -76,3 +80,23 @@ const tag_url = url.split("/").slice(0, -1).join("/") + "/tag";
     )
   }
 </div>
+
+<style>
+  .wordmark-placeholder {
+    width: 13rem;
+    height: 7.5rem;
+    background: oklch(var(--b2));
+  }
+
+  .wm-text {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: 1.1rem;
+    letter-spacing: -0.02em;
+    opacity: 0.6;
+  }
+
+  .wm-arrow {
+    opacity: 0.4;
+  }
+</style>
