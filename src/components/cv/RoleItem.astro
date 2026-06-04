@@ -1,0 +1,17 @@
+---
+const { title, period, duration, location } = Astro.props;
+---
+
+<div class="role-item flex gap-3">
+  <div class="role-dot-wrapper flex flex-col items-center pt-1">
+    <span class="w-3 h-3 rounded-full bg-base-content opacity-30 block flex-shrink-0"></span>
+  </div>
+  <div>
+    <h4 class="font-semibold text-sm">{title}</h4>
+    <p class="text-xs opacity-50">{period}{duration ? ` · ${duration}` : ""}</p>
+    {location && <p class="text-xs opacity-50">{location}</p>}
+    <p class="text-sm mt-1 text-justify">
+      <slot />
+    </p>
+  </div>
+</div>

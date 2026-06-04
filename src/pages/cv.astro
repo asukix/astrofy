@@ -1,6 +1,8 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import TimeLineElement from "../components/cv/TimeLine.astro";
+import CompanyBlock from "../components/cv/CompanyBlock.astro";
+import RoleItem from "../components/cv/RoleItem.astro";
 ---
 
 <BaseLayout title="Resume" sideBarActiveItemID="cv">
@@ -51,49 +53,55 @@ import TimeLineElement from "../components/cv/TimeLine.astro";
     <div class="text-3xl w-full font-bold">Experience</div>
   </div>
 
-  <div class="time-line-container mb-10">
-    <TimeLineElement
-      title="iOS Engineer"
-      subtitle="From [Aug 1 2024] at [RDI Hungary Kft.], [Hungary]"
+  <div class="mb-10">
+    <CompanyBlock
+      company="RDI Software Hungary"
+      total="4 yr 1 mo · Full-time"
+      location="Debrecen, Hungary · Hybrid"
     >
-      <!-- job desc here -->
-    </TimeLineElement>
-    <TimeLineElement
-      title="Android SRE"
-      subtitle="From [Jul 2023] to [Jul 2024] at [RDI Hungary Kft.], [Hungary]"
+      <RoleItem
+        title="iOS App Developer"
+        period="Aug 2024 – Present"
+        duration="1 yr 10 mo"
+      />
+      <RoleItem
+        title="Site Reliability Engineer"
+        period="Jul 2023 – Jul 2024"
+        duration="1 yr 1 mo"
+      />
+      <RoleItem
+        title="iOS App Developer"
+        period="Jan 2023 – Jun 2023"
+        duration="6 mo"
+      />
+      <RoleItem
+        title="Android Developer"
+        period="Jun 2022 – Dec 2022"
+        duration="7 mo"
+      />
+    </CompanyBlock>
+
+    <CompanyBlock
+      company="Alföldi Nyomda Zrt."
+      total="8 yr 1 mo"
+      location="Debrecen, Hungary · On-site"
     >
-       <!-- job desc here -->
-    </TimeLineElement>
-    <TimeLineElement
-      title="Mobile Engineer (Android & iOS)"
-      subtitle="From [Jan 2023] to [Jun 2023] at [RDI Hungary Kft.], [Hungary]"
-    >
-      <!-- job desc here -->
-    </TimeLineElement>
-    <TimeLineElement
-      title="Android Engineer"
-      subtitle="From [Jun 2022] to [Dec 2022] at [RDI Hungary Kft.], [Hungary]"
-    >
-      <!-- job desc here -->
-    </TimeLineElement>
-    <TimeLineElement
-      title="Head of Information Technology"
-      subtitle="From [Jan 2019] to [May 2022] at [Alföldi Nyomda Zrt.], [Hungary]"
-    >
-      <!-- job desc here -->
-    </TimeLineElement>
-    <TimeLineElement
-      title="HANA SQL Developer"
-      subtitle="From [Apr 2017] to [Dec 2018] at [Alföldi Nyomda Zrt.], [Hungary]"
-    >
-      <!-- job desc here -->
-    </TimeLineElement>
-    <TimeLineElement
-      title="System Administrator"
-      subtitle="From [Mar 2015] to [Dec 2018] at [Alföldi Nyomda Zrt.], [Hungary]"
-    >
-      <!-- job desc here -->
-    </TimeLineElement>
+      <RoleItem
+        title="Head of Information Technology"
+        period="Jan 2019 – May 2022"
+        duration="3 yr 5 mo"
+      />
+      <RoleItem
+        title="SQL Developer"
+        period="Apr 2017 – Dec 2018"
+        duration="1 yr 9 mo"
+      />
+      <RoleItem
+        title="System Administrator"
+        period="Mar 2015 – Dec 2018"
+        duration="3 yr 10 mo"
+      />
+    </CompanyBlock>
   </div>
 
   <div class="mb-5">

@@ -1,0 +1,15 @@
+---
+const { company, total, location } = Astro.props;
+---
+
+<div class="company-block mb-8">
+  <div class="company-header flex items-center gap-3 mb-3">
+    <div class="company-info">
+      <h3 class="font-bold text-base">{company}</h3>
+      <p class="text-sm opacity-60">{total}{location ? ` · ${location}` : ""}</p>
+    </div>
+  </div>
+  <div class="company-roles pl-4 border-l-2 border-base-300 flex flex-col gap-4">
+    <slot />
+  </div>
+</div>
