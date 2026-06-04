@@ -74,20 +74,13 @@ import { Image } from "astro:assets";
         margin-left: 0 !important;
       }
 
-      :global([data-mine]) {
-        display: block !important;
-      }
-
-      :global([data-extra][data-open="false"] .extra-content) {
+      :global([data-extra] .extra-content) {
         grid-template-rows: 1fr !important;
       }
 
-      :global([data-extra][data-open="false"] .extra-inner) {
+      :global([data-extra] .extra-inner) {
         padding: 1.25rem 1.5rem !important;
-        background: #f5f5f5 !important;
-        border-left: 4px solid #ccc !important;
-        border-radius: 0 0.625rem 0.625rem 0 !important;
-        margin-top: 1rem !important;
+        overflow: visible !important;
       }
 
       @page {
@@ -108,20 +101,24 @@ import { Image } from "astro:assets";
       }
     }
   </style>
+)}
 
-  <script>
-    document.getElementById('export-pdf-btn')?.addEventListener('click', () => {
-      // Expand all Mine sections
+<script>
+  function setupExportBtn() {
+    const btn = document.getElementById('export-pdf-btn');
+    if (!btn) return;
+    btn.addEventListener('click', () => {
       document.querySelectorAll('[data-mine]').forEach(mine => {
         (mine as HTMLElement).dataset.open = 'true';
         const toggle = mine.querySelector('[data-mine-toggle]');
         if (toggle) toggle.setAttribute('aria-expanded', 'true');
       });
-      // Expand all Extra sections
       document.querySelectorAll('[data-extra]').forEach(extra => {
         (extra as HTMLElement).dataset.open = 'true';
       });
       window.print();
     });
-  </script>
-)}
+  }
+
+  document.addEventListener('astro:page-load', setupExportBtn);
+</script>
