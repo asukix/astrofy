@@ -61,12 +61,27 @@ import { Image } from "astro:assets";
     @media print {
       .no-print { display: none !important; }
 
+      /* Sidebar, overlay, footer elrejtése */
       :global(.drawer-side),
       :global(.drawer-toggle),
       :global(.drawer-overlay),
       :global(footer),
-      :global(.sticky.top-0.z-30),
       :global(#reveal-all-container) {
+        display: none !important;
+      }
+
+      /* Hamburger gomb elrejtése, de a "Thinking Space" szöveg marad */
+      :global(.navbar-start) {
+        display: none !important;
+      }
+
+      /* Show/Hide gombok elrejtése */
+      :global([data-mine-toggle]) {
+        display: none !important;
+      }
+
+      /* textarea elrejtése */
+      :global([data-reader-box]) {
         display: none !important;
       }
 
@@ -74,6 +89,16 @@ import { Image } from "astro:assets";
         margin-left: 0 !important;
       }
 
+      /* Mine tartalom kinyitása */
+      :global([data-mine] .mine-content) {
+        grid-template-rows: 1fr !important;
+      }
+
+      :global([data-mine] .mine-content-inner) {
+        overflow: visible !important;
+      }
+
+      /* Extra tartalom kinyitása */
       :global([data-extra] .extra-content) {
         grid-template-rows: 1fr !important;
       }
@@ -108,11 +133,16 @@ import { Image } from "astro:assets";
     const btn = document.getElementById('export-pdf-btn');
     if (!btn) return;
     btn.addEventListener('click', () => {
+      // Mine szekciók kinyitása + toggle szöveg frissítése
       document.querySelectorAll('[data-mine]').forEach(mine => {
         (mine as HTMLElement).dataset.open = 'true';
         const toggle = mine.querySelector('[data-mine-toggle]');
-        if (toggle) toggle.setAttribute('aria-expanded', 'true');
+        if (toggle) {
+          toggle.setAttribute('aria-expanded', 'true');
+          toggle.textContent = 'Hide';
+        }
       });
+      // Extra szekciók kinyitása
       document.querySelectorAll('[data-extra]').forEach(extra => {
         (extra as HTMLElement).dataset.open = 'true';
       });
