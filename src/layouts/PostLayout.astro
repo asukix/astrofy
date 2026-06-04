@@ -4,15 +4,29 @@ import BaseLayout from "./BaseLayout.astro";
 import dayjs from "dayjs";
 import localizedFormat from "dayjs/plugin/localizedFormat";
 
-export interface Props extends BlogSchema {}
+export interface Props extends BlogSchema {
+  exportable?: boolean;
+}
 
-const { title, description, pubDate, updatedDate, heroImage, badge, tags = [] } = Astro.props;
+const { title, description, pubDate, updatedDate, heroImage, badge, tags = [], exportable = false } = Astro.props;
 dayjs.extend(localizedFormat);
 const displayDate = dayjs(pubDate).format("ll")
 import { Image } from "astro:assets";
 ---
 
 <BaseLayout title={title} description={description} image={heroImage}, ogType="article">
+  {exportable && (
+    <div class="no-print flex justify-end mb-2">
+      <button id="export-pdf-btn" class="btn btn-sm btn-outline gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="7 10 12 15 17 10"/>
+          <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        Export PDF
+      </button>
+    </div>
+  )}
   <main class="md:flex md:justify-center">
     <article class="prose prose-lg max-w-[750px] prose-img:mx-auto">
       {heroImage && <Image width={750} height={422} format="webp" src={heroImage} alt={title} class="w-full mb-6" />}
@@ -41,3 +55,73 @@ import { Image } from "astro:assets";
     </article>
   </main>
 </BaseLayout>
+
+{exportable && (
+  <style>
+    @media print {
+      .no-print { display: none !important; }
+
+      :global(.drawer-side),
+      :global(.drawer-toggle),
+      :global(.drawer-overlay),
+      :global(footer),
+      :global(.sticky.top-0.z-30),
+      :global(#reveal-all-container) {
+        display: none !important;
+      }
+
+      :global(.drawer-content) {
+        margin-left: 0 !important;
+      }
+
+      :global([data-mine]) {
+        display: block !important;
+      }
+
+      :global([data-extra][data-open="false"] .extra-content) {
+        grid-template-rows: 1fr !important;
+      }
+
+      :global([data-extra][data-open="false"] .extra-inner) {
+        padding: 1.25rem 1.5rem !important;
+        background: #f5f5f5 !important;
+        border-left: 4px solid #ccc !important;
+        border-radius: 0 0.625rem 0.625rem 0 !important;
+        margin-top: 1rem !important;
+      }
+
+      @page {
+        size: A4;
+        margin: 1.5cm 2cm;
+        @top-left { content: none; }
+        @top-center { content: none; }
+        @top-right { content: none; }
+        @bottom-left { content: none; }
+        @bottom-center { content: none; }
+        @bottom-right { content: none; }
+      }
+
+      body {
+        font-size: 11pt;
+        color: #000;
+        background: #fff !important;
+      }
+    }
+  </style>
+
+  <script>
+    document.getElementById('export-pdf-btn')?.addEventListener('click', () => {
+      // Expand all Mine sections
+      document.querySelectorAll('[data-mine]').forEach(mine => {
+        (mine as HTMLElement).dataset.open = 'true';
+        const toggle = mine.querySelector('[data-mine-toggle]');
+        if (toggle) toggle.setAttribute('aria-expanded', 'true');
+      });
+      // Expand all Extra sections
+      document.querySelectorAll('[data-extra]').forEach(extra => {
+        (extra as HTMLElement).dataset.open = 'true';
+      });
+      window.print();
+    });
+  </script>
+)}
