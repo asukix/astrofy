@@ -56,77 +56,62 @@ import { Image } from "astro:assets";
   </main>
 </BaseLayout>
 
-{exportable && (
-  <style>
-    @media print {
-      .no-print { display: none !important; }
+{exportable && <meta name="exportable" content="true" />}
 
-      /* Sidebar, overlay, footer elrejtése */
-      :global(.drawer-side),
-      :global(.drawer-toggle),
-      :global(.drawer-overlay),
-      :global(footer),
-      :global(#reveal-all-container) {
-        display: none !important;
-      }
+<style is:global>
+  @media print {
+    .no-print { display: none !important; }
 
-      /* Hamburger gomb elrejtése, de a "Thinking Space" szöveg marad */
-      :global(.navbar-start) {
-        display: none !important;
-      }
-
-      /* Show/Hide gombok elrejtése */
-      :global([data-mine-toggle]) {
-        display: none !important;
-      }
-
-      /* textarea elrejtése */
-      :global([data-reader-box]) {
-        display: none !important;
-      }
-
-      :global(.drawer-content) {
-        margin-left: 0 !important;
-      }
-
-      /* Mine tartalom kinyitása */
-      :global([data-mine] .mine-content) {
-        grid-template-rows: 1fr !important;
-      }
-
-      :global([data-mine] .mine-content-inner) {
-        overflow: visible !important;
-      }
-
-      /* Extra tartalom kinyitása */
-      :global([data-extra] .extra-content) {
-        grid-template-rows: 1fr !important;
-      }
-
-      :global([data-extra] .extra-inner) {
-        padding: 1.25rem 1.5rem !important;
-        overflow: visible !important;
-      }
-
-      @page {
-        size: A4;
-        margin: 1.5cm 2cm;
-        @top-left { content: none; }
-        @top-center { content: none; }
-        @top-right { content: none; }
-        @bottom-left { content: none; }
-        @bottom-center { content: none; }
-        @bottom-right { content: none; }
-      }
-
-      body {
-        font-size: 11pt;
-        color: #000;
-        background: #fff !important;
-      }
+    .drawer-side,
+    .drawer-toggle,
+    .drawer-overlay,
+    footer,
+    #reveal-all-container,
+    .navbar-start,
+    [data-mine-toggle],
+    [data-reader-box] {
+      display: none !important;
     }
-  </style>
-)}
+
+    .drawer-content {
+      margin-left: 0 !important;
+    }
+
+    [data-mine] .mine-content {
+      grid-template-rows: 1fr !important;
+    }
+
+    [data-mine] .mine-content-inner {
+      overflow: visible !important;
+    }
+
+    [data-extra] .extra-content {
+      grid-template-rows: 1fr !important;
+    }
+
+    [data-extra] .extra-inner {
+      padding: 1.25rem 1.5rem !important;
+      overflow: visible !important;
+    }
+
+    @page {
+      size: A4;
+      margin: 1.5cm 2cm;
+      @top-left { content: none; }
+      @top-center { content: none; }
+      @top-right { content: none; }
+      @bottom-left { content: none; }
+      @bottom-center { content: none; }
+      @bottom-right { content: none; }
+    }
+
+    body {
+      font-size: 11pt;
+      color: #000;
+      background: #fff !important;
+    }
+  }
+</style>
 
 <script>
   function setupExportBtn() {
