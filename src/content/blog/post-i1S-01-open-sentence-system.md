@@ -3,6 +3,7 @@ title: "The Open Sentence Method"
 description: Be courious like a chile, understand the topic as a professional and give curiousity to others
 pubDate: "Jul 8 2026"
 tags: ["iOS in 1 Sentence"]
+badge: "Will be released soon"
 ---
 
 Richard Feynman was a great thinker. I like his attitude and aspects about thinking and learning. In this article I would like to organize his system from my own perspective. In my approach I separated his technics for 3 part:

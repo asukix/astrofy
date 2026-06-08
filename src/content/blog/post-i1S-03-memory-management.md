@@ -4,6 +4,7 @@ description: "This is the first element of the iOS in 1 Sentence where we see th
 pubDate: "Jul 8 2026"
 tags: ["iOS in 1 Sentence"]
 thinkingArticle: "ios-memory-management-in-1-sentence"
+badge: "Will be released soon"
 ---
 
 # Memory Management
