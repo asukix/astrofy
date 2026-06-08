@@ -1,0 +1,14 @@
+---
+const { title, desc } = Astro.props;
+---
+
+<div class="upcoming-card rounded-lg bg-base-100 flex flex-col md:flex-row md:items-stretch overflow-hidden opacity-60 cursor-default select-none">
+  <div class="grow">
+    <div class="hero-content w-full justify-start flex-col md:flex-row">
+      <div class="grow w-full">
+        <h1 class="text-xl font-bold text-base-content/70">{title}</h1>
+        <p class="py-1 text-1xl text-base-content/50">{desc}</p>
+      </div>
+    </div>
+  </div>
+</div>
