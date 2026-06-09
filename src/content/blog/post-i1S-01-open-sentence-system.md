@@ -6,12 +6,4 @@ tags: ["iOS in 1 Sentence"]
 badge: "Will be released soon"
 ---
 
-Richard Feynman was a great thinker. I like his attitude and aspects about thinking and learning. In this article I would like to organize his system from my own perspective. In my approach I separated his technics for 3 part:
-
-- **Learning:** first principle
-- **Validating:** simple sentence
-- **Teaching:** open sentence
-
-In my opinion this can be a whole system because it starts from learning something new
-
-## Full article will be published when sengdev.com starts
+## This article will be published when sengdev.com starts
