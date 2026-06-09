@@ -6,12 +6,13 @@ import createSlug from "../../../../lib/createSlug";
 
 export async function getStaticPaths({ paginate }) {
   const all_posts = await getCollection("blog");
-  const all_tags = all_posts.flatMap((post) => {
+  const publishedPosts = all_posts.filter((p) => !p.data.draft);
+  const all_tags = publishedPosts.flatMap((post) => {
     return post.data.tags || [];
   });
 
   return all_tags.flatMap((tag) => {
-    const filtred_posts = all_posts.filter((post) => {
+    const filtred_posts = publishedPosts.filter((post) => {
       return post.data.tags?.includes(tag);
     });
     return paginate(filtred_posts, {
