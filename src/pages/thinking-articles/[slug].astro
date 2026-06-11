@@ -2,10 +2,6 @@
 import { CollectionEntry, getCollection } from "astro:content";
 import PostLayout from "../../layouts/PostLayout.astro";
 import createSlug from "../../lib/createSlug";
-
-import Thought from "../../components/Thought.astro";
-import Q from "../../components/Q.astro";
-import Mine from "../../components/Mine.astro";
 import Extra from "../../components/Extra.astro";
 
 export async function getStaticPaths() {
@@ -22,6 +18,7 @@ interface Props {
 
 const { entry } = Astro.props;
 const post = entry.data;
+const thoughts = post.thoughts ?? [];
 const { Content } = await entry.render();
 ---
 
@@ -35,7 +32,52 @@ const { Content } = await entry.render();
   tags={post.tags}
   exportable={true}
 >
-  <Content components={{ Thought, Q, Mine, Extra }} />
+  <Content />
+
+  {thoughts.map((thought) => (
+    <div class="mine-block" data-mine data-open="false">
+      {thought.title && <h2>{thought.title}</h2>}
+
+      <div class="q-section">
+        <p set:html={thought.question} />
+        {thought.image && <img src={thought.image} alt={thought.title ?? ""} class="thought-image" />}
+      </div>
+
+      <div class="mine-section">
+        <p class="mine-label">Your thought</p>
+        <textarea
+          class="textarea textarea-bordered w-full mine-reader"
+          placeholder="What do you think?"
+          data-reader-box
+          rows="4"
+          autocomplete="off"
+        ></textarea>
+      </div>
+
+      <div class="mine-section mine-author">
+        <p class="mine-label">My thought</p>
+        <button
+          class="btn btn-sm btn-ghost"
+          type="button"
+          data-mine-toggle
+          aria-expanded="false"
+        >
+          Show
+        </button>
+        <div class="mine-content" data-mine-content>
+          <div class="mine-content-inner">
+            <p set:html={thought.mine} />
+          </div>
+        </div>
+      </div>
+    </div>
+  ))}
+
+  {post.extra && (
+    <Extra>
+      <p set:html={post.extra} />
+    </Extra>
+  )}
 
   <div id="reveal-all-container" class="reveal-all-container">
     <button id="reveal-all-btn" class="btn btn-primary btn-wide" type="button">
