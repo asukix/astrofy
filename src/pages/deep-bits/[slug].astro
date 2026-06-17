@@ -1,0 +1,33 @@
+---
+import { CollectionEntry, getCollection } from "astro:content";
+import { DeepBitsSchema } from "../../content/config";
+import PostLayout from "../../layouts/PostLayout.astro";
+import createSlug from "../../lib/createSlug"
+
+export async function getStaticPaths() {
+  const bitEntries = await getCollection("deep-bits");
+  return bitEntries.map((entry) => ({
+    params: { slug: createSlug(entry.data.title, entry.slug) },
+    props: { entry },
+  }));
+}
+
+interface Props {
+  entry: CollectionEntry<"deep-bits">;
+}
+
+const { entry } = Astro.props;
+const bit: DeepBitsSchema = entry.data;
+const { Content } = await entry.render();
+---
+
+<PostLayout
+  title={bit.title}
+  description={bit.description}
+  pubDate={bit.pubDate}
+  updatedDate={bit.updatedDate}
+  badge={bit.badge}
+  tags={bit.tags}
+>
+  <Content />
+</PostLayout>

@@ -54,12 +54,28 @@ export type StoreSchema = z.infer<typeof storeSchema>;
 export type ThinkingArticleSchema = z.infer<typeof thinkingArticleSchema>;
 export type ThoughtSchema = z.infer<typeof thoughtSchema>;
 
+const deepBitsSchema = z.object({
+    title: z.string(),
+    description: z.string().optional(),
+    pubDate: z.coerce.date(),
+    updatedDate: z.string().optional(),
+    badge: z.string().optional(),
+    draft: z.boolean().optional(),
+    tags: z.array(z.string()).refine(items => new Set(items).size === items.length, {
+        message: 'tags must be unique',
+    }).optional(),
+});
+
+export type DeepBitsSchema = z.infer<typeof deepBitsSchema>;
+
 const blogCollection = defineCollection({ schema: blogSchema });
 const storeCollection = defineCollection({ schema: storeSchema });
 const thinkingArticleCollection = defineCollection({ schema: thinkingArticleSchema });
+const deepBitsCollection = defineCollection({ schema: deepBitsSchema });
 
 export const collections = {
     'blog': blogCollection,
     'store': storeCollection,
     'thinking-articles': thinkingArticleCollection,
+    'deep-bits': deepBitsCollection,
 }

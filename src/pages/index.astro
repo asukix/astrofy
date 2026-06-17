@@ -5,8 +5,10 @@ import { getCollection } from "astro:content";
 import createSlug from "../lib/createSlug"
 
 const posts = (await getCollection("blog")).filter((p) => !p.data.draft).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
-
 const last_posts = posts.slice(0, 3);
+
+const deepBits = (await getCollection("deep-bits")).filter((p) => !p.data.draft).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+const last_bits = deepBits.slice(0, 4);
 ---
 
 <BaseLayout sideBarActiveItemID="home">
@@ -48,7 +50,25 @@ On my page you'll find thinking articles — think with me, or just read them in
     ))
   }
 
-<div>
+  <div class="mt-10">
+    <div class="text-3xl w-full font-bold mb-5">Deep Bits</div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      {last_bits.map((bit) => (
+        <a
+          href={"/deep-bits/" + createSlug(bit.data.title, bit.slug)}
+          class="rounded-lg bg-base-100 hover:shadow-xl transition ease-in-out hover:scale-[102%] p-5 flex flex-col gap-2"
+        >
+          <div class="flex items-center gap-2">
+            <span class="font-bold text-lg leading-snug">{bit.data.title}</span>
+            {bit.data.badge && <span class="badge badge-secondary shrink-0">{bit.data.badge}</span>}
+          </div>
+          {bit.data.description && <p class="text-sm opacity-75 leading-snug">{bit.data.description}</p>}
+        </a>
+      ))}
+    </div>
+  </div>
+
+  <div class="mt-10">
     <div class="text-3xl w-full font-bold mb-2">My last projects {"</>"}</div>
   </div>
 
