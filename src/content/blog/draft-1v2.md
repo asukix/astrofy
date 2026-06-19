@@ -5,9 +5,6 @@ pubDate: "Jul 8 2026"
 draft: true
 ---
 
-# The Open Sentence Method
-In this article
-
 ## Thinking at the center
 Currently is very easy to get information and answers. This is useful when we need to know something. For example: If I plan my holiday I would like to know what accomodations avilable where I want to go. In this case I just want some quick information.
 When I am learning I like to slow down. I am curious and I like asking questions. Every one like asking questions because we like to explore.If you slow down to ask questions, you also give thinking space yourself. Providing space where you have time to find your own answers, to let yourself **to enjoy thinking** because when you find answers you will have time to enjoy the way not just get the goal. This is a wonderful process where you can be yourself, where you can asking questions like a child and your thinking space can be your own playground what you can reach from anywhere without any tool.
@@ -34,13 +31,3 @@ iOS Memory Management is **Dependency handling with time constraints.**
 
 ## Recap
 The space of thinking provide me to enjoy the way of thinking. I validate my thoughts and I will create my **Open Sentence** explanations.
-
-
-
-
-
-
-
-
-
-I thought I would try to help others to enjoy their thinking in there own ways. I found that if we have the space for thinking
