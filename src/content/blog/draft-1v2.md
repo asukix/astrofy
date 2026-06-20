@@ -28,10 +28,11 @@ When you try to explain a topic in one sentence that helps you to understand it 
 ### The Open Sentence
 In topics I try to make an Open Sentence that describes the topic. The sentence sould be as small as it can and it should be specific. I like this way because without I knowing a topic enough well I am not able to make only 1 sentence because I should **understand the system** behind the topic. And not just understand it. I should be able to explain it shortly. And here is the extra. Put your curiosity into your sentence. When you learnt the topic you were curious. And with this you can help others to be curious and asking question and **enjoy the way** and enjoy the **space of thinking**.
 
-## My Sentences
+### My Sentences
 I will create my 1 Sentences to help you to enjoy the thinking and with **Thinking Articles** I will provide you a Thinking Space where you will be able to add your thought before reading the next paragraph. Thinking Aticles will be released on my site soon.
 And let me give my first 1 Sentence about iOS Memory Management:
 iOS Memory Management is **Dependency handling with time constraints.**
 
 ## Recap
+During learning we usually getting the answers.
 When you slow down and try to understand the problem space, you provide yorself a thinking space. In this space you can ask your own questions and create your own solution and your own mental model. You can validate your own understanding and you can go deeper with creating your open sentence. In this way you let yourself to enjoy the way of thinking instead of geting the answers and you also can pass your curiosity.
