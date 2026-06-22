@@ -6,7 +6,7 @@ pubDate: "Apr 22 2025"
 
 # Ownership, freshness, and isolation: tradeoffs in Swift data passing
 
-After exploring Swift's recommendation to ["use `struct` by default"](link), I started thinking about how this impacts data ownership, freshness, and system design — especially in reactive contexts like Combine.
+After exploring Swift's recommendation to ["use `struct` by default"](../struct-vs-class-in-swift-understanding-the-real-tradeoffs-behind-the-recommendation/), I started thinking about how this impacts data ownership, freshness, and system design — especially in reactive contexts like Combine.
 
 In my previous post, I showed that structs can behave like references in terms of performance thanks to Copy-on-Write (COW) — as long as they remain unmutated. They're also safer in terms of side effects. So in a clean architecture, structs are often the best choice.
 
