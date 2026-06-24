@@ -67,7 +67,7 @@ Please enjoy my post and thinking. I am planning 3 formats for reading:
           {bit.data.tags && bit.data.tags.length > 0 && (
             <div class="flex flex-wrap gap-1 mt-1">
               {bit.data.tags.map((tag) => (
-                <span class="badge badge-outline badge-sm">{tag}</span>
+                <a href={`/deep-bits/tag/${tag}`} class="badge badge-outline badge-sm" onclick="event.stopPropagation()">{tag}</a>
               ))}
             </div>
           )}
