@@ -57,21 +57,20 @@ Please enjoy my post and thinking. I am planning 3 formats for reading:
     <div class="text-3xl w-full font-bold mb-5">Deep Bits</div>
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
       {last_bits.map((bit) => (
-        <a
-          href={"/deep-bits/" + createSlug(bit.data.title, bit.slug)}
-          class="rounded-xl border border-base-300 bg-base-100 hover:border-primary hover:shadow-lg transition ease-in-out hover:scale-[102%] p-4 flex flex-col gap-2"
-        >
-          {bit.data.badge && <span class="badge badge-secondary w-fit">{bit.data.badge}</span>}
-          <span class="font-bold text-base leading-snug">{bit.data.title}</span>
-          {bit.data.description && <p class="text-xs opacity-70 leading-snug">{bit.data.description}</p>}
+        <div class="rounded-xl border border-base-300 bg-base-100 hover:border-primary hover:shadow-lg transition ease-in-out hover:scale-[102%] flex flex-col overflow-hidden">
+          <a href={"/deep-bits/" + createSlug(bit.data.title, bit.slug)} class="p-4 flex flex-col gap-2 grow">
+            {bit.data.badge && <span class="badge badge-secondary w-fit">{bit.data.badge}</span>}
+            <span class="font-bold text-base leading-snug">{bit.data.title}</span>
+            {bit.data.description && <p class="text-xs opacity-70 leading-snug">{bit.data.description}</p>}
+          </a>
           {bit.data.tags && bit.data.tags.length > 0 && (
-            <div class="flex flex-wrap gap-1 mt-1">
+            <div class="flex flex-wrap gap-1 px-4 pb-3">
               {bit.data.tags.map((tag) => (
-                <a href={`/deep-bits/tag/${tag}`} class="badge badge-outline badge-sm" onclick="event.stopPropagation()">{tag}</a>
+                <a href={`/deep-bits/tag/${tag}`} class="badge badge-outline badge-sm">{tag}</a>
               ))}
             </div>
           )}
-        </a>
+        </div>
       ))}
     </div>
   </div>
