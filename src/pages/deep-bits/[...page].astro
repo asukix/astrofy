@@ -36,6 +36,13 @@ const { page } = Astro.props;
             {bit.data.badge && <span class="badge badge-secondary w-fit">{bit.data.badge}</span>}
             <span class="font-bold text-base leading-snug">{bit.data.title}</span>
             {bit.data.description && <p class="text-xs opacity-70 leading-snug">{bit.data.description}</p>}
+            {bit.data.tags && bit.data.tags.length > 0 && (
+              <div class="flex flex-wrap gap-1 mt-1">
+                {bit.data.tags.map((tag) => (
+                  <span class="badge badge-outline badge-sm">{tag}</span>
+                ))}
+              </div>
+            )}
           </a>
         ))}
       </div>
