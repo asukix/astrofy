@@ -11,6 +11,7 @@ When I am learning I like to slow down. I am curious and I like asking questions
 
 ## Your mental model
 When I am thinking about a topic I like to change the base from the answers to the problem space. Every solution was born because someone wanted to solve a problem. If you understand the problem you will be able to get your own answers and build your own solution. With this you will have your own mental model. When you have your mental model you will be able to create your answers any time. What's more, you'll be able to create better answers later. In this process creation is quite easy and destruction is hard.
+
 **Article Note:** I will write a separate article about destruction
 
 ## Validation
@@ -36,6 +37,7 @@ When I have my thoughts, my system and my Open Sentence, I would like to awaken 
 I will create my 1 Sentences to help you enjoy thinking, and with **Thinking Articles** I will provide you a Thinking Space where you will be able to add your thoughts before reading the next paragraph. Thinking Articles will be released on my site soon.
 And let me give my first 1 Sentence about iOS Memory Management:
 iOS Memory Management is **Dependency handling with time constraints.**
+
 **Article Note:** I will add my extra context and question in my iOS Memory Management in 1 Sentence **Thinking Article** soon.
 
 ## Recap
