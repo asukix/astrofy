@@ -1,6 +1,6 @@
 ---
 title: "Destruction of a Mental Model Draft"
-description: 
+description: In Thinking Space System the destruction is hard. But when it is easy?
 pubDate: "Aug 23 2026"
 draft: true
 ---
