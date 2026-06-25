@@ -1,7 +1,7 @@
 ---
-title: "Destruction of a Mental Model"
+title: "Destruction of a Mental Model Draft"
 description: 
-pubDate: "Jul 8 2026"
+pubDate: "Aug 23 2026"
 draft: true
 ---
 
