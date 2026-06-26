@@ -14,9 +14,9 @@ const tag_url = url.split("/").slice(0, -1).join("/") + "/tag";
 ---
 
 <div
-  class="rounded-lg bg-base-100 flex flex-col md:flex-row md:items-stretch overflow-hidden"
+  class="card-wrapper rounded-lg bg-base-100 flex flex-col md:flex-row md:items-stretch transition ease-in-out hover:shadow-xl"
 >
-  <a href={url} target={target} class="grow transition ease-in-out hover:shadow-xl hover:scale-[102%] hover:z-10 relative rounded-lg">
+  <a href={url} target={target} class="article-link grow md:rounded-lg">
     <div class="hero-content w-full justify-start flex-col md:flex-row">
       {
         img ? (
@@ -58,7 +58,7 @@ const tag_url = url.split("/").slice(0, -1).join("/") + "/tag";
     thinkingArticle && (
       <a
         href={`/thinking-articles/${thinkingArticle}/`}
-        class="think-cta group shrink-0 flex md:flex-col items-center justify-center gap-2 px-6 py-4 md:w-44 font-semibold text-primary-content bg-gradient-to-br from-primary to-secondary hover:brightness-110 active:brightness-95 transition ease-in-out"
+        class="think-cta group shrink-0 flex md:flex-col items-center justify-center gap-2 px-6 py-4 md:w-44 font-semibold text-primary-content bg-gradient-to-br from-primary to-secondary hover:brightness-110 active:brightness-95 transition ease-in-out md:rounded-lg md:my-1 md:mr-1"
         aria-label={`Think with me: ${title}`}
       >
         <svg
@@ -82,6 +82,21 @@ const tag_url = url.split("/").slice(0, -1).join("/") + "/tag";
 </div>
 
 <style>
+  /* Article link: bal oldali border highlight hover-re */
+  .article-link {
+    border-left: 3px solid transparent;
+    transition: border-color 150ms ease;
+  }
+
+  .card-wrapper:has(.think-cta) .article-link:hover {
+    border-left-color: oklch(var(--p) / 0.5);
+  }
+
+  /* Think with me gomb: saját hover — a card-wrapper hover:shadow nem ütközik */
+  .think-cta {
+    transition: filter 150ms ease, opacity 150ms ease;
+  }
+
   .wordmark-placeholder {
     width: 13rem;
     height: 7.5rem;
