@@ -16,12 +16,24 @@ const { page } = Astro.props;
 <BaseLayout title="Thinking Articles" sideBarActiveItemID="thinking">
   <div class="mb-5">
     <div class="text-3xl w-full font-bold">Thinking Articles</div>
-     <text class="text-lg">
-       Thinking articles contains space for thinking where you can add your thoughts before reading the next part of the article. It also contains extra that is some extra context than a normal blog with a question what you can answer to yourself.
+    <text class="text-lg">
+      Thinking articles contains space for thinking where you can add your thoughts before reading the next part of the article. It also contains extra that is some extra context than a normal blog with a question what you can answer to yourself.
       <br>
       NOTE: This part of the website will be released soon.
-      </text>
+    </text>
   </div>
+
+  <!-- Pinned pilot article -->
+  <div class="start-here-block mb-2">
+    <p class="start-here-label">Start here →</p>
+    <a href="/blog/thinking-space-system" class="start-here-card block">
+      <h2 class="start-here-title">Thinking Space System</h2>
+      <p class="start-here-desc">This is how I create a space where I can enjoy thinking from anywhere without any tool. Read this first to understand the format.</p>
+      <span class="badge badge-secondary mt-3">Will be released soon</span>
+    </a>
+  </div>
+
+  <div class="divider my-4" />
 
   {
     page.data.length === 0 ? (
@@ -90,3 +102,42 @@ const { page } = Astro.props;
     }
   </div>
 </BaseLayout>
+
+<style>
+  .start-here-block {
+    padding: 1.25rem 1.5rem;
+    background: oklch(var(--b2));
+    border-left: 4px solid oklch(var(--p));
+    border-radius: 0 0.625rem 0.625rem 0;
+  }
+
+  .start-here-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    opacity: 0.55;
+    margin-bottom: 0.5rem;
+  }
+
+  .start-here-card {
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .start-here-card:hover .start-here-title {
+    opacity: 0.75;
+  }
+
+  .start-here-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 0.4rem;
+    transition: opacity 150ms ease;
+  }
+
+  .start-here-desc {
+    font-size: 0.95rem;
+    opacity: 0.7;
+    line-height: 1.5;
+  }
+</style>
