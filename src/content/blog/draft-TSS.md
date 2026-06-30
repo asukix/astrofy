@@ -2,6 +2,7 @@
 title: "Thinking Space System Draft"
 description: This is how I create a space where I can enjoy thinking from anywhere without any tool.
 pubDate: "Aug 9 2026"
+tags: ["iOS in 1 Sentence"]
 draft: true
 ---
 
