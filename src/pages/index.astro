@@ -10,6 +10,9 @@ const last_posts = posts.slice(0, 3);
 const deepBits = (await getCollection("deep-bits")).filter((p) => !p.data.draft).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 const last_bits = deepBits.slice(0, 4);
 
+const thinkingBits = (await getCollection("thinking-bits")).filter((p) => !p.data.draft).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+const last_thinking_bits = thinkingBits.slice(0, 4);
+
 const thinkingArticles = (await getCollection("thinking-articles")).filter((p) => !p.data.draft).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 const last_thinking = thinkingArticles.slice(0, 3);
 ---
@@ -34,8 +37,58 @@ Please enjoy my posts and thinking. I am planning 3 formats for reading:
     </div>
   </div>
 
+  <div class="divider divider-primary my-10"></div>
 
-  <div class="mt-10">
+  <div>
+    <div class="text-3xl w-full font-bold mb-6">Thinking Content</div>
+
+    <div class="text-xl font-bold mb-4">Thinking Bits</div>
+    {
+      last_thinking_bits.length === 0 ? (
+        <p class="opacity-70 mb-8">No Thinking Bits yet. Check back later!</p>
+      ) : (
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
+          {last_thinking_bits.map((bit) => (
+            <div class="rounded-xl border border-base-300 bg-base-100 hover:border-primary hover:shadow-lg transition ease-in-out hover:scale-[102%] flex flex-col overflow-hidden">
+              <a href={"/thinking-bits/" + createSlug(bit.data.title, bit.slug)} class="p-4 flex flex-col gap-2 grow">
+                {bit.data.badge && <span class="badge badge-secondary w-fit">{bit.data.badge}</span>}
+                <span class="font-bold text-base leading-snug">{bit.data.title}</span>
+                {bit.data.description && <p class="text-xs opacity-70 leading-snug">{bit.data.description}</p>}
+              </a>
+              {bit.data.tags && bit.data.tags.length > 0 && (
+                <div class="flex flex-wrap gap-1 px-4 pb-3">
+                  {bit.data.tags.map((tag) => (
+                    <a href={`/thinking-bits/tag/${tag}`} class="badge badge-outline badge-sm">{tag}</a>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )
+    }
+
+    <div class="text-xl font-bold mb-4">Thinking Articles</div>
+    {
+      last_thinking.map((post) => (
+        <>
+          <HorizontalCard
+            title={post.data.title}
+            img={post.data.heroImage}
+            desc={post.data.description}
+            url={"/thinking-articles/" + createSlug(post.data.title, post.slug)}
+            target="_self"
+            badge={post.data.badge}
+          />
+          <div class="divider my-0" />
+        </>
+      ))
+    }
+  </div>
+
+  <div class="divider divider-primary my-10"></div>
+
+  <div>
     <div class="text-3xl w-full font-bold mb-5">Deep Bits</div>
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
       {last_bits.map((bit) => (
@@ -56,67 +109,26 @@ Please enjoy my posts and thinking. I am planning 3 formats for reading:
       ))}
     </div>
   </div>
-<div class="divider my-0" />
 
-  <div class="mt-10">
-    <div class="text-3xl w-full font-bold mb-5">Latest Thinking Articles</div>
-  </div>
-
-{
-  last_thinking.map((post) => (
-    <>
-      <HorizontalCard
-        title={post.data.title}
-        img={post.data.heroImage}
-        desc={post.data.description}
-        url={"/thinking-articles/" + createSlug(post.data.title, post.slug)}
-        target="_self"
-        badge={post.data.badge}
-      />
-      <div class="divider my-0" />
-    </>
-  ))
-}
+  <div class="divider my-6"></div>
 
   <div>
-    <div class="text-3xl w-full font-bold mb-5 mt-10">Latest from blog</div>
+    <div class="text-3xl w-full font-bold mb-5">Latest from blog</div>
+    {
+      last_posts.map((post) => (
+        <>
+          <HorizontalCard
+            title={post.data.title}
+            img={post.data.heroImage}
+            desc={post.data.description}
+            url={"/blog/" + createSlug(post.data.title, post.slug)}
+            target="_self"
+            badge={post.data.badge}
+            thinkingArticle={post.data.thinkingArticle}
+          />
+          <div class="divider my-0" />
+        </>
+      ))
+    }
   </div>
-
-{
-    last_posts.map((post) => (
-      <>
-        <HorizontalCard
-          title={post.data.title}
-          img={post.data.heroImage}
-          desc={post.data.description}
-          url={"/blog/" + createSlug(post.data.title, post.slug)}
-          target="_self"
-          badge={post.data.badge}
-          thinkingArticle={post.data.thinkingArticle}
-        />
-        <div class="divider my-0" />
-      </>
-    ))
-  }
-
-
-  <div class="mt-10">
-    <div class="text-3xl w-full font-bold mb-2">My last projects {"</>"}</div>
-  </div>
-
-  <HorizontalCard
-    title="MVI Notes App"
-    desc="MVINotes — Notes app demonstrating MVI architecture (Store → Controller → Reducer) with Clean Architecture layering, multi-target test strategy across XCTest and Swift Testing.
-Swift · SwiftUI · CoreData · XCTest · Swift Testing"
-    url="https://github.com/asukix/MVINotes"
-    badge="Architecture"
-  />
-  <div class="divider my-0"></div>
-  <HorizontalCard
-    title="Orderly App"
-    desc="Orderly — UIKit food ordering app exploring the Coordinator pattern with closure-based navigation, MVVM + Clean Architecture, and UIKit/SwiftUI interop via UIHostingController.
-Swift · UIKit · SwiftUI · Combine · async/await · CoreData"
-    url="https://github.com/asukix/Orderly"
-  />
-  
 </BaseLayout>

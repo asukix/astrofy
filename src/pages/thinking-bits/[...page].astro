@@ -1,0 +1,88 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getCollection } from "astro:content";
+import createSlug from "../../lib/createSlug"
+
+export async function getStaticPaths({ paginate }) {
+  const bits = await getCollection("thinking-bits");
+  const publishedBits = bits.filter((p) => !p.data.draft);
+  publishedBits.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+  return paginate(publishedBits, { pageSize: 10 });
+}
+
+const { page } = Astro.props;
+---
+
+<BaseLayout title="Thinking Bits" sideBarActiveItemID="thinking-bits">
+  <div class="mb-5">
+    <div class="text-3xl w-full font-bold">Thinking Bits</div>
+    <p>Thinking Bits are small, quick reads built the same way as Thinking Articles.</p>
+  </div>
+
+  {
+    page.data.length === 0 ? (
+      <div class="bg-base-200 border-l-4 border-secondary w-full p-4 min-w-full">
+        <p class="font-bold">Sorry!</p>
+        <p>There are no Thinking Bits to show at the moment. Check back later!</p>
+      </div>
+    ) : (
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        {page.data.map((bit) => (
+          <div class="rounded-xl border border-base-300 bg-base-100 hover:border-primary hover:shadow-lg transition ease-in-out hover:scale-[102%] flex flex-col overflow-hidden">
+            <a href={"/thinking-bits/" + createSlug(bit.data.title, bit.slug)} class="p-4 flex flex-col gap-2 grow">
+              {bit.data.badge && <span class="badge badge-secondary w-fit">{bit.data.badge}</span>}
+              <span class="font-bold text-base leading-snug">{bit.data.title}</span>
+              {bit.data.description && <p class="text-xs opacity-70 leading-snug">{bit.data.description}</p>}
+            </a>
+            {bit.data.tags && bit.data.tags.length > 0 && (
+              <div class="flex flex-wrap gap-1 px-4 pb-3">
+                {bit.data.tags.map((tag) => (
+                  <a href={`/thinking-bits/tag/${tag}`} class="badge badge-outline badge-sm">{tag}</a>
+                ))}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    )
+  }
+
+  <div class="flex justify-between">
+    {
+      page.url.prev ? (
+        <a href={page.url.prev} class="btn btn-ghost my-10 mx-5">
+          <svg
+            class="h-6 w-6 fill-current md:h-8 md:w-8"
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+          >
+            <path d="M15.41,16.58L10.83,12L15.41,7.41L14,6L8,12L14,18L15.41,16.58Z" />
+          </svg>{" "}
+          Recent bits
+        </a>
+      ) : (
+        <div />
+      )
+    }
+    {
+      page.url.next ? (
+        <a href={page.url.next} class="btn btn-ghost my-10 mx-5">
+          Older Bits{" "}
+          <svg
+            class="h-6 w-6 fill-current md:h-8 md:w-8"
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+          >
+            <path d="M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z" />
+          </svg>
+        </a>
+      ) : (
+        <div />
+      )
+    }
+  </div>
+</BaseLayout>

@@ -68,14 +68,33 @@ const deepBitsSchema = z.object({
 
 export type DeepBitsSchema = z.infer<typeof deepBitsSchema>;
 
+const thinkingBitsSchema = z.object({
+    title: z.string(),
+    description: z.string().optional(),
+    pubDate: z.coerce.date(),
+    updatedDate: z.string().optional(),
+    heroImage: z.string().optional(),
+    badge: z.string().optional(),
+    draft: z.boolean().optional(),
+    tags: z.array(z.string()).refine(items => new Set(items).size === items.length, {
+        message: 'tags must be unique',
+    }).optional(),
+    thoughts: z.array(thoughtSchema).optional(),
+    extra: z.string().optional(),
+});
+
+export type ThinkingBitsSchema = z.infer<typeof thinkingBitsSchema>;
+
 const blogCollection = defineCollection({ schema: blogSchema });
 const storeCollection = defineCollection({ schema: storeSchema });
 const thinkingArticleCollection = defineCollection({ schema: thinkingArticleSchema });
 const deepBitsCollection = defineCollection({ schema: deepBitsSchema });
+const thinkingBitsCollection = defineCollection({ schema: thinkingBitsSchema });
 
 export const collections = {
     'blog': blogCollection,
     'store': storeCollection,
     'thinking-articles': thinkingArticleCollection,
     'deep-bits': deepBitsCollection,
+    'thinking-bits': thinkingBitsCollection,
 }

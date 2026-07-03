@@ -1,0 +1,188 @@
+---
+import { CollectionEntry, getCollection } from "astro:content";
+import PostLayout from "../../layouts/PostLayout.astro";
+import createSlug from "../../lib/createSlug";
+import Extra from "../../components/Extra.astro";
+
+export async function getStaticPaths() {
+  const bitEntries = await getCollection("thinking-bits");
+  return bitEntries.map((entry) => ({
+    params: { slug: createSlug(entry.data.title, entry.slug) },
+    props: { entry },
+  }));
+}
+
+interface Props {
+  entry: CollectionEntry<"thinking-bits">;
+}
+
+const { entry } = Astro.props;
+const bit = entry.data;
+const thoughts = bit.thoughts ?? [];
+const { Content } = await entry.render();
+---
+
+<PostLayout
+  title={bit.title}
+  description={bit.description}
+  pubDate={bit.pubDate}
+  heroImage={bit.heroImage}
+  updatedDate={bit.updatedDate}
+  badge={bit.badge}
+  tags={bit.tags}
+  tagUrlBase="/thinking-bits/tag"
+  exportable={true}
+>
+  <Content />
+
+  {thoughts.map((thought) => (
+    <div class="mine-block" data-mine data-open="false">
+      {thought.title && <h2>{thought.title}</h2>}
+
+      <div class="q-section">
+        <p set:html={thought.question} />
+        {thought.image && <img src={thought.image} alt={thought.title ?? ""} class="thought-image" />}
+      </div>
+
+      <div class="mine-section">
+        <p class="mine-label">Your thought</p>
+        <textarea
+          class="textarea textarea-bordered w-full mine-reader"
+          placeholder="What do you think?"
+          data-reader-box
+          rows="4"
+          autocomplete="off"
+        ></textarea>
+      </div>
+
+      <div class="mine-section mine-author">
+        <p class="mine-label">My thought</p>
+        <button
+          class="btn btn-sm btn-ghost"
+          type="button"
+          data-mine-toggle
+          aria-expanded="false"
+        >
+          Show
+        </button>
+        <div class="mine-content" data-mine-content>
+          <div class="mine-content-inner">
+            <p set:html={thought.mine} />
+          </div>
+        </div>
+      </div>
+    </div>
+  ))}
+
+  {bit.extra && (
+    <Extra>
+      <p set:html={bit.extra} />
+    </Extra>
+  )}
+
+  <div id="reveal-all-container" class="reveal-all-container">
+    <button id="reveal-all-btn" class="btn btn-primary btn-wide" type="button">
+      See my thoughts
+    </button>
+  </div>
+</PostLayout>
+
+<script>
+  function checkAllOpen() {
+    const allMines = document.querySelectorAll('[data-mine]');
+    const allOpen = Array.from(allMines).every(m => (m as HTMLElement).dataset.open === 'true');
+    if (allOpen) {
+      const extra = document.querySelector('[data-extra]');
+      if (extra) (extra as HTMLElement).dataset.open = 'true';
+      const revealContainer = document.getElementById('reveal-all-container');
+      if (revealContainer) revealContainer.style.display = 'none';
+    }
+  }
+
+  function initMine(mine: Element) {
+    const toggle = mine.querySelector('[data-mine-toggle]');
+    if (!toggle) return;
+    toggle.addEventListener('click', () => {
+      const el = mine as HTMLElement;
+      const isOpen = el.dataset.open === 'true';
+      const next = !isOpen;
+      el.dataset.open = String(next);
+      toggle.setAttribute('aria-expanded', String(next));
+      toggle.textContent = next ? 'Hide' : 'Show';
+      if (next) checkAllOpen();
+    });
+  }
+
+  function setupRevealAll() {
+    document.querySelectorAll('[data-mine]').forEach(initMine);
+
+    const btn = document.getElementById('reveal-all-btn');
+    if (!btn) return;
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('[data-mine]').forEach(mine => {
+        (mine as HTMLElement).dataset.open = 'true';
+        const toggle = mine.querySelector('[data-mine-toggle]');
+        if (toggle) {
+          toggle.setAttribute('aria-expanded', 'true');
+          toggle.textContent = 'Hide';
+        }
+      });
+      const extra = document.querySelector('[data-extra]');
+      if (extra) (extra as HTMLElement).dataset.open = 'true';
+      const container = document.getElementById('reveal-all-container');
+      if (container) container.style.display = 'none';
+    });
+  }
+
+  document.addEventListener('astro:page-load', setupRevealAll);
+</script>
+
+<style>
+  .mine-block {
+    margin: 1.5rem 0;
+    padding: 1.25rem;
+    background: oklch(var(--b2) / 0.6);
+    border-radius: 0.625rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .mine-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    opacity: 0.5;
+    margin: 0 0 0.4rem 0;
+  }
+  .mine-reader {
+    width: 100%;
+    resize: vertical;
+    min-height: 80px;
+  }
+  .mine-author {
+    border-top: 1px solid oklch(var(--bc) / 0.1);
+    padding-top: 1rem;
+  }
+  .mine-content {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 180ms ease;
+    margin-top: 0.5rem;
+  }
+  .mine-content-inner {
+    overflow: hidden;
+  }
+  [data-mine][data-open="true"] .mine-content {
+    grid-template-rows: 1fr;
+  }
+  .thought-image {
+    margin-top: 0.75rem;
+    border-radius: 0.5rem;
+    max-width: 100%;
+  }
+  .reveal-all-container {
+    display: flex;
+    justify-content: center;
+    margin: 3rem 0 1rem;
+  }
+</style>
