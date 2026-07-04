@@ -69,13 +69,19 @@ import { Image } from "astro:assets";
     footer,
     #reveal-all-container,
     .navbar-start,
-    [data-mine-toggle],
-    [data-reader-box] {
+    [data-mine-toggle] {
       display: none !important;
     }
 
     .drawer-content {
       margin-left: 0 !important;
+    }
+
+    [data-reader-box] {
+      border: 1px solid #000 !important;
+      resize: none !important;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
     }
 
     [data-mine] .mine-content {
