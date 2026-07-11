@@ -10,7 +10,7 @@ module.exports = {
 			{
 				lofi: {
 					...require("daisyui/src/theming/themes")["lofi"],
-					"base-200": "#adadad",
+					"base-200": "#d4d4d4",
 				},
 			},
 		],
