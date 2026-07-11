@@ -10,13 +10,13 @@ module.exports = {
 			{
 				lofi: {
 					...require("daisyui/src/theming/themes")["lofi"],
-					"primary": "#2563EB",
+					"primary": "#3B82F6",
 					"primary-content": "#FFFFFF",
-					"secondary": "#4B5563",
+					"secondary": "#374151",
 					"secondary-content": "#FFFFFF",
-					"accent": "#2563EB",
+					"accent": "#3B82F6",
 					"accent-content": "#FFFFFF",
-					"neutral": "#4B5563",
+					"neutral": "#374151",
 					"neutral-content": "#FFFFFF",
 					"base-100": "#FFFFFF",
 					"base-200": "#F3F4F6",
