@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://astrofy-template.netlify.app/sitemap-index.xml
+Sitemap: https://sengdev.com/sitemap-index.xml

@@ -5,7 +5,7 @@ import PostLayout from "../../layouts/PostLayout.astro";
 import createSlug from "../../lib/createSlug"
 
 export async function getStaticPaths() {
-  const bitEntries = await getCollection("deep-bits");
+  const bitEntries = (await getCollection("deep-bits")).filter((p) => !p.data.draft);
   return bitEntries.map((entry) => ({
     params: { slug: createSlug(entry.data.title, entry.slug) },
     props: { entry },

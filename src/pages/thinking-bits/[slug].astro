@@ -5,7 +5,7 @@ import createSlug from "../../lib/createSlug";
 import Extra from "../../components/Extra.astro";
 
 export async function getStaticPaths() {
-  const bitEntries = await getCollection("thinking-bits");
+  const bitEntries = (await getCollection("thinking-bits")).filter((p) => !p.data.draft);
   return bitEntries.map((entry) => ({
     params: { slug: createSlug(entry.data.title, entry.slug) },
     props: { entry },
