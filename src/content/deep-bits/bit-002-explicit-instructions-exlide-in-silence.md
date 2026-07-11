@@ -2,7 +2,6 @@
 title: "Instructions Exclude in Silence"
 pubDate: "Jun 23 2026"
 tags: ["AI", "Agent"]
-badge: "Agents"
 ---
 
 Adding explicit direction in an agent instruction file means the AI should follow it — however, every explicit direction also means the AI should avoid other solutions. 
