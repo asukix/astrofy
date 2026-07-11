@@ -40,7 +40,7 @@ Welcome on my side and enjoy my space of thinking. You can find 3 type of articl
     </div>
   </div>
 
-  <div class="divider divider-primary my-10"></div>
+  <div class="divider divider-neutral my-10"></div>
 
   <div>
     <div class="text-3xl w-full font-bold mb-6">Thinking Content</div>
@@ -50,9 +50,9 @@ Welcome on my side and enjoy my space of thinking. You can find 3 type of articl
       last_thinking_bits.length === 0 ? (
         <p class="opacity-70 mb-8">No Thinking Bits yet. Check back later!</p>
       ) : (
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-9 mb-8">
           {last_thinking_bits.map((bit) => (
-            <div class="rounded-xl bg-base-200 border-l-4 border-l-neutral hover:border-l-primary hover:shadow-lg transition ease-in-out hover:scale-[102%] flex flex-col overflow-hidden">
+            <div class="rounded-xl bg-base-200 border-l-4 border-l-neutral hover:shadow-lg transition ease-in-out hover:scale-[102%] flex flex-col overflow-hidden">
               <a href={"/thinking-bits/" + createSlug(bit.data.title, bit.slug)} class="p-4 flex flex-col gap-2 grow">
                 {bit.data.badge && <span class="badge badge-secondary w-fit">{bit.data.badge}</span>}
                 <span class="font-bold text-base leading-snug">{bit.data.title}</span>
@@ -73,7 +73,7 @@ Welcome on my side and enjoy my space of thinking. You can find 3 type of articl
 
     <div class="text-xl font-bold mb-4">Thinking Articles</div>
     {
-      last_thinking.map((post) => (
+      last_thinking.map((post, index) => (
         <>
           <HorizontalCard
             title={post.data.title}
@@ -83,19 +83,19 @@ Welcome on my side and enjoy my space of thinking. You can find 3 type of articl
             target="_self"
             badge={post.data.badge}
           />
-          <div class="divider my-0" />
+          {index < last_thinking.length - 1 && <div class="divider my-0" />}
         </>
       ))
     }
   </div>
 
-  <div class="divider divider-primary my-10"></div>
+  <div class="divider divider-neutral my-10"></div>
 
   <div>
     <div class="text-3xl w-full font-bold mb-5">Deep Bits</div>
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-9">
       {last_bits.map((bit) => (
-        <div class="rounded-xl bg-base-200 border-l-4 border-l-neutral hover:border-l-primary hover:shadow-lg transition ease-in-out hover:scale-[102%] flex flex-col overflow-hidden">
+        <div class="rounded-xl bg-base-200 border-l-4 border-l-neutral hover:shadow-lg transition ease-in-out hover:scale-[102%] flex flex-col overflow-hidden">
           <a href={"/deep-bits/" + createSlug(bit.data.title, bit.slug)} class="p-4 flex flex-col gap-2 grow">
             {bit.data.badge && <span class="badge badge-secondary w-fit">{bit.data.badge}</span>}
             <span class="font-bold text-base leading-snug">{bit.data.title}</span>
@@ -113,12 +113,12 @@ Welcome on my side and enjoy my space of thinking. You can find 3 type of articl
     </div>
   </div>
 
-  <div class="divider my-6"></div>
+  <div class="divider divider-neutral my-6"></div>
 
   <div>
     <div class="text-3xl w-full font-bold mb-5">Latest from blog</div>
     {
-      last_posts.map((post) => (
+      last_posts.map((post, index) => (
         <>
           <HorizontalCard
             title={post.data.title}
@@ -129,7 +129,7 @@ Welcome on my side and enjoy my space of thinking. You can find 3 type of articl
             badge={post.data.badge}
             thinkingArticle={post.data.thinkingArticle}
           />
-          <div class="divider my-0" />
+          {index < last_posts.length - 1 && <div class="divider my-0" />}
         </>
       ))
     }

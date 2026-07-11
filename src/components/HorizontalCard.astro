@@ -84,12 +84,12 @@ const tag_url = url.split("/").slice(0, -1).join("/") + "/tag";
 <style>
   /* Article link: bal oldali border highlight hover-re */
   .article-link {
-    border-left: 3px solid transparent;
+    border-left: 4px solid transparent;
     transition: border-color 150ms ease;
   }
 
-  .card-wrapper:has(.think-cta) .article-link:hover {
-    border-left-color: oklch(var(--p) / 0.5);
+  .article-link:hover {
+    border-left-color: oklch(var(--p));
   }
 
   /* Think with me gomb: saját hover — a card-wrapper hover:shadow nem ütközik */
