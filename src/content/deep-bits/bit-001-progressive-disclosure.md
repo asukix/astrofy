@@ -2,7 +2,6 @@
 title: "Progressive Disclosure"
 pubDate: "Jun 18 2026"
 tags: ["AI", "Agent", "Progressive Disclosure"]
-badge: "Agents"
 ---
 
 A monolithic context.md quietly dilutes an agent's accuracy: every run loads everything, relevant or not.
