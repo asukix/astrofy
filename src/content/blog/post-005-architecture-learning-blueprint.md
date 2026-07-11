@@ -1,6 +1,7 @@
 ---
 title: "Blueprint for Learning any Architecture"
 description: "When you have a system for learning architecture, it becomes easier to understand."
+heroImage: "/architecture-learning-blueprint-card.svg"
 pubDate: "Oct 28 2025"
 ---
 

@@ -1,6 +1,7 @@
 ---
 title: "MVVM Model confusions"
 description: "I had some confusions in MVVM around models."
+heroImage: "/mvvm-model-confusions-card.svg"
 pubDate: "Mar 16 2026"
 ---
 

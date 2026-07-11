@@ -1,6 +1,7 @@
 ---
 title: "Stateless? Decoupled? Think Again. The Real cost of Combine in Complex system"
 description: How breaks the combine the illusion of isolation?
+heroImage: "/real-cost-of-combine-card.svg"
 pubDate: "Apr 22 2025"
 ---
 

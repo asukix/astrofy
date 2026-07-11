@@ -1,6 +1,7 @@
 ---
 title: "iOS App lifecycle & State Machines"
 description: iOS App lifecycle works as a state machine
+heroImage: "/ios-lifecycle-state-machines-card.svg"
 pubDate: "Marc 13 2026"
 ---
 
