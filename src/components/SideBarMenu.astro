@@ -1,35 +1,35 @@
 ---
 const { sideBarActiveItemID } = Astro.props;
-const activeClass = "bg-primary text-primary-content"; // For primary color replace with `active` class
+const activeClass = "bg-base-100 text-base-content rounded-lg"; // For primary color replace with `active` class
 ---
 
 <ul class="menu grow shrink menu-md overflow-y-auto">
-    <li><a class="py-3 text-base" id="home" href="/">Home</a></li>
-    <li><a class="py-3 text-base" id="deep-bits" href="/deep-bits/">Deep Bits</a></li>
-    <li><a class="py-3 text-base" id="blog" href="/blog/">Blog</a></li>
-    <li><a class="py-3 text-base" id="thinking-bits" href="/thinking-bits/">Thinking Bits</a></li>
-    <li><a class="py-3 text-base" id="thinking" href="/thinking-articles/">Thinking Articles</a></li>
-    <li><a class="py-3 text-base" id="projects" href="/projects">Projects</a></li>
-    <li><a class="py-3 text-base" id="cv" href="/cv">CV</a></li>
+    <li><a class="py-3 text-base hover:bg-base-100 hover:text-base-content hover:rounded-lg" id="home" href="/">Home</a></li>
+    <li><a class="py-3 text-base hover:bg-base-100 hover:text-base-content hover:rounded-lg" id="deep-bits" href="/deep-bits/">Deep Bits</a></li>
+    <li><a class="py-3 text-base hover:bg-base-100 hover:text-base-content hover:rounded-lg" id="blog" href="/blog/">Blog</a></li>
+    <li><a class="py-3 text-base hover:bg-base-100 hover:text-base-content hover:rounded-lg" id="thinking-bits" href="/thinking-bits/">Thinking Bits</a></li>
+    <li><a class="py-3 text-base hover:bg-base-100 hover:text-base-content hover:rounded-lg" id="thinking" href="/thinking-articles/">Thinking Articles</a></li>
+    <li><a class="py-3 text-base hover:bg-base-100 hover:text-base-content hover:rounded-lg" id="projects" href="/projects">Projects</a></li>
+    <li><a class="py-3 text-base hover:bg-base-100 hover:text-base-content hover:rounded-lg" id="cv" href="/cv">CV</a></li>
 <!--
-    <li><a class="py-3 text-base" id="services" href="/services">Services</a></li>
-    <li><a class="py-3 text-base" id="store" href="/store">Store</a></li>
+    <li><a class="py-3 text-base hover:bg-base-100 hover:text-base-content hover:rounded-lg" id="services" href="/services">Services</a></li>
+    <li><a class="py-3 text-base hover:bg-base-100 hover:text-base-content hover:rounded-lg" id="store" href="/store">Store</a></li>
     
 -->
     <li>
         <a
-            class="py-3 text-base"
+            class="py-3 text-base hover:bg-base-100 hover:text-base-content hover:rounded-lg"
             href="mailto:asukix@gmail.com"
             target="_blank"
             referrerpolicy="no-referrer-when-downgrade">Contact</a
         >
     </li>
 <!--    
-<li><a class="py-3 text-base" id="upcoming" href="/upcoming">Upcoming site updates</a></li>
+<li><a class="py-3 text-base hover:bg-base-100 hover:text-base-content hover:rounded-lg" id="upcoming" href="/upcoming">Upcoming site updates</a></li>
 -->
 </ul>
 
 <script define:vars={{ sideBarActiveItemID: sideBarActiveItemID, activeClass: activeClass }}>
 const activeItemElem = document.getElementById(sideBarActiveItemID);
-activeItemElem && activeItemElem.classList.add(activeClass);
+activeItemElem && activeItemElem.classList.add(...activeClass.split(" "));
 </script>

@@ -31,7 +31,7 @@ const params = Astro.params;
     ) : (
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {page.data.map((bit) => (
-          <div class="rounded-xl border border-base-300 bg-base-100 hover:border-primary hover:shadow-lg transition ease-in-out hover:scale-[102%] flex flex-col overflow-hidden">
+          <div class="rounded-xl bg-base-200 border-l-4 border-l-neutral hover:border-l-primary hover:shadow-lg transition ease-in-out hover:scale-[102%] flex flex-col overflow-hidden">
             <a href={"/thinking-bits/" + createSlug(bit.data.title, bit.slug)} class="p-4 flex flex-col gap-2 grow">
               {bit.data.badge && <span class="badge badge-secondary w-fit">{bit.data.badge}</span>}
               <span class="font-bold text-base leading-snug">{bit.data.title}</span>
