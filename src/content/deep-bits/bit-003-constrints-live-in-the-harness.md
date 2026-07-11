@@ -2,7 +2,6 @@
 title: "Constraints Live in the Harness"
 pubDate: "Jun 24 2026"
 tags: ["AI", "Agent", "Harness"]
-badge: "Agents"
 ---
 
 You choose a custom agent with a read tool, but it modifies the code. This means you referenced the custom agent's description instead of invoking it.
