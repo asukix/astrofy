@@ -1,11 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 750 422" width="750" height="422">
   <rect x="0" y="0" width="750" height="422" rx="20" fill="#374151"/>
 
-  <text x="60" y="175" font-family="'JetBrains Mono', monospace" font-weight="700" font-size="64" fill="#FFFFFF" fill-opacity="0.92">Thinking</text>
+  <text x="60" y="150" font-family="'JetBrains Mono', monospace" font-weight="700" font-size="64" fill="#FFFFFF" fill-opacity="0.92">Thinking</text>
 
-  <rect x="55" y="205" width="220" height="82" rx="8" fill="none" stroke="#FFFFFF" stroke-opacity="0.5" stroke-width="3"/>
-  <text x="72" y="265" font-family="'JetBrains Mono', monospace" font-weight="700" font-size="64" fill="#FFFFFF" fill-opacity="0.92">Space</text>
+  <rect x="55" y="180" width="220" height="82" rx="8" fill="none" stroke="#FFFFFF" stroke-opacity="0.5" stroke-width="3"/>
+  <text x="72" y="240" font-family="'JetBrains Mono', monospace" font-weight="700" font-size="64" fill="#FFFFFF" fill-opacity="0.92">Space</text>
 
-  <text x="295" y="265" font-family="'JetBrains Mono', monospace" font-weight="700" font-size="64" fill="#FFFFFF" fill-opacity="0.6">System</text>
-  <rect x="295" y="277" width="205" height="4" fill="#F5A623"/>
+  <text x="60" y="330" font-family="'JetBrains Mono', monospace" font-weight="700" font-size="64" fill="#FFFFFF" fill-opacity="0.6">System</text>
+  <rect x="60" y="342" width="205" height="4" fill="#F5A623"/>
 </svg>
