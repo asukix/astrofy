@@ -29,6 +29,7 @@ const { Content } = await entry.render();
   badge={bit.badge}
   tags={bit.tags}
   tagUrlBase="/deep-bits/tag"
+  thinkHref={bit.thinkingBit && `/thinking-bits/${bit.thinkingBit}/`}
 >
   <Content />
 </PostLayout>

@@ -7,9 +7,10 @@ import localizedFormat from "dayjs/plugin/localizedFormat";
 export interface Props extends BlogSchema {
   exportable?: boolean;
   tagUrlBase?: string;
+  thinkHref?: string;
 }
 
-const { title, description, pubDate, updatedDate, heroImage, badge, tags = [], exportable = false, tagUrlBase = "/blog/tag" } = Astro.props;
+const { title, description, pubDate, updatedDate, heroImage, badge, tags = [], exportable = false, tagUrlBase = "/blog/tag", thinkHref } = Astro.props;
 dayjs.extend(localizedFormat);
 const displayDate = dayjs(pubDate).format("ll")
 import { Image } from "astro:assets";
@@ -29,7 +30,7 @@ import { Image } from "astro:assets";
     </div>
   )}
   <main class="md:flex md:justify-center">
-    <article class="prose prose-lg max-w-[750px] prose-img:mx-auto">
+    <article class={`prose prose-lg max-w-[750px] prose-img:mx-auto ${thinkHref ? "pb-24" : ""}`}>
       {heroImage && <Image width={750} height={422} format="webp" src={heroImage} alt={title} class="w-full mb-6" />}
       <h1 class="title my-2 text-4xl font-bold">{title}</h1>
       {pubDate && <time>{displayDate}</time>}
@@ -58,6 +59,24 @@ import { Image } from "astro:assets";
 </BaseLayout>
 
 {exportable && <meta name="exportable" content="true" />}
+
+{
+  thinkHref && (
+    <a
+      href={thinkHref}
+      class="think-fab no-print fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-neutral text-neutral-content shadow-lg active:brightness-95 transition ease-in-out"
+      aria-label={`Think with me: ${title}`}
+    >
+      <svg
+        class="h-6 w-6 fill-current"
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+      >
+        <path d="M12 2a7 7 0 0 0-4 12.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26A7 7 0 0 0 12 2Zm-3 19a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-1H9Z" />
+      </svg>
+    </a>
+  )
+}
 
 <style is:global>
   @media print {
@@ -117,6 +136,18 @@ import { Image } from "astro:assets";
       color: #000;
       background: #fff !important;
     }
+  }
+</style>
+
+<style>
+  .think-fab {
+    transition: background-color 150ms ease, color 150ms ease, transform 150ms ease;
+  }
+
+  .think-fab:hover {
+    background-color: oklch(var(--b3));
+    color: oklch(var(--bc));
+    transform: scale(1.05);
   }
 </style>
 

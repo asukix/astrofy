@@ -29,6 +29,7 @@ const { Content } = await entry.render();
   updatedDate={post.updatedDate}
   badge={post.badge}
   tags={post.tags}
+  thinkHref={post.thinkingArticle && `/thinking-articles/${post.thinkingArticle}/`}
 >
   <Content />
 </PostLayout>
