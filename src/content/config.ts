@@ -19,6 +19,7 @@ const thoughtSchema = z.object({
     question: z.string(),
     mine: z.string(),
     image: z.string().optional(),
+    mineImage: z.string().optional(),
 });
 
 const thinkingArticleSchema = z.object({

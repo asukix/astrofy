@@ -67,6 +67,7 @@ const { Content } = await entry.render();
         <div class="mine-content" data-mine-content>
           <div class="mine-content-inner">
             <p set:html={thought.mine} />
+            {thought.mineImage && <img src={thought.mineImage} alt={thought.title ?? ""} class="thought-image" />}
           </div>
         </div>
       </div>

@@ -1,0 +1,21 @@
+---
+title: "Harness"
+pubDate: "Jul 15 2026"
+tags: ["AI", "Agent", "Harness"]
+
+thoughts:
+  - id: 0
+    question: |
+      Copilot and Cursor contain the same models, like Opus, Codex, Gemini. So they should be the same.
+      But if that's true, why are the answers different if I use the same model?
+    mine: |
+      A lot of times I've seen a similar context where the agent is treated like one black box. Some examples:
+      - We have Copilot. Why do we need Cursor if they have the same models?
+      - When should I use Cursor and when should I use Copilot?
+      - If I write tools and use LangChain, that will save tokens for me.
+      In my opinion, these and similar questions are good questions. And I found that if we see agents = LLM models, we don't have real answers. Under the hood, the agents are separated by harness and LLM models. The harness gives the system prompt, and during the trajectory it provides tools and creates context for the AI model. Once you see this, it's easy to understand that if the context is different because of the harness, the answer will also be different. That's why Copilot ≠ Cursor. So in my opinion, that can be a real difference between them.
+    mineImage: "/tb-agent-black-box-mine.webp"
+extra: |
+  Now we have a little context about harness. If I write my own tools and provide information to the LLM, in my opinion I've started to create a harness.
+  <br>What do you think, when do we really need to write our own harness?
+---
