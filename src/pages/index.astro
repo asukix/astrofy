@@ -15,6 +15,13 @@ const last_thinking_bits = thinkingBits.slice(0, 4);
 
 const thinkingArticles = (await getCollection("thinking-articles")).filter((p) => !p.data.draft).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 const last_thinking = thinkingArticles.slice(0, 3);
+
+const introTypes = [
+  { title: "Blog", description: "Usual format of my articles." },
+  { title: "Deep Bits", description: "Short and deep thoughts for quick read." },
+  { title: "Thinking Articles**", description: "Special articles with space for thinking." },
+  { title: "Thinking Bits", description: "Similar to Deep Bits but with space for thinking." },
+];
 ---
 
 <BaseLayout sideBarActiveItemID="home">
@@ -23,16 +30,38 @@ const last_thinking = thinkingArticles.slice(0, 3);
     <div class="text-5xl font-bold">I'm Seng</div>
     <div class="text-3xl py-3 font-bold">I'm an iOS engineer with an architecture and meta focus</div>
     <div class="py-2">
-      <text class="text-lg">        
-Welcome on my side and enjoy my space of thinking. You can find 4 type of articles with different aspect of thinking:
+      <p class="text-lg">Welcome on my side and enjoy my space of thinking. You can find 4 type of articles with different aspect of thinking:</p>
+    </div>
 
-<br> - <b>Blog:</b> Usual format of my articles.
-<br> - <b>Deep Bits:</b> Short and deep thoughts for quick read.
-<br> - <b>Thinking articles (will be released soon):</b>  Special articles with space for thinking.
-<br> - <b>Thinking Bits:</b> Similar to Deep Bits but with space for thinking.
-<br>In my opinion mental models and understanding are changing. So my articles are snapshots about my mental models when I wrote them. If we have space for thinking we have space to change our models.
-<br><br> - <b>NOTE:</b> Thinking Article functionality planned release is August.
-      </text>
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 my-4">
+      {introTypes.map((type) => (
+        <div class="rounded-xl bg-base-200 border-l-4 border-l-neutral overflow-hidden flex flex-col" data-intro-card data-open="false">
+          <div class="p-4 flex flex-col gap-2 grow">
+            <span class="font-bold text-base leading-snug">{type.title}</span>
+          </div>
+          <div class="px-4 pb-3">
+            <button
+              class="btn btn-xs btn-ghost -ml-2"
+              type="button"
+              data-intro-toggle
+              aria-expanded="false"
+            >
+              Show description
+            </button>
+          </div>
+          <div class="intro-content" data-intro-content>
+            <div class="intro-content-inner">
+              <p class="intro-desc-box text-xs opacity-70 leading-snug">{type.description}</p>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <div class="py-2">
+      <p class="text-lg">In my opinion mental models and understanding are changing. So my articles are snapshots about my mental models when I wrote them. If we have space for thinking we have space to change our models.</p>
+      <p class="text-lg mt-4"><b>NOTE:</b> Thinking Article functionality planned release is August.</p>
+      <p class="text-lg">** Will be released soon</p>
     </div>
     <div class="mt-8">
       <a class="btn btn-neutral" href="https://twitter.com/manuelernestog" target="_blank"> Let's connect!</a>
@@ -160,6 +189,25 @@ Welcome on my side and enjoy my space of thinking. You can find 4 type of articl
   </div>
 </BaseLayout>
 
+<script>
+  function setupIntroToggles() {
+    document.querySelectorAll('[data-intro-card]').forEach((card) => {
+      const toggle = card.querySelector('[data-intro-toggle]');
+      if (!toggle) return;
+      toggle.addEventListener('click', () => {
+        const el = card as HTMLElement;
+        const isOpen = el.dataset.open === 'true';
+        const next = !isOpen;
+        el.dataset.open = String(next);
+        toggle.setAttribute('aria-expanded', String(next));
+        toggle.textContent = next ? 'Hide description' : 'Show description';
+      });
+    });
+  }
+
+  document.addEventListener('astro:page-load', setupIntroToggles);
+</script>
+
 <style>
   .think-cta {
     transition: background-color 150ms ease, color 150ms ease;
@@ -168,5 +216,26 @@ Welcome on my side and enjoy my space of thinking. You can find 4 type of articl
   .think-cta:hover {
     background-color: oklch(var(--b3));
     color: oklch(var(--bc));
+  }
+
+  .intro-content {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 180ms ease;
+  }
+
+  .intro-content-inner {
+    overflow: hidden;
+  }
+
+  [data-intro-card][data-open="true"] .intro-content {
+    grid-template-rows: 1fr;
+  }
+
+  .intro-desc-box {
+    background: oklch(var(--b2) / 0.6);
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+    margin: 0 1rem 1rem 1rem;
   }
 </style>
