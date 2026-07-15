@@ -31,41 +31,4 @@ const { Content } = await entry.render();
   tagUrlBase="/deep-bits/tag"
 >
   <Content />
-
-  {
-    bit.thinkingBit && (
-      <a
-        href={`/thinking-bits/${bit.thinkingBit}/`}
-        class="think-cta group not-prose w-fit mx-auto mt-8 flex items-center justify-center gap-2 px-6 py-4 font-semibold text-neutral-content bg-neutral active:brightness-95 transition ease-in-out rounded-lg no-underline"
-        aria-label={`Think with me: ${bit.title}`}
-      >
-        <svg
-          class="h-5 w-5 fill-current shrink-0"
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-        >
-          <path d="M12 2a7 7 0 0 0-4 12.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26A7 7 0 0 0 12 2Zm-3 19a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-1H9Z" />
-        </svg>
-        <span class="text-center leading-tight">think with me</span>
-        <svg
-          class="h-4 w-4 fill-current shrink-0 group-hover:translate-x-1 transition"
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-        >
-          <path d="M8.59 16.58 13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.42Z" />
-        </svg>
-      </a>
-    )
-  }
 </PostLayout>
-
-<style>
-  .think-cta {
-    transition: background-color 150ms ease, color 150ms ease;
-  }
-
-  .think-cta:hover {
-    background-color: oklch(var(--b3));
-    color: oklch(var(--bc));
-  }
-</style>

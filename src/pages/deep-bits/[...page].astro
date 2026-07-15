@@ -29,18 +29,43 @@ const { page } = Astro.props;
     ) : (
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-9">
         {page.data.map((bit) => (
-          <div class="rounded-xl bg-base-200 border-l-4 border-l-neutral hover:bg-base-100 hover:shadow-lg transition ease-in-out hover:scale-[102%] flex flex-col overflow-hidden">
-            <a href={"/deep-bits/" + createSlug(bit.data.title, bit.slug)} class="p-4 flex flex-col gap-2 grow">
-              {bit.data.badge && <span class="badge badge-secondary w-fit">{bit.data.badge}</span>}
-              <span class="font-bold text-base leading-snug">{bit.data.title}</span>
-              {bit.data.description && <p class="text-xs opacity-70 leading-snug">{bit.data.description}</p>}
-            </a>
-            {bit.data.tags && bit.data.tags.length > 0 && (
-              <div class="flex flex-wrap gap-1 px-4 pb-3">
-                {bit.data.tags.map((tag) => (
-                  <a href={`/deep-bits/tag/${tag}`} class="badge badge-outline badge-sm">{tag}</a>
-                ))}
-              </div>
+          <div class="flex flex-col gap-2">
+            <div class="rounded-xl bg-base-200 border-l-4 border-l-neutral hover:bg-base-100 hover:shadow-lg transition ease-in-out hover:scale-[102%] flex flex-col overflow-hidden">
+              <a href={"/deep-bits/" + createSlug(bit.data.title, bit.slug)} class="p-4 flex flex-col gap-2 grow">
+                {bit.data.badge && <span class="badge badge-secondary w-fit">{bit.data.badge}</span>}
+                <span class="font-bold text-base leading-snug">{bit.data.title}</span>
+                {bit.data.description && <p class="text-xs opacity-70 leading-snug">{bit.data.description}</p>}
+              </a>
+              {bit.data.tags && bit.data.tags.length > 0 && (
+                <div class="flex flex-wrap gap-1 px-4 pb-3">
+                  {bit.data.tags.map((tag) => (
+                    <a href={`/deep-bits/tag/${tag}`} class="badge badge-outline badge-sm">{tag}</a>
+                  ))}
+                </div>
+              )}
+            </div>
+            {bit.data.thinkingBit && (
+              <a
+                href={`/thinking-bits/${bit.data.thinkingBit}/`}
+                class="think-cta group flex items-center justify-center gap-2 px-4 py-3 font-semibold text-sm text-neutral-content bg-neutral active:brightness-95 transition ease-in-out rounded-lg no-underline"
+                aria-label={`Think with me: ${bit.data.title}`}
+              >
+                <svg
+                  class="h-4 w-4 fill-current shrink-0"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M12 2a7 7 0 0 0-4 12.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26A7 7 0 0 0 12 2Zm-3 19a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-1H9Z" />
+                </svg>
+                <span class="text-center leading-tight">think with me</span>
+                <svg
+                  class="h-4 w-4 fill-current shrink-0 group-hover:translate-x-1 transition"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M8.59 16.58 13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.42Z" />
+                </svg>
+              </a>
             )}
           </div>
         ))}
@@ -87,3 +112,14 @@ const { page } = Astro.props;
     }
   </div>
 </BaseLayout>
+
+<style>
+  .think-cta {
+    transition: background-color 150ms ease, color 150ms ease;
+  }
+
+  .think-cta:hover {
+    background-color: oklch(var(--b3));
+    color: oklch(var(--bc));
+  }
+</style>

@@ -2,7 +2,7 @@
 title: "The agent black box"
 pubDate: "Jul 15 2026"
 tags: ["AI", "Agent", "Harness"]
-thinkingBit: "tha-agent-black-box"
+thinkingBit: "the-agent-black-box"
 ---
 
 
