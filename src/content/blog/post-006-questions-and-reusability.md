@@ -6,7 +6,7 @@ pubDate: "Dec 23 2025"
 ---
 
 
-Reusability is a very good concept. If a function or module can be reused, the code becomes clearer, smaller, more modular, you don't repeat yourself, and the solution feels nice.
+Reusability is a very good concept. If a function or module can be reused, the code becomes clearer, smaller, more modular; you don't repeat yourself, and the solution feels nice.
 
 Let's start building questions. Our base question is: **Is reusability good?**
 
