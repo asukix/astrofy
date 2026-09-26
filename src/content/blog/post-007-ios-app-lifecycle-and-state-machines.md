@@ -23,7 +23,7 @@ The lifecycle elements are states, and the system can take these states:
 - Inactive
 - Active
 - Background
-- Suspend
+- Suspended
 
 ## AppDelegate methods connected to the lifecycle
 
