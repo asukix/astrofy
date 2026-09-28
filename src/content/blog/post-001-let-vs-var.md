@@ -86,7 +86,7 @@ You can also assign a new object to the `var`. For example, when you iterate ove
 
 ## Safety and threading
 
-`let` is immutable, therefore it cannot cause a race condition. There can never be a situation where 2 or more threads try to write it.
+`let` constant of a value type can't be written by another thread, so reading it concurrently is safe. With a reference type, `let` only freezes the reference: the object's `var` properties can still be mutated from several threads at once.
 
 If you use `let` to read its value in a thread, it's constant, so it will always show the same value. For example, if you have a string for showing a specific toast message to the user, you will always show the same message if you use `let`.
 

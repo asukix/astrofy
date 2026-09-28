@@ -149,7 +149,7 @@ For this simple example, my answers to the control questions are:
 Let's add some extra requirements:
 
 - The user can add a paper bag to the basket as an extra.
-- The paper bag is free in the shop.
+- Paper bags are free in the shop.
 - We don't want to count the paper bag's quantity in the cart number.
 
 In this case we don't want to expose this logic to other modules. For example, if the app has a reorder function, it shouldn't have to know how to send the new number.
@@ -223,4 +223,4 @@ In `ControlledCartQuantityPublisher`, anyone can still update and read data from
 - Reusability improves.
 - The app scales better.
 
-In another article I'll add more examples and logic.
+In another article, I'll add more examples and logic.
