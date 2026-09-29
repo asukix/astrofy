@@ -44,13 +44,37 @@ When you define a new variable, in the case of `var` your freedom is higher:
 
 - Contrary to the original assumption, `let` can be used with optionals. However, using `let` with an optional only makes sense if you're not planning to reassign the value. It's useful when you want to declare a constant that will be initialized once, possibly with a delayed assignment (e.g., during initialization), but not changed afterward.
 
-- Computed properties can't be `let`. However, if a property doesn't change and is just a very simple constant calculation, it can only be `var`:
+- Computed properties and `lazy` properties can't be `let`, even when the value never changes. A computed property is evaluated on every access, and a `lazy` property gets its value on first access, after init, which mutates the instance. Both need `var`. If you really want `let`, use a stored constant, or a `static let` if you also want it initialized lazily:
 
-  ```swift
-  let answerToLife: Int { 6 * 7 } // logically ok, but you can't do this
-  ```
+```swift
+  let answerToLife: Int { 6 * 7 }   // error: computed properties must be `var`
+  var answerToLife: Int { 6 * 7 }   // ok: read-only computed property
+  let answerToLife = 6 * 7          // ok: stored constant
 
-- `let` can't be declared in a convenience init, as its value should be set in the designated init.
+  final class Formatter {
+      lazy var cache = buildCache()        // lazy, but `var` and not thread-safe
+      static let shared = DateFormatter()  // lazy + `let` + thread-safe
+  }
+```
+
+- A stored `let` property must get its value in the designated init. A convenience init has to call `self.init(...)` first; after that it can still change `var` properties, but not `let` ones. (Convenience inits exist only for classes.)
+```swift
+  class Order {
+      let id: String
+      var note: String
+
+      init(id: String, note: String) {   // designated init
+          self.id = id
+          self.note = note
+      }
+
+      convenience init(id: String) {
+          self.init(id: id, note: "")
+          note = "created"   // ok: `note` is a var
+          // id = "new-id"   // error: `id` is a let, set only in the designated init
+      }
+  }
+```
 
 ## Performance
 
