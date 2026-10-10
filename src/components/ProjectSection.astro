@@ -1,0 +1,22 @@
+---
+// Projektoldal-szekció: opcionális cím + egységes szövegtörzs.
+// A szövegstílus egy helyen él: JetBrains Mono, méret, sorköz, sorhossz,
+// bekezdés- és listatérköz, listajelek.
+//
+// Használat:
+//   <ProjectSection title="…">  <p>…</p>  <ul><li>…</li></ul>  </ProjectSection>
+//   <ProjectSection as="div">…</ProjectSection>   ← cím és szekció-margó nélkül (pl. a fejlécben)
+interface Props {
+  title?: string;
+  as?: "section" | "div";
+}
+
+const { title, as: Tag = "section" } = Astro.props;
+---
+
+<Tag class:list={[{ "mb-10": Tag === "section" }]}>
+  {title && <h2 class="text-2xl font-bold mb-3">{title}</h2>}
+  <div class="font-['JetBrains_Mono',monospace] text-sm leading-relaxed max-w-[80ch] space-y-2 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:space-y-1">
+    <slot />
+  </div>
+</Tag>

@@ -87,11 +87,25 @@ const thinkingBitsSchema = z.object({
 
 export type ThinkingBitsSchema = z.infer<typeof thinkingBitsSchema>;
 
+// Projekt-aloldalak: src/content/projects/<projekt>/<oldal>.md → /projects/<projekt>/<oldal>
+// A projekt központi oldala (hub) külön .astro fájl: src/pages/projects/<projekt>/index.astro
+const projectsSchema = z.object({
+    title: z.string(),
+    description: z.string().optional(),
+    project: z.string(),       // melyik hubhoz tartozik, pl. "second-thought"
+    order: z.number(),         // sorrend a hubon és az előző/következő navigációban
+    updatedDate: z.string().optional(),
+    draft: z.boolean().optional(), // draft: fejlesztés közben megnyílik, élesben nem épül meg
+});
+
+export type ProjectsSchema = z.infer<typeof projectsSchema>;
+
 const blogCollection = defineCollection({ schema: blogSchema });
 const storeCollection = defineCollection({ schema: storeSchema });
 const thinkingArticleCollection = defineCollection({ schema: thinkingArticleSchema });
 const deepBitsCollection = defineCollection({ schema: deepBitsSchema });
 const thinkingBitsCollection = defineCollection({ schema: thinkingBitsSchema });
+const projectsCollection = defineCollection({ schema: projectsSchema });
 
 export const collections = {
     'blog': blogCollection,
@@ -99,4 +113,5 @@ export const collections = {
     'thinking-articles': thinkingArticleCollection,
     'deep-bits': deepBitsCollection,
     'thinking-bits': thinkingBitsCollection,
+    'projects': projectsCollection,
 }

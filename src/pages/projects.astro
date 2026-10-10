@@ -8,6 +8,21 @@ import HorizontalCard from "../components/HorizontalCard.astro";
     <div class="text-3xl w-full font-bold mb-5">Projects</div>
   </div>
 
+  {/* Second Thought — amíg a hub és az aloldalak vázak, csak fejlesztés közben látszik.
+      Élesítéskor vedd ki az import.meta.env.DEV feltételt. */}
+  {import.meta.env.DEV && (
+    <>
+      <HorizontalCard
+        title="Second Thought"
+        img="/projects/second-thought/card-cover.svg"
+        desc="TODO · rövid leírás + stack"
+        url="/projects/second-thought"
+        target="_self"
+      />
+      <div class="divider my-0"></div>
+    </>
+  )}
+
   <HorizontalCard
     title="MVI Notes App"
     desc="MVINotes — Notes app demonstrating MVI architecture (Store → Controller → Reducer) with Clean Architecture layering, multi-target test strategy across XCTest and Swift Testing.

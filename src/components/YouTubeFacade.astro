@@ -1,0 +1,42 @@
+---
+// YouTube-videó "facade" mintával: amíg nem kattintanak, csak egy helyi előnézeti kép látszik,
+// a YouTube lejátszó (és a sütik/szkriptek) csak kattintásra töltődik be, youtube-nocookie.com-ról.
+//
+// Használat:
+//   <YouTubeFacade id="BwX59-gC_18" title="…" thumbnail="/projects/second-thought/youtube-thumbnail.png" />
+interface Props {
+  id: string;        // YouTube videó-azonosító
+  title: string;     // a lejátszó és a gomb akadálymentes címe
+  thumbnail: string; // helyi előnézeti kép (16:9)
+}
+
+const { id, title, thumbnail } = Astro.props;
+---
+
+<div class="yt-facade relative w-full aspect-video rounded-lg overflow-hidden bg-neutral" data-yt-id={id} data-yt-title={title}>
+  <button type="button" class="group absolute inset-0 w-full h-full cursor-pointer" aria-label={`Play video: ${title}`}>
+    <img src={thumbnail} alt="" width="1280" height="720" loading="lazy" class="w-full h-full object-cover" />
+    <span class="absolute inset-0 flex items-center justify-center">
+      <span class="flex items-center justify-center w-20 h-14 rounded-xl bg-black/70 group-hover:bg-[#F5A623] transition">
+        <svg viewBox="0 0 24 24" class="w-8 h-8 fill-white" aria-hidden="true"><path d="M8 5v14l11-7z" /></svg>
+      </span>
+    </span>
+  </button>
+</div>
+
+<script>
+  // Egy delegált figyelő a dokumentumon: View Transitions mellett is működik új oldalbetöltés nélkül.
+  document.addEventListener("click", (event) => {
+    const button = (event.target as HTMLElement).closest(".yt-facade button");
+    if (!button) return;
+    const box = button.parentElement as HTMLElement;
+    const iframe = document.createElement("iframe");
+    iframe.src = `https://www.youtube-nocookie.com/embed/${box.dataset.ytId}?autoplay=1`;
+    iframe.title = box.dataset.ytTitle ?? "YouTube video";
+    iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
+    iframe.referrerPolicy = "strict-origin-when-cross-origin";
+    iframe.allowFullscreen = true;
+    iframe.className = "absolute inset-0 w-full h-full";
+    box.replaceChildren(iframe);
+  });
+</script>

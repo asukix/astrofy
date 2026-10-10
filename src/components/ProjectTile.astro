@@ -1,0 +1,21 @@
+---
+// Csempe a főoldali Deep Bits kártyák mintájára (szürke háttér, bal oldali sáv, hover-nagyítás).
+// A projekt-hubon használjuk: aloldalak és kapcsolódó cikkek.
+interface Props {
+  href: string;
+  title: string;
+  description?: string;
+  badge?: string;
+}
+
+const { href, title, description, badge } = Astro.props;
+---
+
+<a
+  href={href}
+  class="rounded-xl bg-base-200 border-l-4 border-l-neutral hover:bg-base-100 hover:shadow-lg transition ease-in-out hover:scale-[102%] p-4 flex flex-col gap-2"
+>
+  {badge && <span class="badge badge-secondary w-fit">{badge}</span>}
+  <span class="font-bold text-base leading-snug">{title}</span>
+  {description && <p class="text-xs opacity-70 leading-snug">{description}</p>}
+</a>

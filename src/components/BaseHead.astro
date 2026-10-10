@@ -8,20 +8,21 @@ export interface Props {
 	description: string;
 	image?: string;
 	ogType?: string;
+	favicon?: string; // oldalanként felülírható (pl. projektoldalak saját ikonja)
 }
 
-const { title, description, image = '/social_img.webp', ogType = 'website' } = Astro.props;
+const { title, description, image = '/social_img.webp', ogType = 'website', favicon = 'data:,' } = Astro.props;
 ---
 
 <!-- JetBrains Mono font -->
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
 
 <!-- Global Metadata -->
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<link rel="icon" href="data:," />
+<link rel="icon" href={favicon} />
 <meta name="generator" content={Astro.generator} />
 <link rel="alternate" type="application/rss+xml" title="RSS Feed" href="/rss.xml" />
 

@@ -1,0 +1,52 @@
+---
+// Projekt-aloldalak layoutja (pl. /projects/second-thought/architecture).
+// A központi oldal (hub) saját .astro fájl — ez csak az .md aloldalakat keretezi.
+import BaseLayout from "./BaseLayout.astro";
+
+interface NavLink {
+  title: string;
+  href: string;
+}
+
+export interface Props {
+  title: string;
+  description?: string;
+  updatedDate?: string;
+  hubHref: string; // vissza a projekt központi oldalára
+  favicon?: string; // a projekt saját ikonja a böngészőfülön
+  logo?: string;    // világos logó a cím előtt; kattintásra vissza a hubra
+  prev?: NavLink;  // előző aloldal (order szerint)
+  next?: NavLink;  // következő aloldal (order szerint)
+}
+
+const { title, description, updatedDate, hubHref, favicon, logo, prev, next } = Astro.props;
+---
+
+<BaseLayout title={title} description={description} sideBarActiveItemID="projects" ogType="article" favicon={favicon}>
+  <main class="md:flex md:justify-center">
+    <article class="prose prose-lg max-w-[750px] prose-img:mx-auto">
+      <!-- Vissza a hubra -->
+      <a href={hubHref} class="text-sm no-underline opacity-70 hover:opacity-100">← Project overview</a>
+
+      <div class="not-prose flex items-center gap-3 my-2">
+        {logo && (
+          <a href={hubHref} class="shrink-0" aria-label="Project overview">
+            <img src={logo} width="40" height="40" alt="" class="w-10 h-10" />
+          </a>
+        )}
+        <h1 class="title text-4xl font-bold">{title}</h1>
+      </div>
+      {updatedDate && <div>Last updated on <time>{updatedDate}</time></div>}
+      <div class="divider my-2"></div>
+
+      <slot />
+
+      <!-- Előző / következő aloldal — a frontmatter `order` mezője alapján -->
+      <div class="divider my-6"></div>
+      <nav class="not-prose flex justify-between gap-4 text-sm">
+        {prev ? <a href={prev.href} class="link link-hover">← {prev.title}</a> : <span />}
+        {next ? <a href={next.href} class="link link-hover">{next.title} →</a> : <span />}
+      </nav>
+    </article>
+  </main>
+</BaseLayout>

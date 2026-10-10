@@ -1,0 +1,53 @@
+---
+// Az összes projekt-aloldal route-ja:
+//   src/content/projects/<projekt>/<oldal>.md  →  /projects/<projekt>/<oldal>
+// A projekt központi oldala (pl. /projects/second-thought) külön .astro fájl,
+// a statikus route elsőbbséget élvez ezzel szemben.
+import { type CollectionEntry, getCollection } from "astro:content";
+import ProjectLayout from "../../layouts/ProjectLayout.astro";
+
+export async function getStaticPaths() {
+  // Draft oldalak fejlesztés közben megnyílnak, élesben nem épülnek meg.
+  const entries = (await getCollection("projects")).filter(
+    (e) => import.meta.env.DEV || !e.data.draft
+  );
+
+  const link = (e?: CollectionEntry<"projects">) =>
+    e ? { title: e.data.title, href: `/projects/${e.slug}` } : undefined;
+
+  return entries.map((entry) => {
+    const siblings = entries
+      .filter((e) => e.data.project === entry.data.project)
+      .sort((a, b) => a.data.order - b.data.order);
+    const i = siblings.findIndex((e) => e.id === entry.id);
+
+    return {
+      params: { slug: entry.slug },
+      props: { entry, prev: link(siblings[i - 1]), next: link(siblings[i + 1]) },
+    };
+  });
+}
+
+interface Props {
+  entry: CollectionEntry<"projects">;
+  prev?: { title: string; href: string };
+  next?: { title: string; href: string };
+}
+
+const { entry, prev, next } = Astro.props;
+// Logó-konvenció: public/projects/<projekt>/logo-dark.svg (favicon) és logo-light.svg (cím előtt)
+const { Content } = await entry.render();
+---
+
+<ProjectLayout
+  title={entry.data.title}
+  description={entry.data.description}
+  updatedDate={entry.data.updatedDate}
+  hubHref={`/projects/${entry.data.project}`}
+  favicon={`/projects/${entry.data.project}/logo-dark.svg`}
+  logo={`/projects/${entry.data.project}/logo-light.svg`}
+  prev={prev}
+  next={next}
+>
+  <Content />
+</ProjectLayout>

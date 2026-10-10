@@ -1,0 +1,191 @@
+---
+// Second Thought — projekt központi oldal (hub), /projects/second-thought
+//
+// Szerepe: rövid tájékozódási pont — mi ez, demó, aloldalak, linkek.
+// A részletek az .md aloldalakon: src/content/projects/second-thought/*.md
+// Új aloldal = új .md `project: "second-thought"` mezővel → itt magától megjelenik, `order` szerint.
+//
+// A TODO-dobozok csak vázat jelölnek, élesítés előtt mind tűnjön el.
+import { getCollection } from "astro:content";
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import ProjectSection from "../../../components/ProjectSection.astro";
+import ProjectTile from "../../../components/ProjectTile.astro";
+import YouTubeFacade from "../../../components/YouTubeFacade.astro";
+import createSlug from "../../../lib/createSlug";
+
+const PROJECT = "second-thought";
+const REPO_URL = "https://github.com/asukix/second-thought";
+const README_URL = `${REPO_URL}#readme`;
+
+const subpages = (await getCollection("projects"))
+  .filter((e) => e.data.project === PROJECT)
+  .filter((e) => import.meta.env.DEV || !e.data.draft)
+  .sort((a, b) => a.data.order - b.data.order);
+
+// Kapcsolódó cikkek: az AI taggel jelölt deep bitek, legfrissebb elöl.
+// Új AI-s bit magától bekerül; a többi a tag-oldalon („More”).
+const RELATED_TAG = "AI";
+const RELATED_LIMIT = 2;
+const relatedBits = (await getCollection("deep-bits"))
+  .filter((b) => !b.data.draft && b.data.tags?.includes(RELATED_TAG))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+---
+
+<BaseLayout title="Second Thought" sideBarActiveItemID="projects" favicon="/projects/second-thought/logo-dark.svg">
+  <!-- TODO: description prop a BaseLayoutnak (SEO / megosztási előnézet) -->
+
+  <header class="mb-8">
+    <!-- Logó (világos változat) a cím előtt; a sötét változat a favicon -->
+    <div class="flex items-center gap-4 mb-3">
+      <img src="/projects/second-thought/logo-light.svg" width="56" height="56" alt="" class="w-14 h-14 shrink-0" />
+      <h1 class="text-4xl font-bold">Second Thought</h1>
+    </div>
+    <ProjectSection as="div">
+      <p>My website is a space for thinking. It contains thinking content alongside the usual articles.</p>
+      <p><b>Second Thought</b> is a tool that helps me do it better. The tool is my article harness around the LLM.</p>
+    </ProjectSection>
+    <div class="flex gap-3 mt-4">
+      <a href={REPO_URL} target="_blank" class="btn btn-sm btn-outline">GitHub</a>
+      <a href={README_URL} target="_blank" class="btn btn-sm btn-ghost">README</a>
+    </div>
+  </header>
+
+  <ProjectSection title="What is Second Thought?">
+    <p>Second Thought is a tool that helps me to check my articles and improve their quality.</p>
+    <p>It currently has two main features:</p>
+    <ul>
+      <li><b>Language check:</b> helps to correct grammar.</li>
+      <li><b>Editorial review:</b> provides feedback about the article's content and structure.</li>
+    </ul>
+  </ProjectSection>
+
+  <!-- ─────────────────────────────────────────────
+       2. DEMO
+       YouTube video
+       ───────────────────────────────────────────── -->
+  <section class="mb-10">
+    <YouTubeFacade
+      id="BwX59-gC_18"
+      title="Second Thought demo"
+      thumbnail="/projects/second-thought/youtube-thumbnail.png"
+    />
+  </section>
+
+  <ProjectSection title="Why did I want my own harness?">
+    <p>Firstly, I was learning about AI, LLMs and harnesses. I wanted to create my own harness and try it myself.</p>
+    <p>Secondly, I wanted a tool that only provides information and tips for me.</p>
+  </ProjectSection>
+
+  <ProjectSection title="Harness of Second Thought vs. a general agent">
+    <p>In the diagram below, you can see the structure of Second Thought's harness compared to a general agent.</p>
+    <p>You can see that the input is an article that is first segmented, then processed by the harness. 
+      After that, the context is passed to the LLM. The process doesn't stop here. 
+      The output of the LLM is then processed by a second harness layer (guard, diff).
+      When the LLM provides the output, the harness can check the output, handle errors and provide feedback to the user.
+    </p>
+    <p><br/>
+      <a
+        href="/projects/second-thought/Harness.webp"
+        target="_blank"
+        rel="noopener"
+        class="block cursor-zoom-in"
+        title="Open full-size image"
+      >
+        <img
+          src="/projects/second-thought/Harness.webp"
+          width="1251"
+          height="1002"
+          loading="lazy"
+          alt="Side-by-side diagram. Left: a general agent, where the harness (system prompt, tools, context history) builds the context, the LLM's output goes straight to the user, and the context loops back into the history. Right: Second Thought, where the article is first segmented, the harness builds the context without tools or a loop, and after the LLM a second harness layer (guard, diff) produces the output."
+          class="w-full h-auto rounded-lg"
+        />
+      </a>
+    </p>
+  </ProjectSection>
+
+  <!-- ─────────────────────────────────────────────
+       5. NYITOTT HELYEK — döntés kell, hova kerülnek
+       • Mit tanultam + How it was built (Claude co-author):
+           itt a hubon szekcióként, VAGY saját aloldal (új .md, `order`).
+       • Kulcsdöntések és trade-offok:
+           szétosztva az aloldalakon, ahol keletkeztek, VAGY külön döntésnapló aloldal.
+       • Korlátok és következő lépések: nem itt — link a README Roadmapjére (lent).
+       ───────────────────────────────────────────── -->
+  <ProjectSection title="What I learned during the project">
+    <ul>
+      <li>Stop and give time to thinking</li>
+      <li>Quality over functionality</li>
+      <li>Work with AI</li>
+      <li>Architecture before implementation</li>
+    </ul>
+    <p><a href="/projects/second-thought/lessons" class="link link-hover">Read more →</a></p>
+  </ProjectSection>
+
+  <ProjectSection title="Subpages">
+    <section class="mb-10 grid grid-cols-1 md:grid-cols-2 gap-6">
+      {
+        subpages.map((page) => (
+          <ProjectTile
+            href={`/projects/${page.slug}`}
+            title={page.data.title}
+            description={page.data.description}
+            badge={page.data.draft ? "draft" : undefined}
+          />
+        ))
+      }
+    </section>
+  </ProjectSection>
+  
+  <ProjectSection title="Connected articles">
+    <section class="mb-10">      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {
+          relatedBits.slice(0, RELATED_LIMIT).map((bit) => (
+            <ProjectTile
+              href={`/deep-bits/${createSlug(bit.data.title, bit.slug)}`}
+              title={bit.data.title}
+              description={bit.data.description}
+            />
+          ))
+        }
+      </div>
+      {
+        relatedBits.length > RELATED_LIMIT && (
+          <a href={`/deep-bits/tag/${RELATED_TAG}`} class="link link-hover text-sm inline-block mt-4">
+            More ({relatedBits.length - RELATED_LIMIT}) →
+          </a>
+        )
+      }
+    </section>
+  </ProjectSection>
+
+  <!-- ─────────────────────────────────────────────
+       6. LINKBLOKK
+       Repó, README (roadmap ott él).
+       ───────────────────────────────────────────── -->
+  <footer class="mb-10">
+    <div class="divider"></div>
+    <ul class="list-none space-y-1 text-sm">
+      <li><a href={REPO_URL} target="_blank" class="link link-hover">GitHub repository</a></li>
+      <li><a href={`${REPO_URL}#roadmap`} target="_blank" class="link link-hover">Roadmap (README)</a></li>
+    </ul>
+  </footer>
+</BaseLayout>
+
+<style>
+  /* Vázjelölő — élesítés előtt minden .todo elem eltűnik */
+  .todo {
+    border: 1px dashed oklch(var(--bc) / 0.3);
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    opacity: 0.6;
+  }
+  .todo-tall {
+    min-height: 12rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+</style>

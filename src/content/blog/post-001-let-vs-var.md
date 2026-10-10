@@ -17,13 +17,13 @@ Here's a breakdown of the key differences between `let` and `var`, grouped by as
 
 ## Usage
 
-`let` is used like a constant, while `var` represents values that may change. The compiler also helps you: if you don't change the value but declared your variable as `var`, you will get a SwiftLint warning.
+`let` is used like a constant, while `var` represents values that may change. The compiler also helps you: if you don't change the value but declare your variable as `var`, you will get a SwiftLint warning.
 
 ### Definition
 
 When you define a new variable, in the case of `var` your freedom is higher:
 
-- `let` is immutable, `var` is mutable. In the case of a primitive type, `let` is a constant. However, if an object is created with `let`, its values can be modified depending on its definition:
+- `let` is immutable, `var` is mutable. In the case of a primitive type, `let` is a constant. However, if an object is created with `let`, its values can be modified depending on its definition
 
   ```swift
   public class ObjTest {
