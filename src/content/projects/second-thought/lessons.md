@@ -41,5 +41,5 @@ I used Claude for the project. Here is my trade-off. It relates to how I used it
 ## Architecture before implementation
 
 After I stopped to make the project site, I had time to understand the architecture. Unfortunately, at first I only planned the functionality and then started development. With this method I didn't have time to step back and see the bigger picture.
-I made a [drawing of the architecture](/projects/second-thought/architecture). While I was drawing it, I had time to think about it. This led me to plan the next architecture version of the app. It also revealed some weaknesses and possibilities.
+I made a [drawing of the architecture](/projects/second-thought/architecture). While I was drawing it, I had time to think about it. This led me to plan the next architecture version of the app. It also revealed some [weaknesses and possibilities](/projects/second-thought/architecture#planned-architecture).
 I like architectures, and I decided that I will plan them before implementing a project and stop to improve them from time to time before continuing.
