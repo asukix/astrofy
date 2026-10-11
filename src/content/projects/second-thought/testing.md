@@ -1,15 +1,10 @@
 ---
 title: "Testing"
-# description: a hub kártyáján jelenik meg
+description: Test pyramid in the project.
 project: "second-thought"
-order: 4 # a sorrend még nincs eldöntve
-draft: true
+order: 4
+draft: false
 ---
 
-<!--
-VÁZ — tartalom még nincs.
-
-Anyag (kontextus-dokumentum):
-  9. pont — tesztpiramis (unit / integráció / E2E), live smoke test (opt-in),
-            elvek (független tanú, egy teszt egy ok, pontos literál, az idő adat, friss klón)
--->
+In the project I followed the test pyramid. Most of the tests are unit tests. Integration tests use fake passes and a fake LLM to test the whole review flow, and a few end-to-end tests run the CLI as a real process.
+There is also a live smoke test that checks the whole chain against the real Gemini API. It is skipped by default and runs only with `SECOND_THOUGHT_LIVE=1`.
