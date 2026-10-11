@@ -1,30 +1,40 @@
 ---
 title: "Dogfood"
-# description: a hub kártyáján jelenik meg
+description: I tested Second Thought on my blog.
 project: "second-thought"
 order: 3 # a sorrend még nincs eldöntve
-draft: true
+draft: false
 ---
 
-When I had my first versions I would like to try my tool. I had 2 draft articles but I thought that my blog posts and deep bits are good to try.
+## Why I used dogfooding
 
-## Why I used dogfood
+After I finished my first version of Second Thought, I wanted to try it. I had draft articles, but only two. So I decided to check my existing blog posts and deep bits to get useful information and reveal issues in my project. Another motivation was to make my articles better.
 
-I needed some input for try and check how it works. It was very useful because I found several issues: 429 etc.
+## Article fixes
 
-## How did the dogfood help me?
+During dogfooding I got a lot of feedback from the tool, and I made several fixes to my articles. It was a good help to improve their quality. My plan is to continue checking my articles.
 
+## How did dogfooding help me?
 
-<!--
-VÁZ — tartalom még nincs.
+When I tried it on my articles, fortunately I found several issues that helped me improve the quality.
 
-Anyag (kontextus-dokumentum):
-  10. pont — korpusz, módszer, hibamód → javítás → réteg táblázat,
-             a valódi szakmai hibák a saját cikkekben, a tanulság (tünet vs. ok)
-  16. pont — CLI-mintakimenet (post-008)
+### Narrowing the result
 
-Nyitott:
-  • Szűkített editek (8. pont): itt vagy az architektúra oldalon?
+I had a language error with one word: "give", with the suggested fix "would give". The LLM gave back a whole sentence instead of the exact word. This is noise for the user, so I built in multiple checks to narrow the result from the LLM:
+- The language pass tries to locate the exact part of the change with a helper.
+- The LLM got a rule to provide the changes precisely, with location information.
+- A fallback logic works between the previous mechanisms. If the first fails, I use the second solution.
 
-Élesítés előtt: a mutatott cikkrészletek javítása (post-002, post-008) — az olvasó rájuk kattint.
--->
+### Guard and protected ranges
+
+The language pass made a correction inside inline code and suggested replacing `let` with ``let``.
+I added protected ranges to keep several parts of the article unchanged by language suggestions, like code blocks, inline code, frontmatter or HTML elements.
+I also added a guard to keep the protected ranges untouched.
+
+### Planned placeholders
+
+The editorial pass made suggestions because it can't see some parts of the article because of the protected ranges. With placeholders I can tell it that there is a code block or some HTML there, to get better suggestions. The code block part is already partly fixed.
+
+### Planned new persona
+
+The editorial pass makes suggestions for technical articles, where I have or should have code or concrete examples. It is usually good, but not always. Sometimes I write reflective essays. In this case I need a different persona for editorial suggestions.
