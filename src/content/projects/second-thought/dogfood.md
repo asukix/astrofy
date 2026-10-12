@@ -27,7 +27,7 @@ I had a language error with one word: "give", with the suggested fix "would give
 
 ### Guard and protected ranges
 
-The language pass made a correction inside inline code and suggested replacing `let` with ``let``.
+The language pass made a correction inside inline code (`let`), where it should never change anything.
 I added protected ranges to keep several parts of the article unchanged by language suggestions, like code blocks, inline code, frontmatter or HTML elements.
 I also added a guard to keep the protected ranges untouched.
 

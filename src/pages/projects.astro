@@ -8,24 +8,15 @@ import HorizontalCard from "../components/HorizontalCard.astro";
     <div class="text-3xl w-full font-bold mb-5">Projects</div>
   </div>
 
-  {
-    /* Second Thought — amíg a hub és az aloldalak vázak, csak fejlesztés közben látszik.
-      Élesítéskor vedd ki az import.meta.env.DEV feltételt. */
-  }
-  {
-    import.meta.env.DEV && (
-      <>
-        <HorizontalCard
-          title="Second Thought"
-          img="/projects/second-thought/card-cover.svg"
-          desc="This is a tool that helps me to do my articles better using AI as a writting assitant."
-          url="/projects/second-thought"
-          target="_self"
-        />
-        <div class="divider my-0" />
-      </>
-    )
-  }
+  <HorizontalCard
+    title="Second Thought"
+    img="/projects/second-thought/card-cover.svg"
+    desc="This is a tool that helps me to do my articles better using AI as a writting assitant."
+    url="/projects/second-thought"
+    target="_self"
+    />
+  <div class="divider my-0" />
+  </>
 
   <HorizontalCard
     title="MVI Notes App"
