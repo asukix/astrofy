@@ -1,47 +1,72 @@
 ---
 title: "Error handling"
-# description: a hub kártyáján jelenik meg
-project: "second-thought"
-order: 2 # a sorrend még nincs eldöntve
-draft: true
+description: There is a layered error handling in the project.
+order: 2 
+draft: false
 ---
 
-<!--
-VÁZ — tartalom még nincs.
+During dogfooding I ran into several issues:
 
-Anyag (kontextus-dokumentum):
-  7. pont — a bug, a felismerés, hiba mint érték, felelősségi lánc, policy, retry, felhasználói szöveg
-  11. pont — idetartozó döntések: LlmResult, retry az adapterben, retryDelay alsó korlát
+- 429 errors once I exceeded Gemini's free-tier limit
+- dropped network connections that skipped the retry
+- an unclosed HTML tag (`<br>`) that broke parsing and crashed the run
+- and the most misleading one: a 429 that showed up as a parse error
 
-Lehetséges ív:
-  1. A bug: a 429 parse-errorként jelent meg (egy catch-all elnyelte), a nyers JSON kiszivárgott.
-  2. A felismerés: a TS típusa nem mondja meg, mit dobhat egy függvény → a hiba láthatatlan.
-  3. A döntés: a hiba érték (LlmResult, zárt LlmErrorKind lista); a váratlan marad kivétel.
-  4. A felelősségi lánc: adapter fordít → port szerződés → passz jelent → review() dönt → presentation fogalmaz.
-  5. A policy: fail-fast rendszerszintű hibánál, folytatás a bad-requestnél; retry az adapterben.
-  6. Az ár: több rétegen átnyúló változtatás, több boilerplate.
+They were a good opportunity to improve the error handling. I fixed them one by one first,
+then redesigned the error handling across the layers.
 
-Második példa ugyanarra a mintára (2026-10):
-  Az editorial pass ellenőrzés nélkül vette át az LLM JSON-ját → üzenet nélküli finding →
-  VS Code: „TypeError: message must be set”. Javítás a határon: a válasz nem megbízható adat
-  (üres üzenet → kategória, ha az sincs → kihagyás). Tanulság: a hiba ott javítandó, ahol
-  a nem ellenőrzött adat belép, nem ott, ahol felrobban.
+## Error fixes
 
-Kódrészletek (rövidek):
-  • LlmErrorKind / LlmResult típus (ports/llm.ts)
-  • a SYSTEMIC halmaz és a fail-fast (review.ts)
-  • a backoff mint adat a tesztben: [2000, 4000, 8000, 16000]
+First I fixed the issues one by one as the dogfooding surfaced them. On a 429 or a network error,
+the Gemini adapter now retries with exponential backoff. An unparsable file (for example an unclosed `<br>`)
+no longer crashes the run: a parse guard turns it into a single error finding.
 
-Előtte/utána: nyers 429-JSON vs. „Gemini quota exhausted. Wait a minute and run again.”
+## Layered error handling
 
-Planned (csak utalás): retry az adapterben, fallback a modulban, fail-fast a review-ban →
-  ki dönt melyik hibáról? (nyitott kérdés, lásd planned architektúra)
+The most instructive bug was a 429 that showed up as a parse error: a catch-all swallowed the real cause.
+Until then the project only caught errors and tried to recover. At this point I stopped and designed
+the error handling: errors became values, and each layer got one job.
 
-Nyitott:
-  • Mi a határ ez az aloldal és a későbbi hibakezelés-cikk között?
-    (Az aloldal mit rögzít, a cikk mit tanít?)
-    Egy lehetséges válasz: az aloldal a „mi történt és mit döntöttem” (ennél a projektnél),
-    a cikk az átvihető gondolat („ki dönt a hibáról?”), a projekt csak példa benne.
--->
+### Error layers
 
-During dogfood I faced up savaral issues
+- **Mapping (adapter):** the adapter retries first. If that doesn't help, it translates the provider's
+  error into one of our own error kinds. The raw response never crosses the port.
+
+```ts
+  if (status === 429) {
+    return { kind: "rate-limited", message: "Gemini: quota exhausted (429).", retryAfterMs };
+  }
+```
+
+- **Contract (port):** the port defines that a call returns a value, not an exception.
+
+```ts
+  export type LlmResult =
+    | { ok: true; text: string }
+    | { ok: false; error: LlmError };
+```
+
+- **Forwarding (pass):** a pass doesn't decide and doesn't hide the error, it just reports it.
+
+```ts
+  if (!result.ok) return { findings: [], llmError: result.error };
+```
+
+- **Decision (core):** `review()` sees the whole run, so the policy lives here. On a systemic error it stops
+  the remaining passes (fail-fast); a `bad-request` is local, so the next pass still runs.
+
+```ts
+  const SYSTEMIC = new Set(["rate-limited", "unavailable", "auth"]);
+  // ...
+  if (outcome.llmError) {
+    findings.push(llmErrorFinding(outcome.llmError));
+    if (SYSTEMIC.has(outcome.llmError.kind)) break;
+  }
+```
+
+- **Presentation (frontends):** the error category becomes a message the user can act on.
+
+```ts
+  case LlmErrorCategory["rate-limited"]:
+    return "Gemini quota exhausted. Wait a minute and run again.";
+```
