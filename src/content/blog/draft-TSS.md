@@ -1,11 +1,12 @@
 ---
-title: "Thinking Space System Draft"
+title: "One Sentence Draft"
 description: This is how I create a space where I can enjoy thinking from anywhere without any tool.
 pubDate: "Aug 9 2026"
 tags: ["iOS in 1 Sentence"]
 draft: true
 ---
 
+<!--
 ## The thinking space
 Currently, it is very easy to get information and answers. This is useful when we need to know something. For example: if I plan my holiday I would like to know what accommodations are available where I want to go. In this case I just want some quick information.
 When I am learning I like to slow down. I am curious and I like asking questions. Everyone likes asking questions because we like to explore. If you slow down to ask questions, you also give yourself thinking space, and let yourself **enjoy thinking**. Because when you find answers you will have time to enjoy the way, not just get the goal. This is a wonderful process where you can be yourself, where you can ask questions like a child and your thinking space can be your own playground that you can reach from anywhere without any tool.
@@ -21,6 +22,8 @@ If you start thinking about a topic and you start building your own mental model
 - Checking the existing models: if my mental model already exists and is well known, that means it was a valid thought. This does not mean your answer is wrong. It means you are able to make a good mental model.
 - Explain it: when I try to explain something I learnt, it helps me to find my gaps.
 - Write it: I like writing — a blog, a thinking article, or a deep bit. It helps me to structure my knowledge, and it gives me time to think it over again and again. And with writing and explanation, I feel that I can give back something useful.
+
+-->ß
 
 ## The Open Sentence
 I like the idea from Feynman: to try to compress information. This is what he said:
