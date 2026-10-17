@@ -29,9 +29,9 @@ There is one aspect of building mental models that I find difficult: dismantling
 
 ## Validate the model
 
-After learning about mental models and beginning to consciously construct my own, the need arose to validate them. I use the next methods for validation:
+After learning about mental models and beginning to consciously construct my own, the need arose to validate them. I use the following methods for validation:
 - I just try it
-- Comparing with other models: When I built a mental model I can check if there are similar methods or thoghts maybe practices. If there I can make a comparision if my own can be work or not.
+- Comparing with other models: when I build a mental model, I can check whether there are similar methods, thoughts, or practices. If there are, I can compare them to see whether my own holds up or not.
 
 **Article Note:** I will write an article about validation.
 
