@@ -25,7 +25,7 @@ I enjoy sitting down to think about various topics, and I like doing so even mor
 
 There is one aspect of building mental models that I find difficult: dismantling my own mental model. How I go about doing this—and why it’s beneficial—is a topic for another article.
 
-**Article Note:** You can read it soon under my [Destruction of a mental model](blog/destruction-of-a-mental-model) article
+**Article Note:** You can read it soon under my [Destruction of a mental model](/blog/destruction-of-a-mental-model) article
 
 ## Validate the model
 
