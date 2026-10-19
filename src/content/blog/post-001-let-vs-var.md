@@ -3,6 +3,7 @@ title: "Swift's Let vs var:  Beyond immutable vs mutable"
 description: "The let and var is much more than mutable and immutable. They are important in performance safety and memory management as well"
 heroImage: "/let-vs-var-card.svg"
 pubDate: "Apr 19 2025"
+tags: ["Swift", "Memory Management", "Performance"]
 ---
 
 # What is the real difference between `let` and `var` in Swift?

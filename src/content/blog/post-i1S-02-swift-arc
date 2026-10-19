@@ -3,7 +3,7 @@ title: "Swift ARC in 1 Sentence"
 description: "This is the first element of the Swift in 1 Sentence"
 heroImage: "/swift-arc-card.svg"
 pubDate: "Nov 1 2026"
-tags: ["Swift in 1 Sentence"]
+tags: ["Swift in 1 Sentence", "Swift", "Memory Management"]
 thinkingArticle: "ios-memory-management-in-1-sentence"
 badge: "Will be released soon"
 ---

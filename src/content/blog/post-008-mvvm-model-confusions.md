@@ -3,6 +3,7 @@ title: "MVVM Model confusions"
 description: "I had some confusions in MVVM around models."
 heroImage: "/mvvm-model-confusions-card.svg"
 pubDate: "Mar 16 2026"
+tags: ["iOS", "Architecture", "MVVM"]
 ---
 
 I'd like to share some misunderstandings I had about the Model in MVVM. These are my own misconceptions — maybe they'll help you too.

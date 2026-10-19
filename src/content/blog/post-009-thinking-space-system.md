@@ -3,6 +3,9 @@ title: "Thinking Space System"
 description: This is how I create a space where I can enjoy thinking from anywhere without any tool.
 heroImage: "/thinking-space-system-card.svg"
 pubDate: "Oct 16 2026"
+tags: ["Thinking", "Mental Models", "Learning"]
+series: "Thinking Space System"
+badge: "Thinking Space System"
 ---
 
 ## "Run Forrest Run"
@@ -25,16 +28,10 @@ I enjoy sitting down to think about various topics, and I like doing so even mor
 
 There is one aspect of building mental models that I find difficult: dismantling my own mental model. How I go about doing this—and why it’s beneficial—is a topic for another article.
 
-**Article Note:** You can read it soon under my [Destruction of a mental model](/blog/destruction-of-a-mental-model) article
-
-## Validate the model
-
-After learning about mental models and beginning to consciously construct my own, the need arose to validate them. I use the following methods for validation:
-- I just try it
-- Comparing with other models: when I build a mental model, I can check whether there are similar methods, thoughts, or practices. If there are, I can compare them to see whether my own holds up or not.
-
-**Article Note:** I will write an article about validation.
-
 ## Recap in one sentence
 
-I believe that if we pause to understand things and construct our own mental models, we gain a deeper understanding—one that we can draw upon at any time.
+When I pause and create my own mental model during learning, I gain a deeper understanding that I can draw on at any time.
+
+---
+
+**Series Note:** This is the opening of my **Thinking Space System** series — on slowing down, building my own mental models, and keeping them honest. Next in the series: [Destruction of a mental model](/blog/destruction-of-a-mental-model) — why tearing down your own model is the hard part, and why it pays off.

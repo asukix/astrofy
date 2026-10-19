@@ -3,6 +3,7 @@ title: "Disadvantages of reactive programming"
 description: "The Observer is good when we need to react to an event, but it comes at a price."
 heroImage: "/reactive-programming-disadvantages-card.svg"
 pubDate: "Sep 20 2025"
+tags: ["Swift", "Combine", "Reactive Programming", "Software Design"]
 ---
 
 # The hidden costs of reactive programming: control and ownership in Combine

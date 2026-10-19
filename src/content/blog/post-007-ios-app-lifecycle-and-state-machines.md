@@ -3,6 +3,7 @@ title: "iOS App lifecycle & State Machines"
 description: iOS App lifecycle works as a state machine
 heroImage: "/ios-lifecycle-state-machines-card.svg"
 pubDate: "Marc 13 2026"
+tags: ["iOS", "Swift", "State Machines"]
 ---
 
 In this article I try to understand the behaviour and system behind the iOS App lifecycle. I'll draw a parallel between the iOS App Lifecycle and state machines.

@@ -3,6 +3,7 @@ title: "Stateless? Decoupled? Think Again. The Real cost of Combine in Complex s
 description: How breaks the combine the illusion of isolation?
 heroImage: "/real-cost-of-combine-card.svg"
 pubDate: "Apr 22 2025"
+tags: ["Swift", "Combine", "Reactive Programming", "Software Design"]
 ---
 
 # Ownership, freshness, and isolation: tradeoffs in Swift data passing
