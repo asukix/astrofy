@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import HorizontalCard from "../../components/HorizontalCard.astro";
+import TagFilter from "../../components/TagFilter.astro";
 import { getCollection } from "astro:content";
 import createSlug from "../../lib/createSlug"
 
@@ -18,6 +19,8 @@ const { page } = Astro.props;
   <div class="mb-5">
     <div class="text-3xl w-full font-bold">Blog</div>
   </div>
+
+  <TagFilter />
 
   {
     page.data.length === 0 ? (

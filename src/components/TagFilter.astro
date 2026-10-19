@@ -1,0 +1,36 @@
+---
+import { getCollection } from "astro:content";
+
+const { activeTag } = Astro.props;
+
+const posts = (await getCollection("blog")).filter((p) => !p.data.draft);
+const counts = new Map<string, number>();
+posts.forEach((post) => {
+  (post.data.tags || []).forEach((tag) => counts.set(tag, (counts.get(tag) || 0) + 1));
+});
+// most used tags first, then alphabetical
+const tags = [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+---
+
+{
+  tags.length > 0 && (
+    <nav aria-label="Filter posts by tag" class="flex flex-wrap gap-2 mb-6">
+      <a
+        href="/blog"
+        class:list={["badge badge-lg", activeTag ? "badge-outline" : "badge-primary"]}
+        aria-current={activeTag ? undefined : "page"}
+      >
+        All ({posts.length})
+      </a>
+      {tags.map(([tag, count]) => (
+        <a
+          href={`/blog/tag/${tag}`}
+          class:list={["badge badge-lg", tag === activeTag ? "badge-primary" : "badge-outline"]}
+          aria-current={tag === activeTag ? "page" : undefined}
+        >
+          {tag} ({count})
+        </a>
+      ))}
+    </nav>
+  )
+}
