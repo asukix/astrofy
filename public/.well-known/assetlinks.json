@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.sengdev.surpriser",
+      "sha256_cert_fingerprints": [
+        "3A:7D:7A:F0:2C:AE:5E:FB:A7:AA:84:2A:8C:F4:7B:74:0B:3C:B0:99:45:DE:B9:38:B4:59:7C:3E:A7:7A:01:88"
+      ]
+    }
+  }
+]
