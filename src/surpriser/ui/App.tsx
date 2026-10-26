@@ -206,14 +206,16 @@ function GiverApp({ me }: { me: User }) {
       content = (
         <InviteScreen
           myEmail={me.email}
+          myName={me.displayName}
           sent={snapshot.sentPending}
+          onInfo={(text) => toast.show(text)}
           onInvite={async (email) => {
             let outcome = "sent" as "sent" | "accepted";
             const ok = await guarded(async () => {
               outcome = await invite(me, email);
             }, null);
-            if (ok) toast.show(outcome === "accepted" ? S.inviteAcceptedBack : S.inviteSent);
-            return ok;
+            if (ok && outcome === "accepted") toast.show(S.inviteAcceptedBack);
+            return ok ? outcome : null;
           }}
         />
       );

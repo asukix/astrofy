@@ -244,3 +244,41 @@ export function Toast({ message, onDismiss }: { message: ToastMessage | null; on
     </div>
   );
 }
+
+const HOME_HINT_KEY = "surpriser.homeScreenHintDismissed";
+
+/** iPhone/iPad in Safari, not yet opened from the home screen: explain how to add it (once). */
+export function HomeScreenHint() {
+  const [show, setShow] = useState(false);
+  useEffect(() => {
+    try {
+      const ios = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+      const standalone = (navigator as Navigator & { standalone?: boolean }).standalone === true
+        || window.matchMedia("(display-mode: standalone)").matches;
+      setShow(ios && !standalone && localStorage.getItem(HOME_HINT_KEY) !== "1");
+    } catch {
+      setShow(false);
+    }
+  }, []);
+  if (!show) return null;
+  return (
+    <aside class="sp-hint">
+      <p class="font-semibold">{S.homeScreenTitle}</p>
+      <p class="text-sm mt-1">{S.homeScreenIos}</p>
+      <button
+        type="button"
+        class="btn btn-ghost btn-sm mt-2 -ml-3 text-primary"
+        onClick={() => {
+          try {
+            localStorage.setItem(HOME_HINT_KEY, "1");
+          } catch {
+            // Without storage the hint simply shows again next time.
+          }
+          setShow(false);
+        }}
+      >
+        {S.homeScreenDismiss}
+      </button>
+    </aside>
+  );
+}

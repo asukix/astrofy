@@ -2,7 +2,7 @@ import type { ComponentChildren } from "preact";
 import { useState } from "preact/hooks";
 import { previewOf, type Board, type PersonWishes } from "../model";
 import { S } from "../strings";
-import { Avatar, personSubtitle, Spinner, WishRow } from "./components";
+import { Avatar, HomeScreenHint, personSubtitle, Spinner, WishRow } from "./components";
 import { href } from "./router";
 
 export function BoardScreen({
@@ -41,6 +41,7 @@ export function BoardScreen({
 
   return (
     <div class="flex flex-col gap-8">
+      <HomeScreenHint />
       {myList}
 
       {board.managed.length > 0 && (

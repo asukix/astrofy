@@ -21,6 +21,15 @@ export const isConfigured = useEmulator || !Object.values(firebaseConfig).includ
 /** Where the app lives; e-mail links (verification, password reset) come back here. */
 export const APP_PATH = "/apps/surpriser";
 
+/**
+ * Sign in with Apple needs a paid Apple Developer Program membership (Services ID + key, see README).
+ * Until that's set up, the button stays hidden.
+ */
+export const APPLE_SIGN_IN_ENABLED = false;
+
+/** Public address of the web view; invitation links point here (also on localhost). */
+export const PUBLIC_ORIGIN = "https://sengdev.com";
+
 /** Data controller shown on the privacy notice and the account deletion page. */
 export const CONTROLLER = {
   name: "Seng (sengdev.com)",

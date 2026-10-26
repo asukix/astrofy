@@ -1,21 +1,29 @@
 import { useState } from "preact/hooks";
 import type { SentInvitation } from "../data/board";
+import { invitationLink, shareInvitation } from "../data/invitationLink";
 import { EMAIL_PATTERN, normalizeEmail } from "../format";
 import { S } from "../strings";
 
 export function InviteScreen({
   myEmail,
+  myName,
   sent,
   onInvite,
+  onInfo,
 }: {
   myEmail: string;
+  myName: string;
   sent: SentInvitation[];
-  /** Resolves true when the invitation went out (or was answered), so the field can be cleared. */
-  onInvite: (email: string) => Promise<boolean>;
+  /** "sent": a new invitation; "accepted": they had invited me, so it counted as accepting; null: failed. */
+  onInvite: (email: string) => Promise<"sent" | "accepted" | null>;
+  /** Short confirmation at the bottom of the screen. */
+  onInfo: (text: string) => void;
 }) {
   const [email, setEmail] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  /** The address just invited: its link is offered right away. */
+  const [justInvited, setJustInvited] = useState<string | null>(null);
 
   const submit = async (event: Event) => {
     event.preventDefault();
@@ -25,10 +33,21 @@ export function InviteScreen({
     setError(null);
     setBusy(true);
     try {
-      if (await onInvite(address)) setEmail("");
+      const result = await onInvite(address);
+      if (result) setEmail("");
+      setJustInvited(result === "sent" ? address : null);
     } finally {
       setBusy(false);
     }
+  };
+
+  const share = async (inviteeEmail: string) => {
+    const result = await shareInvitation(
+      invitationLink(myName, inviteeEmail),
+      S.shareInviteTitle,
+      S.shareInviteText(myName),
+    );
+    if (result === "copied") onInfo(S.linkCopied);
   };
 
   return (
@@ -48,13 +67,29 @@ export function InviteScreen({
         <p class="text-sm text-base-content/60">{S.inviteNoEmailNote}</p>
       </form>
 
+      {justInvited && (
+        <div class="sp-booking sp-booking--mine" role="status">
+          <p class="font-semibold">{S.inviteSentShare}</p>
+          <p class="text-sm mt-1 break-words opacity-80">{justInvited}</p>
+          <button type="button" class="btn btn-secondary w-full mt-3" onClick={() => share(justInvited)}>
+            {S.shareInvite}
+          </button>
+          <p class="text-xs mt-3 opacity-70 break-words">
+            {S.inviteLinkLabel} {invitationLink(myName, justInvited)}
+          </p>
+        </div>
+      )}
+
       {sent.length > 0 && (
         <section>
           <h2 class="sp-section-title text-xl">{S.sentInvitations}</h2>
           <ul class="sp-card sp-wishlist">
             {sent.map((inv) => (
-              <li key={inv.id} class="px-4 py-3 text-base-content/80 break-all">
-                {S.sentInvitationItem(inv.inviteeEmail)}
+              <li key={inv.id} class="flex items-center gap-3 px-4 py-2">
+                <span class="flex-1 min-w-0 text-base-content/80 break-words">{S.sentInvitationItem(inv.inviteeEmail)}</span>
+                <button type="button" class="btn btn-ghost btn-sm text-primary shrink-0" onClick={() => share(inv.inviteeEmail)}>
+                  {S.shareInvite}
+                </button>
               </li>
             ))}
           </ul>

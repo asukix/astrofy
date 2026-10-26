@@ -43,6 +43,8 @@ export const S = {
   logout: "Kijelentkezés",
   webIntro: "A Surpriser webes nézete: telepítés nélkül látod a családod kívánságait, és névtelenül lefoglalhatod, amit megveszel.",
 
+  invitedByLead: "A meghívás erre a címre szól. Ezzel a címmel regisztrálj vagy lépj be (Google-lel is, ha ez a Google-fiókod címe):",
+
   // Board
   boardTitle: "Kívánságlisták",
   myBookings: "Foglalásaim",
@@ -63,6 +65,9 @@ export const S = {
   childOf: (parents: string) => `${parents} gyereke`,
   groupSubtitle: "Közös kívánságaik",
   managedHint: "A gyerekeid listáit az appban szerkesztheted; itt lefoglalhatod, amit megveszel nekik.",
+  homeScreenTitle: "Tedd ki a kezdőképernyőre",
+  homeScreenIos: "Safariban koppints a Megosztás gombra, majd a „Főképernyőhöz adás” pontra: így a Surpriser saját ikonnal, appként nyílik meg.",
+  homeScreenDismiss: "Rendben",
   appOnlyNote: "A gyerekeid listáit és az ajándéktervezőt az Android-appban kezelheted.",
 
   // My list
@@ -124,8 +129,14 @@ export const S = {
     "Add meg a meghívott e-mail-címét. Ő azonnal látja a kívánságaidat; ha elfogadja a meghívást, te is látod az övéit.",
   inviteSent: "Meghívás elküldve.",
   inviteAcceptedBack: "Ő már meghívott téged, így elfogadtad a meghívását.",
-  inviteNoEmailNote:
-    "A meghívott nem kap e-mailt: szólj neki, hogy regisztráljon ezzel a címmel az appban vagy a sengdev.com/apps/surpriser oldalon.",
+  inviteNoEmailNote: "Az app nem küld e-mailt: a meghívás után küldd el neki a meghívó linket üzenetben.",
+  shareInvite: "Meghívó küldése",
+  shareInviteTitle: "Meghívó a Surpriserbe",
+  shareInviteText: (inviter: string) =>
+    `${inviter} meghívott a Surpriserbe: itt megnézheted a kívánságlistáját, és névtelenül lefoglalhatod, amit megveszel neki.`,
+  linkCopied: "A meghívó linkje a vágólapra került, illeszd be egy üzenetbe.",
+  inviteLinkLabel: "Meghívó link:",
+  inviteSentShare: "Meghívás elküldve. Most küldd el neki a meghívó linket!",
   sentInvitations: "Elküldött meghívások",
   sentInvitationItem: (email: string) => `${email} – válaszra vár`,
 

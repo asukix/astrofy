@@ -1,0 +1,15 @@
+{
+  "name": "Surpriser – kívánságlisták",
+  "short_name": "Surpriser",
+  "description": "Családi kívánságlista: nézd meg, mire vágynak a szeretteid, és foglald le névtelenül, amit megveszel.",
+  "lang": "hu",
+  "start_url": "/apps/surpriser/",
+  "scope": "/apps/surpriser/",
+  "display": "standalone",
+  "background_color": "#F6F3FD",
+  "theme_color": "#5B3FC4",
+  "icons": [
+    { "src": "/apps/surpriser/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/apps/surpriser/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

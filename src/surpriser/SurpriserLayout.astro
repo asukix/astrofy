@@ -29,6 +29,10 @@ const { title, description, noindex = false } = Astro.props;
     <meta name="theme-color" content="#5B3FC4" />
     <link rel="icon" type="image/png" href="/apps/surpriser/icon-192.png" />
     <link rel="apple-touch-icon" href="/apps/surpriser/apple-touch-icon.png" />
+    <link rel="manifest" href="/apps/surpriser/manifest.webmanifest" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Surpriser" />
     <script is:inline>
       // Follow the system's light/dark setting.
       (function () {
@@ -375,6 +379,12 @@ const { title, description, noindex = false } = Astro.props;
     padding: 0.85rem 1.1rem;
     font-weight: 600;
     color: oklch(var(--bc) / 0.75);
+  }
+  .sp-hint {
+    padding: 1rem 1.1rem 0.5rem;
+    border-radius: var(--rounded-box);
+    background: oklch(var(--p) / 0.08);
+    border: 1px solid oklch(var(--p) / 0.25);
   }
   .sp-confirm {
     padding: 0.9rem 1rem;

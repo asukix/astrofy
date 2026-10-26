@@ -8,6 +8,7 @@ A Surpriser webes változata a sengdev.com/apps/surpriser címen: telepítés n�
 |---|---|
 | `/apps/surpriser` | `src/pages/apps/surpriser/index.astro` → `ui/App.tsx` (Preact-sziget, `client:only`) |
 | `/apps/surpriser/adatvedelem` | `src/pages/apps/surpriser/adatvedelem.astro` (Play Console: Privacy policy URL) |
+| `/apps/surpriser/meghivo?tol=…&cim=…` | `src/pages/apps/surpriser/meghivo.astro` – meghívó link céloldala (statikus, csak megjelenít) |
 | `/apps/surpriser/fiok-torlese` | `src/pages/apps/surpriser/fiok-torlese.astro` (Play Console: Delete account URL) |
 
 Az app belső útvonalai hash-alapúak (`#/kivansag/<id>`, `#/foglalasaim`, `#/uj-kivansag`, `#/sajat/<id>`, `#/meghivas`), így a Cloudflare-en nem kell átirányítás.
@@ -33,3 +34,15 @@ Ajándékozóként tulajonként két lekérdezés fut (`audience array-contains 
 ## Helyi futtatás
 
 `pnpm dev`, majd http://localhost:4321/apps/surpriser. A `localhost` alapból engedélyezett domain, így a valódi projekttel is működik. Emulátorral: `PUBLIC_SURPRISER_EMULATOR=1 pnpm dev` (Auth: 9099, Firestore: 8080).
+
+## Meghívó link
+
+Az app nem küld e-mailt (a Firebase Spark csomagban a linkes belépés napi 5 e-mailre korlátozott). A meghívó a „Meghívó küldése” gombbal a telefon megosztó menüjén küldi el a linket: `https://sengdev.com/apps/surpriser/meghivo?tol=<név>&cim=<e-mail>`. A céloldal kitölti az e-mail-címet a regisztrációnál/belépésnél (`/apps/surpriser?cim=…&mod=regisztracio`). A link nem ad jogot semmihez: a meghívás a Firestore-ban van, az e-mail-címhez kötve.
+
+## Apple-belépés
+
+A kód kész, de a gomb rejtve van (`APPLE_SIGN_IN_ENABLED` a `config.ts`-ben), mert fizetős Apple Developer tagság kell hozzá (Services ID, kulcs).
+
+## Kezdőképernyő
+
+`public/apps/surpriser/manifest.webmanifest` + Apple meta tagek; iPhone-on egyszer megjelenik egy tipp a „Főképernyőhöz adás”-ról.

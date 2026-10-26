@@ -15,6 +15,7 @@ import {
   signOut,
   type ProviderResult,
 } from "../data/authService";
+import { APPLE_SIGN_IN_ENABLED } from "../config";
 import { EMAIL_PATTERN, isStrongPassword, normalizeEmail } from "../format";
 import { S } from "../strings";
 import { AppMark } from "./components";
@@ -33,10 +34,21 @@ const SUBTITLE: Record<Mode, string> = {
  * Sign-in, registration, e-mail verification, password reset and linking a Google account
  * to an existing password account. [unverifiedEmail] is set for a signed-in account that isn't verified yet.
  */
+/** Coming from an invitation link: /apps/surpriser?cim=<invited e-mail>&mod=regisztracio */
+function invitationParams(): { email: string | null; register: boolean } {
+  try {
+    const params = new URLSearchParams(location.search);
+    return { email: params.get("cim"), register: params.get("mod") === "regisztracio" };
+  } catch {
+    return { email: null, register: false };
+  }
+}
+
 export function AuthScreen({ unverifiedEmail, onVerified }: { unverifiedEmail: string | null; onVerified: () => void }) {
-  const [mode, setMode] = useState<Mode>(unverifiedEmail ? "verify" : "login");
+  const [invited] = useState(invitationParams);
+  const [mode, setMode] = useState<Mode>(unverifiedEmail ? "verify" : invited.register ? "register" : "login");
   const [displayName, setDisplayName] = useState("");
-  const [email, setEmail] = useState(unverifiedEmail ?? "");
+  const [email, setEmail] = useState(unverifiedEmail ?? invited.email ?? "");
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -156,7 +168,12 @@ export function AuthScreen({ unverifiedEmail, onVerified }: { unverifiedEmail: s
       </section>
 
       <section class="sp-auth__panel">
-        {mode === "login" && <p class="text-base-content/70 mb-5">{SUBTITLE.login}</p>}
+        {mode === "login" && !invited.email && <p class="text-base-content/70 mb-5">{SUBTITLE.login}</p>}
+        {invited.email && (mode === "login" || mode === "register") && (
+          <p class="sp-alert mb-4">
+            {S.invitedByLead} <strong class="break-words">{invited.email}</strong>
+          </p>
+        )}
 
         <form onSubmit={submit} class="flex flex-col gap-3" noValidate>
           {mode === "register" && (
@@ -227,9 +244,11 @@ export function AuthScreen({ unverifiedEmail, onVerified }: { unverifiedEmail: s
               <button type="button" class="btn btn-outline w-full" onClick={() => withProvider(signInWithGoogle, "Google")} disabled={busy}>
                 {S.google}
               </button>
-              <button type="button" class="btn sp-btn-apple w-full" onClick={() => withProvider(signInWithApple, "Apple")} disabled={busy}>
-                {S.apple}
-              </button>
+              {APPLE_SIGN_IN_ENABLED && (
+                <button type="button" class="btn sp-btn-apple w-full" onClick={() => withProvider(signInWithApple, "Apple")} disabled={busy}>
+                  {S.apple}
+                </button>
+              )}
             </div>
           </>
         )}

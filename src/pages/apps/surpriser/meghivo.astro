@@ -1,0 +1,64 @@
+---
+// Invitation landing page: /apps/surpriser/meghivo?tol=<inviter name>&cim=<invited e-mail>
+// The inviter shares this link (the app sends no e-mail). It only displays what the link says; the
+// invitation itself is in Firestore, bound to the e-mail address. With Android App Links set up
+// (public/.well-known/assetlinks.json), the same URL opens the Android app when it's installed.
+import SurpriserLayout from "../../../surpriser/SurpriserLayout.astro";
+---
+
+<SurpriserLayout
+  title="Meghívó – Surpriser"
+  description="Meghívtak a Surpriserbe: nézd meg, mire vágynak a szeretteid, és foglald le névtelenül, amit megveszel."
+  noindex
+>
+  <main class="sp-auth">
+    <section class="sp-auth__hero">
+      <span class="sp-spark sp-spark--a" aria-hidden="true"></span>
+      <span class="sp-spark sp-spark--b" aria-hidden="true"></span>
+      <span class="sp-spark sp-spark--c" aria-hidden="true"></span>
+      <img src="/apps/surpriser/icon-192.png" width="72" height="72" alt="" class="rounded-[28%] shrink-0" />
+      <h1 class="sp-auth__title" style="font-size: 2.1rem; line-height: 1.1">
+        <span id="sp-inviter">Meghívtak</span> a Surpriserbe
+      </h1>
+    </section>
+
+    <section class="sp-auth__panel flex flex-col gap-4">
+      <p>
+        A Surpriser családi kívánságlista. Megnézheted, mire vágynak a szeretteid, és névtelenül lefoglalhatod, amit
+        megveszel nekik: így nincs dupla ajándék, és a meglepetés is megmarad.
+      </p>
+      <p id="sp-for" class="sp-alert" hidden>
+        A meghívás erre a címre szól, ezzel regisztrálj vagy lépj be:
+        <strong id="sp-email" class="break-words"></strong>
+      </p>
+      <a id="sp-register" href="/apps/surpriser?mod=regisztracio" class="btn btn-primary">Regisztrálok</a>
+      <a id="sp-login" href="/apps/surpriser" class="btn btn-outline">Már van fiókom</a>
+      <p class="text-sm text-base-content/60">
+        Telepíteni semmit nem kell, böngészőből is működik. Androidos telefonon az appot is használhatod.
+      </p>
+    </section>
+
+    <p class="sp-auth__footer">
+      <a href="/apps/surpriser/adatvedelem" class="link link-hover">Adatvédelmi tájékoztató</a>
+    </p>
+  </main>
+</SurpriserLayout>
+
+<script>
+  // Text from the link is only ever shown as text, never as HTML.
+  const params = new URLSearchParams(location.search);
+  const inviter = (params.get("tol") ?? "").trim().slice(0, 100);
+  const email = (params.get("cim") ?? "").trim().toLowerCase().slice(0, 200);
+
+  if (inviter) {
+    document.getElementById("sp-inviter")!.textContent = `${inviter} meghívott`;
+    document.title = `${inviter} meghívott – Surpriser`;
+  }
+  if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    document.getElementById("sp-email")!.textContent = email;
+    document.getElementById("sp-for")!.hidden = false;
+    const query = (extra: Record<string, string>) => `?${new URLSearchParams({ cim: email, ...extra })}`;
+    (document.getElementById("sp-register") as HTMLAnchorElement).href = `/apps/surpriser${query({ mod: "regisztracio" })}`;
+    (document.getElementById("sp-login") as HTMLAnchorElement).href = `/apps/surpriser${query({})}`;
+  }
+</script>
