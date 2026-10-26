@@ -1,0 +1,26 @@
+---
+// Apps: small apps I build and run for real people. Each app lives under /apps/<name>.
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import HorizontalCard from "../../components/HorizontalCard.astro";
+---
+
+<BaseLayout
+  title="Apps"
+  description="Small apps I build and run for real people."
+  sideBarActiveItemID="apps"
+>
+  <div>
+    <div class="text-3xl w-full font-bold mb-2">Apps</div>
+    <p class="mb-5 text-base-content/70">Small apps I build and run for real people. Free, no ads.</p>
+  </div>
+
+  <HorizontalCard
+    title="Surpriser"
+    img="/apps/surpriser/card-cover.svg"
+    desc="A family wish-list app for Christmas. Relatives see each other's wish lists and book gifts anonymously, so nobody buys the same present twice and the surprise stays a surprise. Android app, plus a web version that needs no install (in Hungarian).
+Kotlin · Jetpack Compose · Firebase · Preact"
+    url="/apps/surpriser"
+    badge="Android + Web"
+    target="_self"
+  />
+</BaseLayout>
