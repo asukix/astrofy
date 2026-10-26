@@ -1,3 +1,6 @@
 allowBuilds:
   esbuild: true
   sharp: true
+  # Firebase's install scripts aren't needed for the Surpriser web view (config is passed explicitly).
+  '@firebase/util': false
+  protobufjs: false

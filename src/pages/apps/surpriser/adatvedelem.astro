@@ -1,0 +1,108 @@
+---
+// Surpriser privacy notice. Its URL goes to the Play Console (App content → Privacy policy).
+import SurpriserLayout from "../../../surpriser/SurpriserLayout.astro";
+import { CONTROLLER, PRIVACY_UPDATED } from "../../../surpriser/config";
+---
+
+<SurpriserLayout
+  title="Adatvédelmi tájékoztató – Surpriser"
+  description="Milyen adatokat kezel a Surpriser kívánságlista-alkalmazás, mire használja őket, és hogyan kérheted a törlésüket."
+>
+  <main class="sp-doc">
+    <a href="/apps/surpriser" class="sp-doc__home inline-flex items-center gap-3">
+      <img src="/apps/surpriser/icon-192.png" width="40" height="40" alt="" class="rounded-[28%]" />
+      <span class="font-bold text-base-content">Surpriser</span>
+    </a>
+
+    <h1>Adatvédelmi tájékoztató</h1>
+    <p class="sp-doc__meta">Hatályos: {PRIVACY_UPDATED}</p>
+
+    <p>
+      A Surpriser családi kívánságlista-alkalmazás (Android-app és webes nézet a sengdev.com/apps/surpriser címen).
+      A felhasználók megosztják egymással a kívánságaikat, és névtelenül lefoglalhatják, amit megvesznek. Ez a
+      tájékoztató leírja, milyen személyes adatokat kezelünk, mire, és milyen jogaid vannak.
+    </p>
+
+    <h2>Az adatkezelő</h2>
+    <p>
+      {CONTROLLER.name}, magánszemélyként üzemeltetett, nem kereskedelmi célú alkalmazás.<br />
+      Kapcsolat: <a href={`mailto:${CONTROLLER.email}`}>{CONTROLLER.email}</a>
+    </p>
+
+    <h2>Milyen adatokat kezelünk</h2>
+    <ul>
+      <li><strong>Fiókadatok:</strong> név, e-mail-cím, a bejelentkezés módja (jelszó vagy Google-fiók). A jelszót a Firebase Authentication titkosítva tárolja, mi nem látjuk.</li>
+      <li><strong>Kívánságok:</strong> megnevezés, ár, és ha megadod: leírás, kép linkje, termék linkje, a lista sorrendje, és hogy megkaptad-e.</li>
+      <li><strong>Kapcsolatok:</strong> a meghívások (a meghívó és a meghívott neve, e-mail-címe, a meghívás állapota).</li>
+      <li><strong>Gyerekprofilok:</strong> a szülő által megadott név és (nem kötelezően) e-mail-cím, a szülők neve, valamint hogy kik láthatják a gyerek listáját.</li>
+      <li><strong>Foglalások:</strong> melyik kívánságot ki foglalta le, és mikor. Ezt csak a foglaló láthatja; a lista tulajdonosa csak annyit lát, hogy valaki megveszi.</li>
+      <li><strong>Ajándéktervek</strong> (csak az appban): tervezett kívánságok, amiket csak a lista szerkesztői látnak.</li>
+      <li><strong>Hiányzó adatok kérése:</strong> hogy egy kívánsághoz kértek-e leírást, képet vagy linket. Azt, hogy ki kérte, nem tároljuk.</li>
+    </ul>
+    <p>
+      Nem gyűjtünk helyadatot, kapcsolatlistát, hirdetési azonosítót, és nem használunk analitikát vagy reklámot.
+      Az Android-app a Google Play Integrity szolgáltatással ellenőrzi, hogy az adatbázist valóban a Surpriser
+      alkalmazás éri-e el (Firebase App Check); ehhez a Google az eszközről technikai adatokat kaphat.
+    </p>
+
+    <h2>Mire használjuk</h2>
+    <p>
+      Kizárólag a szolgáltatás működtetésére: hogy a kívánságlistádat lássák azok, akiket meghívtál vagy akiknek a
+      meghívását elfogadtad, hogy a foglalások ne ütközzenek, és hogy be tudj jelentkezni. Az e-mail-címedre csak a
+      fiókoddal kapcsolatos üzenetek mennek (megerősítés, jelszó-visszaállítás). Az adatokat nem adjuk el, és nem
+      adjuk át harmadik félnek, kivéve az alábbi tárhelyszolgáltatót.
+    </p>
+    <p>
+      Az adatkezelés jogalapja a szolgáltatás nyújtása, amelyet a regisztrációval kérsz (GDPR 6. cikk (1) b) pont).
+      A gyerekprofil adatait a szülő adja meg, a gyerek érdekében, a családi ajándékozás megszervezéséhez.
+    </p>
+
+    <h2>Ki látja az adataidat</h2>
+    <ul>
+      <li>A kívánságlistádat azok látják, akiket meghívtál, és akiknek a meghívását elfogadtad.</li>
+      <li>A gyerek listáját a szülei, a szülők elfogadott kapcsolatai, és ha regisztrált, maga a gyerek látja.</li>
+      <li>A nevedet és az e-mail-címedet a kapcsolataid látják.</li>
+      <li>Azt, hogy ki foglalt le egy ajándékot, senki más nem látja, csak a foglaló.</li>
+    </ul>
+
+    <h2>Hol tároljuk</h2>
+    <p>
+      Az adatokat a Google Firebase szolgáltatásában tároljuk (Firebase Authentication és Cloud Firestore,
+      Google Ireland Ltd. / Google LLC), amely adatfeldolgozóként jár el. Az adatok az Európai Gazdasági Térségen kívülre
+      is továbbítódhatnak; ilyenkor a Google az Európai Bizottság által elfogadott általános szerződési feltételek alapján
+      gondoskodik a megfelelő védelemről. Az Android-app az adatok egy részét a telefonon is tárolja, hogy internet nélkül
+      is lásd őket; a webes nézet a bejelentkezést a böngészőben tárolja. Sütiket követésre nem használunk.
+    </p>
+
+    <h2>Meddig tároljuk</h2>
+    <p>
+      Amíg a fiókod létezik. Ha törlöd a fiókodat, a kívánságaid, a meghívásaid, a kapcsolataid és a foglalásaid
+      törlődnek; amit lefoglaltál, újra szabad lesz. Ha egy gyerekednek van társszülője, ő kezeli tovább a gyerek
+      listáját; ha nincs, a gyerek profilja is törlődik. A fiók törléséről itt olvashatsz:
+      <a href="/apps/surpriser/fiok-torlese">Fiók törlése</a>.
+    </p>
+
+    <h2>Gyerekek</h2>
+    <p>
+      A gyerekprofilt a szülő hozza létre és kezeli. Ha a szülő megadja a gyerek e-mail-címét, a gyerek azzal
+      regisztrálhat, és onnantól ő is szerkesztheti a saját listáját; a szülők jogai megmaradnak.
+    </p>
+
+    <h2>A jogaid</h2>
+    <p>
+      Kérhetsz tájékoztatást a rólad tárolt adatokról, kérheted a helyesbítésüket, törlésüket, kezelésük korlátozását,
+      és hogy géppel olvasható formában megkapd őket; tiltakozhatsz is az adatkezelés ellen. Ezt a fenti e-mail-címen
+      kérheted; 30 napon belül válaszolunk. A nevedet és a kívánságaidat az appban magad is módosíthatod vagy törölheted.
+    </p>
+    <p>
+      Ha úgy érzed, hogy megsértettük a jogaidat, panaszt tehetsz a Nemzeti Adatvédelmi és Információszabadság
+      Hatóságnál (NAIH, 1055 Budapest, Falk Miksa utca 9–11., postacím: 1363 Budapest, Pf. 9.,
+      <a href="https://naih.hu" rel="noopener">naih.hu</a>, ugyfelszolgalat@naih.hu), vagy bírósághoz fordulhatsz.
+    </p>
+
+    <h2>Változások</h2>
+    <p>
+      Ha ez a tájékoztató lényegesen változik, az új változatot itt tesszük közzé, a hatálybalépés dátumával.
+    </p>
+  </main>
+</SurpriserLayout>

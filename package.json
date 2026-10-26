@@ -13,12 +13,17 @@
   },
   "dependencies": {
     "@astrojs/mdx": "^2.0.3",
+    "@astrojs/preact": "3.5.4",
     "@astrojs/rss": "^3.0.0",
     "@astrojs/sitemap": "3.2.1",
     "@astrojs/tailwind": "^5.0.3",
+    "@fontsource-variable/bricolage-grotesque": "5.3.0",
+    "@fontsource-variable/figtree": "5.3.0",
     "astro": "^4.0.2",
     "daisyui": "^4.4.10",
     "dayjs": "^1.11.9",
+    "firebase": "^12.19.0",
+    "preact": "^10.29.8",
     "sharp": "^0.32.6",
     "tailwindcss": "^3.3.5"
   },

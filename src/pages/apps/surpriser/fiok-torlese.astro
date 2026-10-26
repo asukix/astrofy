@@ -1,0 +1,67 @@
+---
+// Surpriser account deletion page. Its URL goes to the Play Console (Data safety → Delete account URL).
+// For now deletion without the app is requested by e-mail; the in-app flow is FirestoreDataSource.deleteAccountData.
+import SurpriserLayout from "../../../surpriser/SurpriserLayout.astro";
+import { CONTROLLER } from "../../../surpriser/config";
+
+const subject = encodeURIComponent("Surpriser – fiók törlése");
+const body = encodeURIComponent(
+  "Kérem a Surpriser-fiókom és az adataim törlését.\n\nA fiókomhoz tartozó e-mail-cím: \n",
+);
+---
+
+<SurpriserLayout
+  title="Fiók törlése – Surpriser"
+  description="Hogyan törölheted a Surpriser-fiókodat és az adataidat, az alkalmazásban vagy anélkül."
+>
+  <main class="sp-doc">
+    <a href="/apps/surpriser" class="sp-doc__home inline-flex items-center gap-3">
+      <img src="/apps/surpriser/icon-192.png" width="40" height="40" alt="" class="rounded-[28%]" />
+      <span class="font-bold text-base-content">Surpriser</span>
+    </a>
+
+    <h1>A Surpriser-fiók törlése</h1>
+    <p>A fiókodat és a hozzá tartozó adatokat bármikor törölheted. Kétféleképpen teheted meg.</p>
+
+    <h2>Az Android-alkalmazásban</h2>
+    <ol>
+      <li>Nyisd meg a Surpriser alkalmazást, és jelentkezz be.</li>
+      <li>A Kívánságlisták képernyőn nyisd meg a jobb felső menüt (⋮).</li>
+      <li>Válaszd a <strong>Fiók törlése</strong> lehetőséget.</li>
+      <li>Erősítsd meg a jelszavaddal, vagy válaszd ki újra a Google-fiókodat, majd nyomd meg a <strong>Végleges törlés</strong> gombot.</li>
+    </ol>
+    <p>A törlés azonnal megtörténik.</p>
+
+    <h2>Az alkalmazás nélkül</h2>
+    <p>
+      Írj a <a href={`mailto:${CONTROLLER.email}?subject=${subject}&body=${body}`}>{CONTROLLER.email}</a> címre arról az
+      e-mail-címről, amellyel regisztráltál, „Surpriser – fiók törlése” tárggyal. A kérést legfeljebb 30 napon belül
+      teljesítjük, és válaszban megerősítjük.
+    </p>
+    <p>
+      <a class="btn btn-primary" href={`mailto:${CONTROLLER.email}?subject=${subject}&body=${body}`}>
+        Törlési kérelem küldése e-mailben
+      </a>
+    </p>
+
+    <h2>Mi törlődik</h2>
+    <ul>
+      <li>a fiókod (név, e-mail-cím, bejelentkezési adatok);</li>
+      <li>a kívánságaid és az ajándékterveid;</li>
+      <li>a meghívásaid és a kapcsolataid;</li>
+      <li>a foglalásaid: amit lefoglaltál, újra szabad lesz, hogy más megvehesse;</li>
+      <li>
+        a gyerekeid profiljai, ha nincs társszülőjük (a kívánságaikkal és a közös listáikkal együtt). Ha van társszülő,
+        ő kezeli tovább a gyereket; egy már regisztrált gyerek a saját profilját megtartja.
+      </li>
+    </ul>
+    <p>
+      A törlés végleges, nem vonható vissza. Biztonsági mentést nem őrzünk meg az adataidról. Mások listái és
+      kívánságai az ő fiókjukhoz tartoznak, azok megmaradnak.
+    </p>
+
+    <p class="mt-8">
+      Részletek: <a href="/apps/surpriser/adatvedelem">Adatvédelmi tájékoztató</a>
+    </p>
+  </main>
+</SurpriserLayout>

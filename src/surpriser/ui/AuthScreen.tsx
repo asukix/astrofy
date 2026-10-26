@@ -1,0 +1,322 @@
+import type { OAuthCredential } from "firebase/auth";
+import { useEffect, useState } from "preact/hooks";
+import {
+  authErrorMessage,
+  linkGoogle,
+  login,
+  register,
+  reloadUser,
+  resendVerification,
+  sendPasswordReset,
+  signInWithGoogle,
+  signOut,
+} from "../data/authService";
+import { EMAIL_PATTERN, isStrongPassword, normalizeEmail } from "../format";
+import { S } from "../strings";
+import { AppMark } from "./components";
+
+type Mode = "login" | "register" | "verify" | "forgot" | "link";
+
+const SUBTITLE: Record<Mode, string> = {
+  login: S.authSubtitleLogin,
+  register: S.authSubtitleRegister,
+  verify: S.authSubtitleVerify,
+  forgot: S.authSubtitleForgot,
+  link: S.authSubtitleLink,
+};
+
+/**
+ * Sign-in, registration, e-mail verification, password reset and linking a Google account
+ * to an existing password account. [unverifiedEmail] is set for a signed-in account that isn't verified yet.
+ */
+export function AuthScreen({ unverifiedEmail, onVerified }: { unverifiedEmail: string | null; onVerified: () => void }) {
+  const [mode, setMode] = useState<Mode>(unverifiedEmail ? "verify" : "login");
+  const [displayName, setDisplayName] = useState("");
+  const [email, setEmail] = useState(unverifiedEmail ?? "");
+  const [password, setPassword] = useState("");
+  const [passwordConfirm, setPasswordConfirm] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [info, setInfo] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [pendingGoogle, setPendingGoogle] = useState<OAuthCredential | null>(null);
+
+  useEffect(() => {
+    if (unverifiedEmail) {
+      setEmail(unverifiedEmail);
+      setMode("verify");
+    }
+  }, [unverifiedEmail]);
+
+  // Coming back from the verification e-mail in another tab: check again.
+  useEffect(() => {
+    if (mode !== "verify") return;
+    const onFocus = () => {
+      reloadUser()
+        .then((ok) => ok && onVerified())
+        .catch(() => {});
+    };
+    window.addEventListener("focus", onFocus);
+    return () => window.removeEventListener("focus", onFocus);
+  }, [mode]);
+
+  const switchMode = (next: Mode) => {
+    setMode(next);
+    setPassword("");
+    setPasswordConfirm("");
+    setError(null);
+    setInfo(null);
+    setPendingGoogle(null);
+  };
+
+  const run = async (work: () => Promise<void>) => {
+    if (busy) return;
+    setBusy(true);
+    setError(null);
+    try {
+      await work();
+    } catch (e) {
+      setError(authErrorMessage(e));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const validEmail = () => {
+    if (!EMAIL_PATTERN.test(normalizeEmail(email))) {
+      setError(S.errInvalidEmail);
+      return false;
+    }
+    return true;
+  };
+
+  const submit = (event: Event) => {
+    event.preventDefault();
+    const address = normalizeEmail(email);
+    switch (mode) {
+      case "login":
+        if (!validEmail()) return;
+        return run(() => login(address, password));
+      case "register":
+        if (!displayName.trim()) return setError(S.errNameRequired);
+        if (!validEmail()) return;
+        if (!isStrongPassword(password)) return setError(S.errWeakPassword);
+        if (password !== passwordConfirm) return setError(S.errPasswordsDontMatch);
+        return run(async () => {
+          await register(displayName.trim(), address, password);
+          setPassword("");
+          setPasswordConfirm("");
+          setInfo(S.infoLinkSent);
+        });
+      case "verify":
+        return run(async () => {
+          if (await reloadUser()) onVerified();
+          else setError(S.errNotVerifiedYet);
+        });
+      case "forgot":
+        if (!validEmail()) return;
+        return run(async () => {
+          await sendPasswordReset(address);
+          setInfo(S.infoResetLinkSent);
+        });
+      case "link":
+        if (!pendingGoogle) return;
+        return run(async () => {
+          await linkGoogle(address, password, pendingGoogle);
+          setPendingGoogle(null);
+        });
+    }
+  };
+
+  const google = () =>
+    run(async () => {
+      const result = await signInWithGoogle();
+      if (result.kind === "needsLink") {
+        switchMode("link");
+        setEmail(result.email || email);
+        setPendingGoogle(result.credential);
+      }
+    });
+
+  const showGoogle = mode === "login" || mode === "register";
+
+  return (
+    <div class="sp-auth">
+      <section class="sp-auth__hero">
+        <span class="sp-spark sp-spark--a" aria-hidden="true" />
+        <span class="sp-spark sp-spark--b" aria-hidden="true" />
+        <span class="sp-spark sp-spark--c" aria-hidden="true" />
+        <AppMark size={72} />
+        <h1 class="sp-auth__title">{S.appName}</h1>
+        <p class="sp-auth__lead">{mode === "login" ? S.webIntro : SUBTITLE[mode]}</p>
+      </section>
+
+      <section class="sp-auth__panel">
+        {mode === "login" && <p class="text-base-content/70 mb-5">{SUBTITLE.login}</p>}
+
+        <form onSubmit={submit} class="flex flex-col gap-3" noValidate>
+          {mode === "register" && (
+            <Field label={S.displayName} value={displayName} onInput={setDisplayName} autocomplete="name" />
+          )}
+          {mode === "verify" ? (
+            <p class="sp-note">{S.verifyHint(email)}</p>
+          ) : (
+            <Field
+              label={S.email}
+              type="email"
+              value={email}
+              onInput={setEmail}
+              autocomplete="email"
+              readOnly={mode === "link"}
+            />
+          )}
+          {mode === "link" && <p class="sp-note">{S.linkHint}</p>}
+          {(mode === "login" || mode === "register" || mode === "link") && (
+            <Field
+              label={S.password}
+              type="password"
+              value={password}
+              onInput={setPassword}
+              autocomplete={mode === "register" ? "new-password" : "current-password"}
+              hint={mode === "register" ? S.passwordHint : undefined}
+            />
+          )}
+          {mode === "register" && (
+            <Field
+              label={S.passwordConfirm}
+              type="password"
+              value={passwordConfirm}
+              onInput={setPasswordConfirm}
+              autocomplete="new-password"
+            />
+          )}
+
+          {error && (
+            <p class="sp-alert sp-alert--error" role="alert">
+              {error}
+            </p>
+          )}
+          {info && (
+            <p class="sp-alert" role="status">
+              {info}
+            </p>
+          )}
+
+          <button type="submit" class="btn btn-primary mt-1" disabled={busy}>
+            {busy && <span class="loading loading-spinner loading-sm" />}
+            {
+              {
+                login: S.login,
+                register: S.register,
+                verify: S.verify,
+                forgot: S.sendResetLink,
+                link: S.link,
+              }[mode]
+            }
+          </button>
+        </form>
+
+        {showGoogle && (
+          <>
+            <div class="divider text-sm text-base-content/50 my-4">{S.or}</div>
+            <button type="button" class="btn btn-outline w-full gap-3" onClick={google} disabled={busy}>
+              <GoogleLogo />
+              {S.google}
+            </button>
+          </>
+        )}
+
+        <nav class="flex flex-col items-center gap-1 mt-6 text-sm">
+          {mode === "login" && (
+            <>
+              <button type="button" class="link link-hover" onClick={() => switchMode("forgot")}>
+                {S.forgotPassword}
+              </button>
+              <button type="button" class="link link-primary font-semibold" onClick={() => switchMode("register")}>
+                {S.goRegister}
+              </button>
+            </>
+          )}
+          {mode === "register" && (
+            <button type="button" class="link link-primary font-semibold" onClick={() => switchMode("login")}>
+              {S.goLogin}
+            </button>
+          )}
+          {mode === "verify" && (
+            <>
+              <button
+                type="button"
+                class="link link-hover"
+                disabled={busy}
+                onClick={() =>
+                  run(async () => {
+                    await resendVerification();
+                    setInfo(S.infoLinkSent);
+                  })
+                }
+              >
+                {S.resendLink}
+              </button>
+              <button
+                type="button"
+                class="link link-hover"
+                onClick={() => {
+                  signOut();
+                  switchMode("login");
+                }}
+              >
+                {S.backToLogin}
+              </button>
+            </>
+          )}
+          {(mode === "forgot" || mode === "link") && (
+            <button type="button" class="link link-hover" onClick={() => switchMode("login")}>
+              {S.backToLogin}
+            </button>
+          )}
+        </nav>
+      </section>
+
+      <p class="sp-auth__footer">
+        <a href="/apps/surpriser/adatvedelem" class="link link-hover">
+          Adatvédelmi tájékoztató
+        </a>
+      </p>
+    </div>
+  );
+}
+
+function Field(props: {
+  label: string;
+  value: string;
+  onInput: (value: string) => void;
+  type?: string;
+  autocomplete?: string;
+  hint?: string;
+  readOnly?: boolean;
+}) {
+  return (
+    <label class="form-control w-full">
+      <span class="label-text font-semibold mb-1.5">{props.label}</span>
+      <input
+        class="input input-bordered w-full"
+        type={props.type ?? "text"}
+        value={props.value}
+        autocomplete={props.autocomplete}
+        readOnly={props.readOnly}
+        onInput={(e) => props.onInput((e.currentTarget as HTMLInputElement).value)}
+      />
+      {props.hint && <span class="text-xs text-base-content/60 mt-1.5">{props.hint}</span>}
+    </label>
+  );
+}
+
+function GoogleLogo() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true">
+      <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z" />
+      <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z" />
+      <path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z" />
+      <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z" />
+    </svg>
+  );
+}

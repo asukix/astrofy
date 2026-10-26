@@ -1,0 +1,17 @@
+---
+// Surpriser web view: givers see their family's wish lists and book anonymously, without installing the app.
+// The whole app is a client-side island (Firebase runs in the browser); see src/surpriser/.
+import SurpriserLayout from "../../../surpriser/SurpriserLayout.astro";
+import App from "../../../surpriser/ui/App";
+---
+
+<SurpriserLayout
+  title="Surpriser – kívánságlisták"
+  description="Nézd meg, mire vágynak a szeretteid, és foglald le névtelenül, amit megveszel."
+  noindex
+>
+  <App client:only="preact" />
+  <noscript>
+    <p class="sp-empty">A Surpriser webes nézetéhez engedélyezd a JavaScriptet.</p>
+  </noscript>
+</SurpriserLayout>
