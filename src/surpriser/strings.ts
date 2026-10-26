@@ -30,10 +30,16 @@ export const S = {
   infoLinkSent: "Elküldtük a megerősítő linket.",
   infoResetLinkSent: "Ha létezik ilyen fiók, elküldtük a jelszó-visszaállító linket.",
   backToLogin: "Vissza a bejelentkezéshez",
-  linkHint:
-    "Ezzel az e-mail-címmel már van jelszavas fiókod. Lépj be egyszer a jelszavaddal, és hozzákötjük a Google-fiókodat: utána mindkét módon beléphetsz, és minden adatod megmarad.",
   link: "Belépés és összekötés",
   google: "Folytatás Google-fiókkal",
+  apple: "Folytatás az Apple-lel",
+  linkHintProvider: (provider: string) =>
+    `Ezzel az e-mail-címmel már van jelszavas fiókod. Lépj be egyszer a jelszavaddal, és hozzákötjük a(z) ${provider}-fiókodat: utána mindkét módon beléphetsz, és minden adatod megmarad.`,
+  nameTitle: "Hogyan szólítsanak?",
+  nameHint: "Ezt a nevet látják a családtagjaid és az ismerőseid.",
+  nameSave: "Tovább",
+  relayEmailNote: (email: string) =>
+    `Az Apple elrejtette az e-mail-címedet, ezért a fiókod címe: ${email}. Aki meg akar hívni, erre a címre küldje a meghívást. Ha inkább a valódi címeddel használnád: az Apple ID beállításaiban a „Bejelentkezés az Apple-lel” résznél állítsd le a Surpriser használatát, majd lépj be újra, és oszd meg az e-mail-címedet.`,
   logout: "Kijelentkezés",
   webIntro: "A Surpriser webes nézete: telepítés nélkül látod a családod kívánságait, és névtelenül lefoglalhatod, amit megveszel.",
 

@@ -1,7 +1,7 @@
 import type { User as FirebaseUser } from "firebase/auth";
 import { useCallback, useEffect, useMemo, useRef, useState } from "preact/hooks";
 import { isConfigured } from "../config";
-import { observeUser, signOut, toUser } from "../data/authService";
+import { isAppleRelayEmail, observeUser, signOut, toUser } from "../data/authService";
 import {
   audienceCandidates,
   boardOf,
@@ -29,7 +29,7 @@ import {
 } from "../data/storeService";
 import type { User, Wish, WishField } from "../model";
 import { S } from "../strings";
-import { AuthScreen } from "./AuthScreen";
+import { AuthScreen, NameScreen } from "./AuthScreen";
 import { BoardScreen } from "./BoardScreen";
 import { BookingsScreen } from "./BookingsScreen";
 import { Spinner, Toast, TopBar, type ToastMessage } from "./components";
@@ -65,6 +65,9 @@ function SignedInGate() {
         onVerified={() => setVerifiedTick((n) => n + 1)}
       />
     );
+  }
+  if (!firebaseUser.displayName?.trim()) {
+    return <NameScreen email={firebaseUser.email ?? ""} onDone={() => setVerifiedTick((n) => n + 1)} />;
   }
   return <GiverApp key={firebaseUser.uid} me={toUser(firebaseUser)} />;
 }
@@ -159,6 +162,7 @@ function GiverApp({ me }: { me: User }) {
       <div class="dropdown-content z-30 mt-2 w-64 rounded-box bg-base-100 p-4 shadow-lg border border-base-300">
         <p class="font-semibold truncate">{me.displayName}</p>
         <p class="text-sm text-base-content/60 truncate mb-3">{me.email}</p>
+        {isAppleRelayEmail(me.email) && <p class="text-xs text-base-content/70 mb-3">{S.relayEmailNote(me.email)}</p>}
         <button type="button" class="btn btn-sm btn-outline w-full" onClick={() => signOut()}>
           {S.logout}
         </button>

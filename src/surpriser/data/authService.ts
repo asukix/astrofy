@@ -2,8 +2,10 @@
 
 import {
   createUserWithEmailAndPassword,
+  getAdditionalUserInfo,
   GoogleAuthProvider,
   linkWithCredential,
+  OAuthProvider,
   onAuthStateChanged,
   reload,
   sendEmailVerification,
@@ -13,8 +15,10 @@ import {
   signOut as firebaseSignOut,
   updateProfile,
   type ActionCodeSettings,
+  type AuthProvider,
   type OAuthCredential,
   type User as FirebaseUser,
+  type UserCredential,
 } from "firebase/auth";
 import { FirebaseError } from "firebase/app";
 import { APP_PATH } from "../config";
@@ -27,7 +31,7 @@ export function toUser(user: FirebaseUser): User {
   return {
     id: user.uid,
     email,
-    // A Google account may have no name; the public profile needs one.
+    // A Google or Apple account may have no name; the public profile needs one.
     displayName: user.displayName?.trim() || email.split("@")[0],
     isEmailVerified: user.emailVerified,
   };
@@ -52,17 +56,20 @@ export async function login(email: string, password: string): Promise<void> {
   await signInWithEmailAndPassword(firebase().auth, email, password);
 }
 
-export type GoogleResult =
+export type ProviderResult =
   | { kind: "signedIn" }
   | { kind: "cancelled" }
-  /** This e-mail already has a password account: sign in with it once, then the Google account is linked. */
+  /** This e-mail already has a password account: sign in with it once, then the new provider is linked. */
   | { kind: "needsLink"; email: string; credential: OAuthCredential };
 
-export async function signInWithGoogle(): Promise<GoogleResult> {
-  const provider = new GoogleAuthProvider();
-  provider.setCustomParameters({ prompt: "select_account" });
+async function signInWithProvider(
+  provider: AuthProvider,
+  credentialFromError: (e: FirebaseError) => OAuthCredential | null,
+  afterSignIn?: (result: UserCredential) => Promise<void>,
+): Promise<ProviderResult> {
   try {
-    await signInWithPopup(firebase().auth, provider);
+    const result = await signInWithPopup(firebase().auth, provider);
+    await afterSignIn?.(result);
     return { kind: "signedIn" };
   } catch (e) {
     if (e instanceof FirebaseError) {
@@ -70,7 +77,7 @@ export async function signInWithGoogle(): Promise<GoogleResult> {
         return { kind: "cancelled" };
       }
       if (e.code === "auth/account-exists-with-different-credential") {
-        const credential = GoogleAuthProvider.credentialFromError(e);
+        const credential = credentialFromError(e);
         const email = (e.customData?.email as string | undefined) ?? "";
         if (credential) return { kind: "needsLink", email, credential };
       }
@@ -79,9 +86,52 @@ export async function signInWithGoogle(): Promise<GoogleResult> {
   }
 }
 
-export async function linkGoogle(email: string, password: string, credential: OAuthCredential): Promise<void> {
+export function signInWithGoogle(): Promise<ProviderResult> {
+  const provider = new GoogleAuthProvider();
+  provider.setCustomParameters({ prompt: "select_account" });
+  return signInWithProvider(provider, (e) => GoogleAuthProvider.credentialFromError(e));
+}
+
+/**
+ * Sign in with Apple. Apple tells the name only at the very first sign-in, and Firebase doesn't store it:
+ * save it on the profile then. Without a name the app asks for one (see NameScreen).
+ */
+export function signInWithApple(): Promise<ProviderResult> {
+  const provider = new OAuthProvider("apple.com");
+  provider.addScope("email");
+  provider.addScope("name");
+  provider.setCustomParameters({ locale: "hu_HU" });
+  return signInWithProvider(
+    provider,
+    (e) => OAuthProvider.credentialFromError(e),
+    async (result) => {
+      if (result.user.displayName?.trim()) return;
+      const profile = getAdditionalUserInfo(result)?.profile as { name?: { firstName?: string; lastName?: string } } | undefined;
+      // The name may come in the token response on the first sign-in only (not part of the public API).
+      const token = (result as unknown as { _tokenResponse?: { firstName?: string; lastName?: string } })._tokenResponse;
+      const first = profile?.name?.firstName ?? token?.firstName;
+      const last = profile?.name?.lastName ?? token?.lastName;
+      const name = [last, first].filter(Boolean).join(" ").trim(); // Hungarian order: family name first
+      if (name) await updateProfile(result.user, { displayName: name });
+    },
+  );
+}
+
+/** Signs in with the password once and links the provider (Google or Apple) to that account. */
+export async function linkProvider(email: string, password: string, credential: OAuthCredential): Promise<void> {
   const { user } = await signInWithEmailAndPassword(firebase().auth, email, password);
   await linkWithCredential(user, credential);
+}
+
+/** Sets the display name (e.g. after Apple, which may not tell it). */
+export async function setDisplayName(name: string): Promise<void> {
+  const user = firebase().auth.currentUser;
+  if (user) await updateProfile(user, { displayName: name });
+}
+
+/** Apple's "Hide My Email" address: invitations must be sent to this one, not the person's real address. */
+export function isAppleRelayEmail(email: string): boolean {
+  return /@privaterelay\.appleid\.com$/i.test(email);
 }
 
 /** Returns whether the e-mail is verified now. Refreshes the token too: the rules read email_verified from it. */
@@ -134,6 +184,8 @@ export function authErrorMessage(e: unknown): string {
     case "auth/popup-blocked":
       return S.errPopupBlocked;
     case "auth/operation-not-allowed":
+    case "auth/invalid-oauth-client-id":
+    case "auth/invalid-oauth-provider":
     case "auth/unauthorized-domain":
     case "auth/invalid-api-key":
     case "auth/api-key-not-valid.-please-pass-a-valid-api-key.":
