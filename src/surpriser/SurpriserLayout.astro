@@ -438,6 +438,63 @@ const { title, description, noindex = false } = Astro.props;
     max-height: 14rem;
     object-fit: contain;
   }
+  .sp-zoomable {
+    cursor: zoom-in;
+    width: 100%;
+  }
+  .sp-hero-image .sp-zoomable img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  .sp-lightbox {
+    max-width: 100vw;
+    max-height: 100dvh;
+    width: 100vw;
+    height: 100dvh;
+    margin: 0;
+    padding: 1rem;
+    border: none;
+    background: transparent;
+    cursor: zoom-out;
+  }
+  .sp-lightbox[open] {
+    display: grid;
+    place-items: center;
+  }
+  .sp-lightbox::backdrop {
+    background: rgb(10 6 24 / 0.88);
+  }
+  .sp-lightbox img {
+    max-width: 100%;
+    max-height: calc(100dvh - 2rem);
+    object-fit: contain;
+    border-radius: 0.75rem;
+    background: #fff;
+  }
+  .sp-lightbox__close {
+    position: fixed;
+    top: max(0.75rem, env(safe-area-inset-top));
+    right: 0.75rem;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.15);
+    color: #fff;
+    font-size: 1.75rem;
+    line-height: 1;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .sp-lightbox[open] img {
+      animation: sp-zoom-in 160ms ease-out;
+    }
+  }
+  @keyframes sp-zoom-in {
+    from {
+      transform: scale(0.96);
+      opacity: 0;
+    }
+  }
   .sp-confirm {
     padding: 0.9rem 1rem;
     border-radius: 0.9rem;

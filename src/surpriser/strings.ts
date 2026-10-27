@@ -3,6 +3,8 @@
 export const S = {
   appName: "Surpriser",
   back: "Vissza",
+  close: "Bezárás",
+  zoomImage: "Kép nagyítása",
   cancel: "Mégse",
   or: "vagy",
 

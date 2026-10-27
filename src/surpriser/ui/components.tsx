@@ -1,5 +1,5 @@
 import type { ComponentChildren } from "preact";
-import { useEffect, useState } from "preact/hooks";
+import { useEffect, useRef, useState } from "preact/hooks";
 import { formatHuf, safeUrl } from "../format";
 import type { Person, ViewedWish, Wish } from "../model";
 import { S } from "../strings";
@@ -166,12 +166,37 @@ export function WishRow({ wish, meta, inBookings = false }: { wish: ViewedWish; 
 export function ImagePreview({ url }: { url: string | null | undefined }) {
   const src = safeUrl(url);
   const [failed, setFailed] = useState(false);
+  const [zoomed, setZoomed] = useState(false);
   useEffect(() => setFailed(false), [src]);
   if (!src || failed) return null;
   return (
-    <div class="sp-image-preview">
-      <img src={src} alt="" referrerpolicy="no-referrer" loading="lazy" onError={() => setFailed(true)} />
-    </div>
+    <>
+      <button type="button" class="sp-image-preview sp-zoomable" aria-label={S.zoomImage} onClick={() => setZoomed(true)}>
+        <img src={src} alt="" referrerpolicy="no-referrer" loading="lazy" onError={() => setFailed(true)} />
+      </button>
+      {zoomed && <ImageLightbox src={src} alt="" onClose={() => setZoomed(false)} />}
+    </>
+  );
+}
+
+/** The picture enlarged in a pop-up; closes on a tap anywhere, the close button or Esc. */
+export function ImageLightbox({ src, alt, onClose }: { src: string; alt: string; onClose: () => void }) {
+  const ref = useRef<HTMLDialogElement>(null);
+  useEffect(() => {
+    const dialog = ref.current;
+    if (!dialog) return;
+    dialog.showModal();
+    const closed = () => onClose();
+    dialog.addEventListener("close", closed);
+    return () => dialog.removeEventListener("close", closed);
+  }, []);
+  return (
+    <dialog ref={ref} class="sp-lightbox" aria-label={S.zoomImage} onClick={() => ref.current?.close()}>
+      <img src={src} alt={alt} referrerpolicy="no-referrer" />
+      <button type="button" class="sp-lightbox__close" aria-label={S.close} onClick={() => ref.current?.close()}>
+        ×
+      </button>
+    </dialog>
   );
 }
 

@@ -2,7 +2,7 @@ import { useState } from "preact/hooks";
 import { formatHuf, hostOf, safeUrl } from "../format";
 import type { ViewedWish, WishField } from "../model";
 import { S } from "../strings";
-import { IconExternal, IconGift, StatusPill } from "./components";
+import { IconExternal, IconGift, ImageLightbox, StatusPill } from "./components";
 
 const REQUESTS: { field: WishField; action: string; label: string; isEmpty: (w: ViewedWish) => boolean }[] = [
   { field: "DESCRIPTION", action: S.requestDescription, label: S.fieldDescription, isEmpty: (w) => !w.description },
@@ -38,6 +38,7 @@ export function WishDetailsScreen({
   const image = safeUrl(wish.imageUrl);
   const link = safeUrl(wish.productUrl);
   const [imageFailed, setImageFailed] = useState(false);
+  const [zoomed, setZoomed] = useState(false);
   const mine = wish.status === "BOOKED_BY_ME";
 
   const statusText = wish.isReceived
@@ -55,11 +56,14 @@ export function WishDetailsScreen({
     <article class="flex flex-col gap-5">
       <div class={`sp-hero-image ${image && !imageFailed ? "" : "sp-hero-image--empty"}`}>
         {image && !imageFailed ? (
-          <img src={image} alt={wish.name} referrerpolicy="no-referrer" onError={() => setImageFailed(true)} />
+          <button type="button" class="sp-zoomable w-full h-full" aria-label={S.zoomImage} onClick={() => setZoomed(true)}>
+            <img src={image} alt={wish.name} referrerpolicy="no-referrer" onError={() => setImageFailed(true)} />
+          </button>
         ) : (
           <IconGift class="w-12 h-12" />
         )}
       </div>
+      {zoomed && image && <ImageLightbox src={image} alt={wish.name} onClose={() => setZoomed(false)} />}
 
       <header>
         <h2 class="sp-detail-title">{wish.name}</h2>
