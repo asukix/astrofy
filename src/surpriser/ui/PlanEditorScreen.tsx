@@ -1,8 +1,8 @@
 import { useState } from "preact/hooks";
-import { formatHuf, safeUrl } from "../format";
+import { formatHuf } from "../format";
 import type { Plan, PlanList, WishDraft } from "../model";
 import { S } from "../strings";
-import { OpenLinkButton } from "./components";
+import { ImagePreview, OpenLinkButton } from "./components";
 import { blankToNull, EditorField, MAX_PRICE_HUF, parsePrice, URL_PATTERN } from "./WishEditorScreen";
 
 type Errors = Partial<Record<"name" | "price" | "imageUrl" | "productUrl", string>>;
@@ -84,7 +84,6 @@ export function PlanEditorScreen({
   };
 
   const parsed = parsePrice(price);
-  const preview = safeUrl(imageUrl);
 
   return (
     <form onSubmit={save} class="flex flex-col gap-4" noValidate>
@@ -122,8 +121,8 @@ export function PlanEditorScreen({
         <div class="flex items-center gap-3">
           <input class="input input-bordered w-full" type="url" inputMode="url" placeholder="https://" value={imageUrl}
             onInput={(e) => { setImageUrl(e.currentTarget.value); clearError("imageUrl"); }} />
-          {preview && <img src={preview} alt="" referrerpolicy="no-referrer" class="sp-thumb" style={{ width: "48px", height: "48px" }} />}
         </div>
+        <ImagePreview url={imageUrl} />
       </EditorField>
 
       <EditorField label={S.fieldProductUrl} error={errors.productUrl}>

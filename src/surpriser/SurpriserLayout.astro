@@ -423,6 +423,21 @@ const { title, description, noindex = false } = Astro.props;
     background: oklch(var(--p) / 0.08);
     border: 1px solid oklch(var(--p) / 0.25);
   }
+  .sp-image-preview {
+    margin-top: 0.6rem;
+    display: grid;
+    place-items: center;
+    max-height: 14rem;
+    border-radius: 0.9rem;
+    overflow: hidden;
+    background: oklch(var(--b1));
+    border: 1px solid oklch(var(--b3));
+  }
+  .sp-image-preview img {
+    max-width: 100%;
+    max-height: 14rem;
+    object-fit: contain;
+  }
   .sp-confirm {
     padding: 0.9rem 1rem;
     border-radius: 0.9rem;

@@ -162,6 +162,19 @@ export function WishRow({ wish, meta, inBookings = false }: { wish: ViewedWish; 
   );
 }
 
+/** The picture behind an image link, shown under the field; nothing if the link is invalid or doesn't load. */
+export function ImagePreview({ url }: { url: string | null | undefined }) {
+  const src = safeUrl(url);
+  const [failed, setFailed] = useState(false);
+  useEffect(() => setFailed(false), [src]);
+  if (!src || failed) return null;
+  return (
+    <div class="sp-image-preview">
+      <img src={src} alt="" referrerpolicy="no-referrer" loading="lazy" onError={() => setFailed(true)} />
+    </div>
+  );
+}
+
 /** Opens a product link in a new tab; renders nothing for a missing or non-http(s) link. */
 export function OpenLinkButton({ url, class: extra = "" }: { url: string | null | undefined; class?: string }) {
   const link = safeUrl(url);

@@ -1,9 +1,9 @@
 import type { ComponentChildren } from "preact";
 import { useState } from "preact/hooks";
-import { formatHuf, safeUrl } from "../format";
+import { formatHuf } from "../format";
 import { isPrivate, type Person, type Wish, type WishDraft, type WishField } from "../model";
 import { S } from "../strings";
-import { OpenLinkButton } from "./components";
+import { ImagePreview, OpenLinkButton } from "./components";
 
 export const MAX_PRICE_HUF = 100_000_000;
 export const URL_PATTERN = /^https?:\/\/[^\s/$.?#][^\s]*$/i;
@@ -110,7 +110,6 @@ export function WishEditorScreen({
     });
   };
 
-  const preview = safeUrl(imageUrl);
 
   return (
     <form onSubmit={submit} class="flex flex-col gap-4" noValidate>
@@ -148,8 +147,8 @@ export function WishEditorScreen({
         <div class="flex items-center gap-3">
           <input class="input input-bordered w-full" type="url" inputMode="url" placeholder="https://" value={imageUrl}
             disabled={locked.IMAGE_URL} onInput={(e) => { setImageUrl(e.currentTarget.value); clearError("imageUrl"); }} />
-          {preview && <img src={preview} alt="" referrerpolicy="no-referrer" class="sp-thumb" style={{ width: "48px", height: "48px" }} />}
         </div>
+        <ImagePreview url={imageUrl} />
       </EditorField>
 
       <EditorField label={S.fieldProductUrl} error={errors.productUrl} requested={requested.has("PRODUCT_URL")}>
