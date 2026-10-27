@@ -41,6 +41,7 @@ export function BoardScreen({
 
   return (
     <div class="flex flex-col gap-8">
+      <InviteEmailMismatch myEmail={board.me.email} />
       <HomeScreenHint />
       {myList}
 
@@ -65,7 +66,10 @@ export function BoardScreen({
           </a>
         </div>
         {board.people.length === 0 ? (
-          <p class="sp-empty">{S.peopleEmpty}</p>
+          <div class="sp-empty">
+            <p>{S.peopleEmpty}</p>
+            <p class="text-sm mt-3 break-words">{S.peopleEmptyEmail(board.me.email)}</p>
+          </div>
         ) : (
           <div class="flex flex-col gap-4">{board.people.map(card)}</div>
         )}
@@ -147,5 +151,21 @@ function PersonCard({
         </div>
       )}
     </article>
+  );
+}
+
+/** Came from an invitation link (?cim=…) but signed in with another address: the invitation can't show up. */
+function InviteEmailMismatch({ myEmail }: { myEmail: string }) {
+  let invited: string | null = null;
+  try {
+    invited = new URLSearchParams(location.search).get("cim")?.trim().toLowerCase() ?? null;
+  } catch {
+    invited = null;
+  }
+  if (!invited || invited === myEmail.toLowerCase()) return null;
+  return (
+    <p class="sp-alert sp-alert--error break-words" role="alert">
+      {S.inviteEmailMismatch(invited, myEmail)}
+    </p>
   );
 }

@@ -53,6 +53,10 @@ export const S = {
   children: "Gyerekeim",
   people: "Család és barátok",
   peopleEmpty: "Még nincs kapcsolatod. Hívd meg a családtagjaidat a „Meghívás” gombbal!",
+  peopleEmptyEmail: (email: string) =>
+    `Ha téged hívtak meg, a meghívásnak erre a címre kell szólnia, mert ezzel vagy bejelentkezve: ${email}. Ha más címre jött, kérd meg a meghívót, hogy ezt a címet hívja meg.`,
+  inviteEmailMismatch: (invited: string, me: string) =>
+    `A meghívó link a(z) ${invited} címre szól, de te a(z) ${me} címmel vagy bejelentkezve, ezért a meghívás nem jelenik meg. Lépj be a meghívott címmel, vagy kérd meg a meghívót, hogy ezt a címet hívja meg.`,
   invitedYou: "Meghívott téged. Ha elfogadod, ő is látni fogja a kívánságaidat.",
   accept: "Elfogadás",
   decline: "Elutasítás",

@@ -239,8 +239,12 @@ export function observeSnapshot(me: User, onChange: (snapshot: Snapshot) => void
     });
   };
 
-  /** Housekeeping on my own account list, as the app does it: old wishes become public, received ones expire. */
-  const tidyMyList = (wishes: Wish[]) => {
+  /**
+   * Housekeeping on a list I fully see (my account's, my children's and their shared lists), as the app's
+   * SyncEngine does it: wishes from before private wishes existed become public (givers' queries only find
+   * them then), and received ones expire after a week.
+   */
+  const tidyList = (wishes: Wish[]) => {
     const now = Date.now();
     const expired = wishes.filter((w) => !tidied.has(w.id) && w.receivedAt !== null && now - w.receivedAt >= RECEIVED_RETENTION_MS);
     const legacy = wishes.filter((w) => !tidied.has(w.id) && w.audience === null && !expired.includes(w));
@@ -268,7 +272,7 @@ export function observeSnapshot(me: User, onChange: (snapshot: Snapshot) => void
       if (wishListeners.has(ownerId)) continue;
       const stop = observe.wishesOf(ownerId, giverId, (wishes) => {
         wishesByOwner.set(ownerId, wishes);
-        if (ownerId === me.id) tidyMyList(wishes);
+        if (giverId === null) tidyList(wishes);
         emit();
       });
       wishListeners.set(ownerId, { giverId, stop });
