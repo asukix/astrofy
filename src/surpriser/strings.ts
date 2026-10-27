@@ -74,7 +74,7 @@ export const S = {
   homeScreenTitle: "Tedd ki a kezdőképernyőre",
   homeScreenIos: "Safariban koppints a Megosztás gombra, majd a „Főképernyőhöz adás” pontra: így a Surpriser saját ikonnal, appként nyílik meg.",
   homeScreenDismiss: "Rendben",
-  appOnlyNote: "A gyerekeid listáit és az ajándéktervezőt az Android-appban kezelheted.",
+  appOnlyNote: "A gyerekeid listáit (kívánságok, gyerek hozzáadása) az Android-appban szerkesztheted.",
 
   // My list
   myList: "Saját listám",

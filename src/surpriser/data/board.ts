@@ -16,6 +16,7 @@ import {
   type ViewedWish,
   type Wish,
 } from "../model";
+import { publishFamilies } from "./familyPublisher";
 import { deleteWish, markWishesPublic, observe } from "./storeService";
 
 /** Received wishes leave the list after a week (as in the app). */
@@ -300,12 +301,35 @@ export function observeSnapshot(me: User, onChange: (snapshot: Snapshot) => void
     }
   };
 
+  // Who may see my children: published like the app does, so a parent using only the web keeps it current too.
+  let lastPublished = "";
+  let publishTimer: ReturnType<typeof setTimeout> | undefined;
+  const schedulePublish = () => {
+    const own = sources.own?.[0]?.id;
+    const input = {
+      me,
+      people,
+      pendingInviteeEmails: (sources.sent ?? []).filter((i) => i.status === "PENDING").map((i) => i.inviteeEmail),
+      managedChildren: (sources.managedChildren ?? []).filter((c) => c.id !== own),
+      managedGroups: sources.managedGroups ?? [],
+    };
+    const key = JSON.stringify(input);
+    if (key === lastPublished || input.managedChildren.length === 0) return;
+    clearTimeout(publishTimer);
+    publishTimer = setTimeout(() => {
+      if (closed) return;
+      lastPublished = key;
+      publishFamilies(input).catch((e) => console.warn("Surpriser: publishing families failed", e));
+    }, 1500);
+  };
+
   const update = <K extends keyof Sources>(key: K) => (items: Sources[K]) => {
     sources[key] = items;
     if (SOURCE_KEYS.every((k) => sources[k] !== undefined)) {
       people = buildPeople(me, sources as Sources);
       syncOwners();
       syncPlans();
+      schedulePublish();
     }
     emit();
   };
@@ -323,6 +347,7 @@ export function observeSnapshot(me: User, onChange: (snapshot: Snapshot) => void
 
   return () => {
     closed = true;
+    clearTimeout(publishTimer);
     stops.forEach((stop) => stop());
     wishListeners.forEach((l) => l.stop());
     planListeners.forEach((stop) => stop());
