@@ -4,8 +4,8 @@ import { formatHuf, safeUrl } from "../format";
 import { isPrivate, type Person, type Wish, type WishDraft, type WishField } from "../model";
 import { S } from "../strings";
 
-const MAX_PRICE_HUF = 100_000_000;
-const URL_PATTERN = /^https?:\/\/[^\s/$.?#][^\s]*$/i;
+export const MAX_PRICE_HUF = 100_000_000;
+export const URL_PATTERN = /^https?:\/\/[^\s/$.?#][^\s]*$/i;
 
 const FIELD_LABEL: Record<WishField, string> = {
   DESCRIPTION: S.fieldDescription,
@@ -15,12 +15,12 @@ const FIELD_LABEL: Record<WishField, string> = {
 
 type Errors = Partial<Record<"name" | "price" | "imageUrl" | "productUrl", string>>;
 
-function parsePrice(text: string): number | null {
+export function parsePrice(text: string): number | null {
   const digits = text.replace(/[\s .]/g, "").replace(/Ft$/i, "");
   return /^\d+$/.test(digits) ? Number(digits) : null;
 }
 
-const blankToNull = (text: string) => (text.trim() === "" ? null : text.trim());
+export const blankToNull = (text: string) => (text.trim() === "" ? null : text.trim());
 
 /**
  * Adding or editing a wish on my own list (WishEditorScreen in the app). Once someone booked it, only empty
@@ -33,6 +33,7 @@ export function WishEditorScreen({
   onSave,
   onToggleReceived,
   onDelete,
+  onMoveToPlans,
 }: {
   existing: Wish | null;
   /** Accepted connections who can be chosen to see a private wish. */
@@ -41,6 +42,8 @@ export function WishEditorScreen({
   onSave: (draft: WishDraft, answered: WishField[]) => Promise<boolean>;
   onToggleReceived: () => Promise<void>;
   onDelete: () => Promise<boolean>;
+  /** Back to the gift planner; only offered while nobody booked or received it. */
+  onMoveToPlans: () => Promise<void>;
 }) {
   const [name, setName] = useState(existing?.name ?? "");
   const [price, setPrice] = useState(existing ? String(existing.priceHuf) : "");
@@ -200,6 +203,11 @@ export function WishEditorScreen({
           <button type="button" class="btn btn-ghost" disabled={busy} onClick={() => run(onToggleReceived)}>
             {received ? S.restore : S.markReceived}
           </button>
+          {!booked && !received && (
+            <button type="button" class="btn btn-ghost" disabled={busy} onClick={() => run(onMoveToPlans)}>
+              {S.moveToPlans}
+            </button>
+          )}
           {(!booked || received) && !confirmDelete && (
             <button type="button" class="btn btn-ghost text-error" disabled={busy} onClick={() => setConfirmDelete(true)}>
               {S.delete}
@@ -227,7 +235,7 @@ export function WishEditorScreen({
   );
 }
 
-function EditorField(props: {
+export function EditorField(props: {
   label: string;
   error?: string;
   hint?: string;

@@ -123,6 +123,37 @@ export const S = {
   privateNoConnections: "Még nincs elfogadott ismerősöd, akit kijelölhetnél.",
   privateWho: "Rajtad kívül ők láthatják:",
 
+  // Gift planner
+  plannerTitle: "Ajándéktervező",
+  plannerHint:
+    "A terveket csak a lista szerkesztői látják: te, a társszülő és a regisztrált gyerek. Ha valamelyikőtök jóváhagyja, kívánság lesz belőle, és onnantól a többiek is látják.",
+  plannerKindMine: "Saját listám",
+  plannerKindChild: "Gyerek listája",
+  plannerKindShared: "Közös lista",
+  plannerSectionEmpty: "Nincs még terv.",
+  plannerNoPrice: "Ár még nincs",
+  plannerApprove: "Jóváhagyás",
+  plannerApproved: "Jóváhagyva: mostantól kívánság.",
+  plannerAdd: "Új terv",
+  plannerAddShort: "+ Terv",
+  plannerLink: (n: number) => (n > 0 ? `Ajándéktervező (${n})` : "Ajándéktervező"),
+  planEditorTitleNew: "Új terv",
+  planEditorTitleEdit: "Terv szerkesztése",
+  planEditorOwner: "Kinek a listájára?",
+  planEditorPrice: "Ár (ráér később)",
+  planEditorSave: "Mentés tervként",
+  planEditorApprove: "Jóváhagyás: legyen kívánság",
+  planEditorApproveInfo: "Kívánság csak árral lehet. Add meg az árat, majd hagyd jóvá.",
+  planEditorVisibility: "Amíg terv, csak a lista szerkesztői látják.",
+  planEditorDeleteTitle: "Törlöd a tervet?",
+  planEditorDeleteMessage: (name: string) => `A(z) „${name}” terv véglegesen törlődik.`,
+  planSaved: "Terv mentve.",
+  planDeleted: "Terv törölve.",
+  planNotFound: "A terv nem található.",
+  errPlanPriceRequired: "Kívánsághoz add meg az árat.",
+  moveToPlans: "Vissza a tervek közé",
+  movedToPlans: "Visszakerült az ajándéktervezőbe.",
+
   // Inviting
   invite: "Meghívás",
   inviteExplanation:

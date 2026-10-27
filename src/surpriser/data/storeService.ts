@@ -26,6 +26,7 @@ import {
 import { firebase } from "../firebase";
 import { AUDIENCE_PUBLIC } from "../model";
 import type {
+  Plan,
   Booking,
   ChildGroup,
   ChildProfile,
@@ -82,6 +83,21 @@ function toWish(snap: DocumentSnapshot<DocumentData>): Wish | null {
     createdAt,
     receivedAt: millis(d.receivedAt),
     audience: Array.isArray(d.audience) ? strings(d.audience) : null,
+  };
+}
+
+function toPlan(snap: DocumentSnapshot<DocumentData>): Plan | null {
+  const d = snap.data({ serverTimestamps: "estimate" });
+  if (!d || typeof d.ownerId !== "string" || typeof d.name !== "string") return null;
+  return {
+    id: snap.id,
+    ownerId: d.ownerId,
+    name: d.name,
+    priceHuf: typeof d.priceHuf === "number" ? d.priceHuf : null,
+    description: d.description ?? null,
+    imageUrl: d.imageUrl ?? null,
+    productUrl: d.productUrl ?? null,
+    createdAt: millis(d.createdAt) ?? 0,
   };
 }
 
@@ -222,6 +238,9 @@ export const observe = {
       stopMine();
     };
   },
+  /** Plans of a list I can edit (the rules only let the list's editors read them). */
+  plansOf: (ownerId: string, cb: (items: Plan[]) => void) =>
+    listen(query(col("plans"), where("ownerId", "==", ownerId)), toPlan, cb, `plans of ${ownerId}`),
   bookings: (uid: string, cb: (items: Booking[]) => void) =>
     listen(query(col("bookings"), where("bookerId", "==", uid)), toBooking, cb, "bookings"),
 };
@@ -382,24 +401,26 @@ async function write(label: string, work: () => Promise<unknown>): Promise<void>
   }
 }
 
+function newWishData(ownerId: string, draft: WishDraft, sortOrder: number) {
+  return {
+    ownerId,
+    name: draft.name,
+    priceHuf: draft.priceHuf,
+    description: draft.description,
+    imageUrl: draft.imageUrl,
+    productUrl: draft.productUrl,
+    booked: false,
+    requestedFields: [],
+    sortOrder,
+    receivedAt: null,
+    audience: audienceOf(draft),
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  };
+}
+
 export function createWish(ownerId: string, draft: WishDraft, sortOrder: number): Promise<void> {
-  return write("creating a wish", () =>
-    setDoc(doc(col("wishes")), {
-      ownerId,
-      name: draft.name,
-      priceHuf: draft.priceHuf,
-      description: draft.description,
-      imageUrl: draft.imageUrl,
-      productUrl: draft.productUrl,
-      booked: false,
-      requestedFields: [],
-      sortOrder,
-      receivedAt: null,
-      audience: audienceOf(draft),
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
-    }),
-  );
+  return write("creating a wish", () => setDoc(doc(col("wishes")), newWishData(ownerId, draft, sortOrder)));
 }
 
 /** [answered]: requested fields the owner just filled in; their requests are cleared. */
@@ -497,6 +518,69 @@ export async function invite(me: User, inviteeEmail: string): Promise<"sent" | "
     console.warn("Surpriser: inviting failed", e);
     throw new StoreError(isOffline(e) ? S.errNetwork : S.errUnknown);
   }
+}
+
+// endregion
+
+// region Gift planner (plans/{id}; PlanUseCases and FirestoreDataSource in the app)
+
+function planData(ownerId: string, draft: WishDraft) {
+  return {
+    ownerId,
+    name: draft.name,
+    priceHuf: draft.priceHuf,
+    description: draft.description,
+    imageUrl: draft.imageUrl,
+    productUrl: draft.productUrl,
+    updatedAt: serverTimestamp(),
+  };
+}
+
+function newPlanData(ownerId: string, draft: WishDraft, createdBy: string) {
+  return { ...planData(ownerId, draft), createdBy, createdAt: serverTimestamp() };
+}
+
+export function createPlan(ownerId: string, draft: WishDraft, me: User): Promise<void> {
+  return write("creating a plan", () => setDoc(doc(col("plans")), newPlanData(ownerId, draft, me.id)));
+}
+
+/** Editing, or moving it to another list I can edit. */
+export function updatePlan(planId: string, ownerId: string, draft: WishDraft): Promise<void> {
+  return write("updating a plan", () => updateDoc(doc(db(), "plans", planId), planData(ownerId, draft)));
+}
+
+export function deletePlan(planId: string): Promise<void> {
+  return write("deleting a plan", () => deleteDoc(doc(db(), "plans", planId)));
+}
+
+/** The plan becomes a wish on [ownerId]'s list: created and deleted in one batch. */
+export function approvePlan(planId: string, ownerId: string, draft: WishDraft, sortOrder: number): Promise<void> {
+  const batch = writeBatch(db());
+  batch.set(doc(col("wishes")), newWishData(ownerId, { ...draft, visibleTo: null }, sortOrder));
+  batch.delete(doc(db(), "plans", planId));
+  return write("approving a plan", () => batch.commit());
+}
+
+/** Back to the planner: only while nobody booked or received it (the rules check it too). */
+export function moveWishToPlans(wish: Wish, me: User): Promise<void> {
+  const batch = writeBatch(db());
+  batch.set(
+    doc(col("plans")),
+    newPlanData(
+      wish.ownerId,
+      {
+        name: wish.name,
+        priceHuf: wish.priceHuf,
+        description: wish.description,
+        imageUrl: wish.imageUrl,
+        productUrl: wish.productUrl,
+        visibleTo: null,
+      },
+      me.id,
+    ),
+  );
+  batch.delete(doc(db(), "wishes", wish.id));
+  return write("moving a wish to the planner", () => batch.commit());
 }
 
 // endregion

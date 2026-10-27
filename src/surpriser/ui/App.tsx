@@ -7,16 +7,24 @@ import {
   boardOf,
   bookingsOf,
   findOwnWish,
+  findPlan,
   findWish,
   myListOf,
+  nextSortOrder,
   observeSnapshot,
+  planCount,
+  plannerOf,
   type Snapshot,
 } from "../data/board";
 import {
+  approvePlan,
   book,
   claimChildProfile,
+  createPlan,
   createWish,
+  deletePlan,
   deleteWish,
+  moveWishToPlans,
   invite,
   requestInfo,
   respondToInvitation,
@@ -25,6 +33,7 @@ import {
   StoreError,
   unbook,
   updateOrder,
+  updatePlan,
   updateWish,
 } from "../data/storeService";
 import type { User, Wish, WishField } from "../model";
@@ -35,6 +44,8 @@ import { BookingsScreen } from "./BookingsScreen";
 import { Spinner, Toast, TopBar, type ToastMessage } from "./components";
 import { InviteScreen } from "./InviteScreen";
 import { MyListSection } from "./MyListSection";
+import { PlanEditorScreen } from "./PlanEditorScreen";
+import { PlannerScreen } from "./PlannerScreen";
 import { goBack, href, useRoute } from "./router";
 import { WishDetailsScreen } from "./WishDetailsScreen";
 import { WishEditorScreen } from "./WishEditorScreen";
@@ -184,6 +195,7 @@ function GiverApp({ me }: { me: User }) {
           <MyListSection
             list={myList}
             people={snapshot.people}
+            planCount={planCount(snapshot)}
             onMove={async (orders) => {
               await guarded(() => updateOrder(orders), null);
             }}
@@ -250,10 +262,65 @@ function GiverApp({ me }: { me: User }) {
             if (ok) goBack();
             return ok;
           }}
+          onMoveToPlans={async () => {
+            if (!existing) return;
+            if (await guarded(() => moveWishToPlans(existing, me), S.movedToPlans)) location.hash = href.planner();
+          }}
         />
       );
     } else if (snapshot?.ready) {
       content = <p class="sp-empty">{S.detailsNotFound}</p>;
+    }
+  } else if (route.name === "planner") {
+    title = S.plannerTitle;
+    back = goBack;
+    if (snapshot?.ready) {
+      content = (
+        <PlannerScreen
+          sections={plannerOf(snapshot)}
+          onApprove={async (plan) => {
+            // Without a price it stays a plan: the editor asks for one.
+            if (plan.priceHuf === null) {
+              location.hash = href.editPlan(plan.id);
+              return;
+            }
+            const draft = { ...plan, visibleTo: null };
+            await guarded(() => approvePlan(plan.id, plan.ownerId, draft, nextSortOrder(snapshot, plan.ownerId)), S.plannerApproved);
+          }}
+        />
+      );
+    }
+  } else if (route.name === "newPlan" || route.name === "editPlan") {
+    back = goBack;
+    title = route.name === "newPlan" ? S.planEditorTitleNew : S.planEditorTitleEdit;
+    const existing = route.name === "editPlan" && snapshot ? findPlan(snapshot, route.planId) : null;
+    if (snapshot?.ready && (route.name === "newPlan" || existing)) {
+      content = (
+        <PlanEditorScreen
+          key={existing?.id ?? "new"}
+          existing={existing}
+          lists={snapshot.planLists}
+          initialOwnerId={route.name === "newPlan" ? route.ownerId : null}
+          onSave={async (ownerId, draft) => {
+            const ok = existing
+              ? await guarded(() => updatePlan(existing.id, ownerId, draft), S.planSaved)
+              : await guarded(() => createPlan(ownerId, draft, me), S.planSaved);
+            if (ok) goBack();
+          }}
+          onApprove={async (ownerId, draft) => {
+            const ok = existing
+              ? await guarded(() => approvePlan(existing.id, ownerId, draft, nextSortOrder(snapshot, ownerId)), S.plannerApproved)
+              // A new idea approved right away is simply a new wish.
+              : await guarded(() => createWish(ownerId, draft, nextSortOrder(snapshot, ownerId)), S.plannerApproved);
+            if (ok) goBack();
+          }}
+          onDelete={async () => {
+            if (existing && (await guarded(() => deletePlan(existing.id), S.planDeleted))) goBack();
+          }}
+        />
+      );
+    } else if (snapshot?.ready) {
+      content = <p class="sp-empty">{S.planNotFound}</p>;
     }
   } else if (route.name === "wish") {
     back = goBack;

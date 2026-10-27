@@ -7,7 +7,10 @@ export type Route =
   | { name: "bookings" }
   | { name: "newWish" }
   | { name: "editWish"; wishId: string }
-  | { name: "invite" };
+  | { name: "invite" }
+  | { name: "planner" }
+  | { name: "newPlan"; ownerId: string | null }
+  | { name: "editPlan"; planId: string };
 
 export function parseRoute(hash: string): Route {
   const path = hash.replace(/^#\/?/, "");
@@ -17,6 +20,9 @@ export function parseRoute(hash: string): Route {
   if (head === "uj-kivansag") return { name: "newWish" };
   if (head === "sajat" && id) return { name: "editWish", wishId: decodeURIComponent(id) };
   if (head === "meghivas") return { name: "invite" };
+  if (head === "tervezo") return { name: "planner" };
+  if (head === "uj-terv") return { name: "newPlan", ownerId: id ? decodeURIComponent(id) : null };
+  if (head === "terv" && id) return { name: "editPlan", planId: decodeURIComponent(id) };
   return { name: "board" };
 }
 
@@ -27,6 +33,9 @@ export const href = {
   newWish: () => "#/uj-kivansag",
   editWish: (wishId: string) => `#/sajat/${encodeURIComponent(wishId)}`,
   invite: () => "#/meghivas",
+  planner: () => "#/tervezo",
+  newPlan: (ownerId?: string) => (ownerId ? `#/uj-terv/${encodeURIComponent(ownerId)}` : "#/uj-terv"),
+  editPlan: (planId: string) => `#/terv/${encodeURIComponent(planId)}`,
 };
 
 /** How many in-app steps can be undone with the browser's back. */

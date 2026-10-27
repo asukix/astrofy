@@ -1,6 +1,6 @@
 # Surpriser – webes nézet
 
-A Surpriser webes változata a sengdev.com/apps/surpriser címen: telepítés nélkül látszanak a családtagok listái, névtelenül lehet foglalni, és a saját lista is kezelhető (kívánságok, sorrend, „Megkaptam”, privát kívánság, meghívás). Gyerekek kezelése és az ajándéktervező az Android-appban marad. A háttér ugyanaz a Firebase-projekt (`surpriser-d3491`), mint az Android-appé, a jogosultságokat a `firestore.rules` kényszeríti ki.
+A Surpriser webes változata a sengdev.com/apps/surpriser címen: telepítés nélkül látszanak a családtagok listái, névtelenül lehet foglalni, a saját lista is kezelhető (kívánságok, sorrend, „Megkaptam”, privát kívánság, meghívás), és van ajándéktervező (`#/tervezo`) a saját, a gyerekek és a közös listákra. A gyerekek kezelése az Android-appban marad. A háttér ugyanaz a Firebase-projekt (`surpriser-d3491`), mint az Android-appé, a jogosultságokat a `firestore.rules` kényszeríti ki.
 
 ## Oldalak
 

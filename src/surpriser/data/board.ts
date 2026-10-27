@@ -10,6 +10,8 @@ import {
   type Invitation,
   type Person,
   type PersonWishes,
+  type Plan,
+  type PlanList,
   type User,
   type ViewedWish,
   type Wish,
@@ -39,6 +41,25 @@ export interface Snapshot {
   canMakePrivate: boolean;
   /** Invitations I sent that are still waiting for an answer. */
   sentPending: SentInvitation[];
+  /** Lists I can plan for: mine first, then my children's, then the shared ones. */
+  planLists: PlanList[];
+  plansByOwner: Map<string, Plan[]>;
+}
+
+/** Port of editableLists in PlanUseCases: my list, my children's, and the shared ones (of my children, or that I'm in). */
+function planListsOf(me: User, s: Partial<Sources>, myListOwnerId: string): PlanList[] {
+  const own = s.own?.[0] ?? null;
+  const byName = (a: PlanList, b: PlanList) => a.name.localeCompare(b.name, "hu", { sensitivity: "base" });
+  const kids = (s.managedChildren ?? [])
+    .filter((c) => c.id !== own?.id)
+    .map((c): PlanList => ({ ownerId: c.id, name: c.name, kind: "CHILD" }))
+    .sort(byName);
+  const groups = new Map<string, PlanList>();
+  for (const g of s.managedGroups ?? []) groups.set(g.id, { ownerId: g.id, name: groupName(g), kind: "SHARED" });
+  for (const g of s.visibleGroups ?? []) {
+    if (own && g.memberIds.includes(own.id)) groups.set(g.id, { ownerId: g.id, name: groupName(g), kind: "SHARED" });
+  }
+  return [{ ownerId: myListOwnerId, name: me.displayName, kind: "MINE" }, ...kids, ...[...groups.values()].sort(byName)];
 }
 
 interface Sources {
@@ -189,6 +210,8 @@ export function observeSnapshot(me: User, onChange: (snapshot: Snapshot) => void
   /** ownerId → the giver id its listener was started with (null: full list) and how to stop it. */
   const wishListeners = new Map<string, { giverId: string | null; stop: () => void }>();
   const tidied = new Set<string>();
+  const plansByOwner = new Map<string, Plan[]>();
+  const planListeners = new Map<string, () => void>();
   let people: Person[] = [];
   let closed = false;
 
@@ -211,6 +234,8 @@ export function observeSnapshot(me: User, onChange: (snapshot: Snapshot) => void
       sentPending: (sources.sent ?? [])
         .filter((inv) => inv.status === "PENDING")
         .map((inv) => ({ id: inv.id, inviteeEmail: inv.inviteeEmail })),
+      planLists: planListsOf(me, sources, myListOwnerId()),
+      plansByOwner: new Map(plansByOwner),
     });
   };
 
@@ -250,11 +275,33 @@ export function observeSnapshot(me: User, onChange: (snapshot: Snapshot) => void
     }
   };
 
+  const syncPlans = () => {
+    const owners = new Set(planListsOf(me, sources, myListOwnerId()).map((l) => l.ownerId));
+    for (const [ownerId, stop] of planListeners) {
+      if (!owners.has(ownerId)) {
+        stop();
+        planListeners.delete(ownerId);
+        plansByOwner.delete(ownerId);
+      }
+    }
+    for (const ownerId of owners) {
+      if (planListeners.has(ownerId)) continue;
+      planListeners.set(
+        ownerId,
+        observe.plansOf(ownerId, (plans) => {
+          plansByOwner.set(ownerId, plans);
+          emit();
+        }),
+      );
+    }
+  };
+
   const update = <K extends keyof Sources>(key: K) => (items: Sources[K]) => {
     sources[key] = items;
     if (SOURCE_KEYS.every((k) => sources[k] !== undefined)) {
       people = buildPeople(me, sources as Sources);
       syncOwners();
+      syncPlans();
     }
     emit();
   };
@@ -274,6 +321,7 @@ export function observeSnapshot(me: User, onChange: (snapshot: Snapshot) => void
     closed = true;
     stops.forEach((stop) => stop());
     wishListeners.forEach((l) => l.stop());
+    planListeners.forEach((stop) => stop());
   };
 }
 
@@ -378,3 +426,37 @@ export function bookingsOf(snapshot: Snapshot): BookedItem[] {
 }
 
 // endregion
+
+export interface PlanSection {
+  list: PlanList;
+  /** Newest last, as they were added. */
+  plans: Plan[];
+}
+
+export function plannerOf(snapshot: Snapshot): PlanSection[] {
+  return snapshot.planLists.map((list) => ({
+    list,
+    plans: (snapshot.plansByOwner.get(list.ownerId) ?? []).slice().sort((a, b) => a.createdAt - b.createdAt),
+  }));
+}
+
+export function planCount(snapshot: Snapshot): number {
+  let n = 0;
+  for (const list of snapshot.planLists) n += snapshot.plansByOwner.get(list.ownerId)?.length ?? 0;
+  return n;
+}
+
+export function findPlan(snapshot: Snapshot, planId: string): Plan | null {
+  for (const plans of snapshot.plansByOwner.values()) {
+    const plan = plans.find((p) => p.id === planId);
+    if (plan) return plan;
+  }
+  return null;
+}
+
+/** Sort order for a wish added to [ownerId]'s list: after everything there (WishOrdering.nextOrder). */
+export function nextSortOrder(snapshot: Snapshot, ownerId: string): number {
+  const wishes = snapshot.wishesByOwner.get(ownerId);
+  if (!wishes) return Date.now(); // list not loaded (e.g. a shared list I'm a member of): put it last
+  return Math.max(-1, ...wishes.map((w) => w.sortOrder)) + 1;
+}

@@ -31,6 +31,31 @@ export interface Wish {
 
 export const AUDIENCE_PUBLIC = "public";
 
+/**
+ * A gift idea on a list that isn't a wish yet. Only the list's editors see it (the owner, the parents and
+ * the registered child); once one of them approves it, it becomes a wish everyone can see.
+ */
+export interface Plan {
+  id: string;
+  ownerId: string;
+  name: string;
+  /** May still be missing; a wish needs one, so it's asked for at approval. */
+  priceHuf: number | null;
+  description: string | null;
+  imageUrl: string | null;
+  productUrl: string | null;
+  createdAt: number;
+}
+
+export type PlanListKind = "MINE" | "CHILD" | "SHARED";
+
+/** A list I can edit, and so plan for. */
+export interface PlanList {
+  ownerId: string;
+  name: string;
+  kind: PlanListKind;
+}
+
 export function isPrivate(wish: Wish): boolean {
   return wish.audience !== null && !wish.audience.includes(AUDIENCE_PUBLIC);
 }
