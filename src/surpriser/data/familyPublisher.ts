@@ -137,29 +137,61 @@ async function publishGroup(
   });
 }
 
-/** Writes what changed; a failure is logged and retried at the next change, like in the app. */
-export async function publishFamilies(input: PublishInput): Promise<void> {
-  if (input.managedChildren.length === 0) return;
+export interface Publications {
+  families: { childId: string; viewerEmails: string[]; family: ReturnType<typeof familyMember>[] }[];
+  groups: { groupId: string; viewerEmails: string[]; managers: string[]; memberNames: Record<string, string> }[];
+}
+
+/**
+ * What I should publish, computed only from my own connections and children (planFamilyPublications and
+ * planGroupPublications in the app). It doesn't depend on what's currently stored, so a write by another
+ * client never makes this client write again.
+ */
+export function planPublications(input: PublishInput): Publications {
+  if (input.managedChildren.length === 0) return { families: [], groups: [] };
   const viewerEmails = viewerEmailsOf(input);
-  for (const child of input.managedChildren) {
-    try {
-      await publishFamily(input.me, child.id, viewerEmails, familyOf(input, child));
-    } catch (e) {
-      console.warn(`Surpriser: publishing the family of ${child.id} failed`, e);
-    }
-  }
+  const families = input.managedChildren.map((child) => ({ childId: child.id, viewerEmails, family: familyOf(input, child) }));
 
   const mine = new Map(input.managedChildren.map((c) => [c.id, c]));
   const registeredEmails = input.managedChildren.filter((c) => c.uid !== null && c.email).map((c) => c.email as string);
   const groupViewers = viewerEmailsOf(input, registeredEmails);
-  for (const group of input.managedGroups) {
+  const groups = input.managedGroups.map((group) => {
     const members = group.memberIds.map((id) => mine.get(id)).filter((c): c is ChildProfile => !!c);
-    const managers = [...new Set([input.me.id, ...members.flatMap((c) => c.managers)])].sort();
-    const memberNames = Object.fromEntries(members.map((c) => [c.id, c.name]));
+    return {
+      groupId: group.id,
+      viewerEmails: groupViewers,
+      managers: [...new Set([input.me.id, ...members.flatMap((c) => c.managers)])].sort(),
+      memberNames: Object.fromEntries(members.map((c) => [c.id, c.name])),
+    };
+  });
+  return { families, groups };
+}
+
+function isQuotaError(e: unknown): boolean {
+  const code = (e as { code?: string } | null)?.code ?? "";
+  return code === "resource-exhausted" || code === "firestore/resource-exhausted";
+}
+
+/**
+ * Writes what changed (each write is skipped when the stored values already match). Returns false when
+ * Firestore's quota ran out: the caller then stops publishing for this session.
+ */
+export async function applyPublications(me: User, plan: Publications): Promise<boolean> {
+  for (const f of plan.families) {
     try {
-      await publishGroup(input.me, group.id, groupViewers, managers, memberNames);
+      await publishFamily(me, f.childId, f.viewerEmails, f.family);
     } catch (e) {
-      console.warn(`Surpriser: publishing the shared list ${group.id} failed`, e);
+      console.warn(`Surpriser: publishing the family of ${f.childId} failed`, e);
+      if (isQuotaError(e)) return false;
     }
   }
+  for (const g of plan.groups) {
+    try {
+      await publishGroup(me, g.groupId, g.viewerEmails, g.managers, g.memberNames);
+    } catch (e) {
+      console.warn(`Surpriser: publishing the shared list ${g.groupId} failed`, e);
+      if (isQuotaError(e)) return false;
+    }
+  }
+  return true;
 }

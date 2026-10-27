@@ -16,7 +16,7 @@ import {
   type ViewedWish,
   type Wish,
 } from "../model";
-import { publishFamilies } from "./familyPublisher";
+import { applyPublications, planPublications } from "./familyPublisher";
 import { deleteWish, markWishesPublic, observe } from "./storeService";
 
 /** Received wishes leave the list after a week (as in the app). */
@@ -302,29 +302,47 @@ export function observeSnapshot(me: User, onChange: (snapshot: Snapshot) => void
   };
 
   // Who may see my children: published like the app does, so a parent using only the web keeps it current too.
-  let lastPublished = "";
+  // Guard rails: it reacts only to changes of what *I* would publish (never to someone else's write), runs at
+  // most once a minute, and stops for the session if Firestore's quota runs out.
+  const PUBLISH_COOLDOWN_MS = 60_000;
+  let lastPlan = "";
+  let lastRunAt = 0;
+  let publishStopped = false;
   let publishTimer: ReturnType<typeof setTimeout> | undefined;
   const schedulePublish = () => {
+    // Publishing from incomplete data would take people off my children's lists.
+    if (publishStopped || failedSources.size > 0) return;
     const own = sources.own?.[0]?.id;
-    const input = {
+    const plan = planPublications({
       me,
       people,
       pendingInviteeEmails: (sources.sent ?? []).filter((i) => i.status === "PENDING").map((i) => i.inviteeEmail),
       managedChildren: (sources.managedChildren ?? []).filter((c) => c.id !== own),
       managedGroups: sources.managedGroups ?? [],
-    };
-    const key = JSON.stringify(input);
-    if (key === lastPublished || input.managedChildren.length === 0) return;
+    });
+    const key = JSON.stringify(plan);
+    if (key === lastPlan || plan.families.length === 0) return;
     clearTimeout(publishTimer);
+    const wait = Math.max(2_000, lastRunAt + PUBLISH_COOLDOWN_MS - Date.now());
     publishTimer = setTimeout(() => {
-      if (closed) return;
-      lastPublished = key;
-      publishFamilies(input).catch((e) => console.warn("Surpriser: publishing families failed", e));
-    }, 1500);
+      if (closed || publishStopped) return;
+      lastPlan = key;
+      lastRunAt = Date.now();
+      applyPublications(me, plan)
+        .then((ok) => {
+          if (!ok) publishStopped = true;
+        })
+        .catch((e) => console.warn("Surpriser: publishing families failed", e));
+    }, wait);
   };
 
-  const update = <K extends keyof Sources>(key: K) => (items: Sources[K]) => {
+  /** Sources whose query failed: then I don't know my full circle, so nothing is published from it. */
+  const failedSources = new Set<keyof Sources>();
+
+  const update = <K extends keyof Sources>(key: K) => (items: Sources[K], failed?: boolean) => {
     sources[key] = items;
+    if (failed) failedSources.add(key);
+    else failedSources.delete(key);
     if (SOURCE_KEYS.every((k) => sources[k] !== undefined)) {
       people = buildPeople(me, sources as Sources);
       syncOwners();

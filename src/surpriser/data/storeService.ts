@@ -176,10 +176,13 @@ type Unsubscribe = () => void;
  * Live query. A denied query (e.g. access revoked) reports an empty list rather than failing the screen,
  * like `emptyOnError` in the app's SyncEngine.
  */
+/** Receives the items; [failed] is true when the query failed and the empty list stands in for it. */
+export type Listener<T> = (items: T[], failed?: boolean) => void;
+
 function listen<T>(
   q: Query<DocumentData>,
   map: (snap: DocumentSnapshot<DocumentData>) => T | null,
-  onData: (items: T[]) => void,
+  onData: Listener<T>,
   label: string,
 ): Unsubscribe {
   return onSnapshot(
@@ -187,7 +190,7 @@ function listen<T>(
     (snapshot) => onData(snapshot.docs.map(map).filter((x): x is T => x !== null)),
     (error) => {
       console.warn(`Surpriser: ${label} failed`, error);
-      onData([]);
+      onData([], true);
     },
   );
 }
@@ -195,26 +198,26 @@ function listen<T>(
 const col = (name: string) => collection(db(), name);
 
 export const observe = {
-  receivedInvitations: (email: string, cb: (items: Invitation[]) => void) =>
+  receivedInvitations: (email: string, cb: Listener<Invitation>) =>
     listen(query(col("invitations"), where("inviteeEmail", "==", email)), toInvitation, cb, "received invitations"),
-  sentInvitations: (uid: string, cb: (items: Invitation[]) => void) =>
+  sentInvitations: (uid: string, cb: Listener<Invitation>) =>
     listen(query(col("invitations"), where("inviterUid", "==", uid)), toInvitation, cb, "sent invitations"),
-  managedChildren: (uid: string, cb: (items: ChildProfile[]) => void) =>
+  managedChildren: (uid: string, cb: Listener<ChildProfile>) =>
     listen(query(col("children"), where("managers", "array-contains", uid)), toChild, cb, "managed children"),
-  ownChildProfile: (uid: string, cb: (items: ChildProfile[]) => void) =>
+  ownChildProfile: (uid: string, cb: Listener<ChildProfile>) =>
     listen(query(col("children"), where("uid", "==", uid)), toChild, cb, "own child profile"),
-  visibleChildren: (email: string, cb: (items: ChildProfile[]) => void) =>
+  visibleChildren: (email: string, cb: Listener<ChildProfile>) =>
     listen(query(col("children"), where("viewerEmails", "array-contains", email)), toChild, cb, "visible children"),
-  managedGroups: (uid: string, cb: (items: ChildGroup[]) => void) =>
+  managedGroups: (uid: string, cb: Listener<ChildGroup>) =>
     listen(query(col("childGroups"), where("managers", "array-contains", uid)), toGroup, cb, "managed shared lists"),
-  visibleGroups: (email: string, cb: (items: ChildGroup[]) => void) =>
+  visibleGroups: (email: string, cb: Listener<ChildGroup>) =>
     listen(query(col("childGroups"), where("viewerEmails", "array-contains", email)), toGroup, cb, "visible shared lists"),
   /**
    * One owner's wishes (one query per owner, not `in`: the rules check each owner on its own).
    * [giverId] null: I see the whole list (my own, or my child's). Otherwise the rules only allow queries
    * that can't return a private wish meant for someone else: the public ones, and the ones meant for me.
    */
-  wishesOf: (ownerId: string, giverId: string | null, cb: (items: Wish[]) => void) => {
+  wishesOf: (ownerId: string, giverId: string | null, cb: Listener<Wish>) => {
     const ofOwner = (...extra: ReturnType<typeof where>[]) => query(col("wishes"), where("ownerId", "==", ownerId), ...extra);
     if (giverId === null) return listen(ofOwner(), toWish, cb, `wishes of ${ownerId}`);
     let pub: Wish[] | null = null;
@@ -239,9 +242,9 @@ export const observe = {
     };
   },
   /** Plans of a list I can edit (the rules only let the list's editors read them). */
-  plansOf: (ownerId: string, cb: (items: Plan[]) => void) =>
+  plansOf: (ownerId: string, cb: Listener<Plan>) =>
     listen(query(col("plans"), where("ownerId", "==", ownerId)), toPlan, cb, `plans of ${ownerId}`),
-  bookings: (uid: string, cb: (items: Booking[]) => void) =>
+  bookings: (uid: string, cb: Listener<Booking>) =>
     listen(query(col("bookings"), where("bookerId", "==", uid)), toBooking, cb, "bookings"),
 };
 
