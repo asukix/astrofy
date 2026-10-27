@@ -40,6 +40,19 @@ export const IconGift = svg(
     <path d="M12 9c-1.5-3.5-5.5-4.5-6-2s3 2 6 2zM12 9c1.5-3.5 5.5-4.5 6-2s-3 2-6 2z" />
   </>,
 );
+export const IconBulb = svg(
+  <>
+    <path d="M9 18h6M10 21h4" />
+    <path d="M12 3a6 6 0 0 0-3.6 10.8c.6.5 1 1.2 1.1 2V16h5v-.2c.1-.8.5-1.5 1.1-2A6 6 0 0 0 12 3z" />
+  </>,
+);
+export const IconPersonAdd = svg(
+  <>
+    <circle cx="9" cy="8" r="3.5" />
+    <path d="M2.5 20c.6-3.6 3.3-5.5 6.5-5.5s5.9 1.9 6.5 5.5" />
+    <path d="M19 8v6M16 11h6" />
+  </>,
+);
 export const IconTag = svg(
   <>
     <path d="M3 12V4a1 1 0 0 1 1-1h8l9 9-9 9-9-9z" />
@@ -145,6 +158,34 @@ export function WishRow({ wish, meta, inBookings = false }: { wish: ViewedWish; 
         </span>
       </span>
       <StatusPill wish={wish} hideMine={inBookings} />
+    </a>
+  );
+}
+
+/** Opens a product link in a new tab; renders nothing for a missing or non-http(s) link. */
+export function OpenLinkButton({ url, class: extra = "" }: { url: string | null | undefined; class?: string }) {
+  const link = safeUrl(url);
+  if (!link) return null;
+  return (
+    <a
+      href={link}
+      target="_blank"
+      rel="noopener noreferrer nofollow"
+      class={`btn btn-ghost btn-sm btn-square shrink-0 ${extra}`}
+      aria-label={S.openLink}
+      title={S.openLink}
+    >
+      <IconExternal />
+    </a>
+  );
+}
+
+/** An icon button of the top bar, as in the app (planner, bookings, invite), with an optional count. */
+export function TopBarIcon({ href: to, label, count, children }: { href: string; label: string; count?: number; children: ComponentChildren }) {
+  return (
+    <a href={to} class="sp-iconbtn" aria-label={count ? `${label} (${count})` : label} title={label}>
+      {children}
+      {count ? <span class="sp-iconbtn__badge" aria-hidden="true">{count > 99 ? "99+" : count}</span> : null}
     </a>
   );
 }

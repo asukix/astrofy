@@ -3,7 +3,7 @@ import type { PlanSection } from "../data/board";
 import { formatHuf } from "../format";
 import type { Plan, PlanListKind } from "../model";
 import { S } from "../strings";
-import { Thumbnail } from "./components";
+import { OpenLinkButton, Thumbnail } from "./components";
 import { href } from "./router";
 
 const KIND_LABEL: Record<PlanListKind, string> = {
@@ -64,6 +64,7 @@ export function PlannerScreen({
                         </span>
                       </span>
                     </a>
+                    <OpenLinkButton url={plan.productUrl} />
                     <button
                       type="button"
                       class="btn btn-outline btn-primary btn-sm shrink-0"

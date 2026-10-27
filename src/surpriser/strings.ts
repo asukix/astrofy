@@ -136,7 +136,6 @@ export const S = {
   plannerApproved: "Jóváhagyva: mostantól kívánság.",
   plannerAdd: "Új terv",
   plannerAddShort: "+ Terv",
-  plannerLink: (n: number) => (n > 0 ? `Ajándéktervező (${n})` : "Ajándéktervező"),
   planEditorTitleNew: "Új terv",
   planEditorTitleEdit: "Terv szerkesztése",
   planEditorOwner: "Kinek a listájára?",

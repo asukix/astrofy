@@ -31,15 +31,12 @@ export function moveWish(wishes: Wish[], wishId: string, step: -1 | 1): Map<stri
 export function MyListSection({
   list,
   people,
-  planCount,
   onMove,
   onRestore,
   onClearReceived,
 }: {
   list: MyList;
   people: Person[];
-  /** Plans on the lists I edit, shown on the planner link. */
-  planCount: number;
   onMove: (orders: Map<string, number>) => Promise<void>;
   onRestore: (wish: Wish) => Promise<void>;
   onClearReceived: () => Promise<void>;
@@ -169,9 +166,6 @@ export function MyListSection({
           </details>
         )}
       </article>
-      <a href={href.planner()} class="btn btn-ghost btn-sm text-primary mt-2">
-        {S.plannerLink(planCount)}
-      </a>
     </section>
   );
 }

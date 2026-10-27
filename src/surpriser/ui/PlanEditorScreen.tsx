@@ -2,6 +2,7 @@ import { useState } from "preact/hooks";
 import { formatHuf, safeUrl } from "../format";
 import type { Plan, PlanList, WishDraft } from "../model";
 import { S } from "../strings";
+import { OpenLinkButton } from "./components";
 import { blankToNull, EditorField, MAX_PRICE_HUF, parsePrice, URL_PATTERN } from "./WishEditorScreen";
 
 type Errors = Partial<Record<"name" | "price" | "imageUrl" | "productUrl", string>>;
@@ -126,8 +127,11 @@ export function PlanEditorScreen({
       </EditorField>
 
       <EditorField label={S.fieldProductUrl} error={errors.productUrl}>
-        <input class="input input-bordered w-full" type="url" inputMode="url" placeholder="https://" value={productUrl}
-          onInput={(e) => { setProductUrl(e.currentTarget.value); clearError("productUrl"); }} />
+        <div class="flex items-center gap-2">
+          <input class="input input-bordered w-full" type="url" inputMode="url" placeholder="https://" value={productUrl}
+            onInput={(e) => { setProductUrl(e.currentTarget.value); clearError("productUrl"); }} />
+          <OpenLinkButton url={productUrl} />
+        </div>
       </EditorField>
 
       <p class="text-sm text-base-content/70">{S.planEditorVisibility}</p>

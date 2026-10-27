@@ -98,6 +98,37 @@ const { title, description, noindex = false } = Astro.props;
     text-overflow: ellipsis;
     min-width: 0;
   }
+  .sp-iconbtn {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 999px;
+    color: oklch(var(--bc) / 0.85);
+  }
+  .sp-iconbtn:hover {
+    background: oklch(var(--bc) / 0.08);
+  }
+  .sp-iconbtn svg {
+    width: 22px;
+    height: 22px;
+  }
+  .sp-iconbtn__badge {
+    position: absolute;
+    top: 0.1rem;
+    right: 0.05rem;
+    min-width: 1.15rem;
+    height: 1.15rem;
+    padding: 0 0.3rem;
+    border-radius: 999px;
+    background: oklch(var(--er));
+    color: oklch(var(--erc));
+    font-size: 0.7rem;
+    font-weight: 700;
+    line-height: 1.15rem;
+    text-align: center;
+  }
   .sp-me {
     display: grid;
     place-items: center;

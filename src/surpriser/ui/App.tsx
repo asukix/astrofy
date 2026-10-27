@@ -41,7 +41,7 @@ import { S } from "../strings";
 import { AuthScreen, NameScreen } from "./AuthScreen";
 import { BoardScreen } from "./BoardScreen";
 import { BookingsScreen } from "./BookingsScreen";
-import { Spinner, Toast, TopBar, type ToastMessage } from "./components";
+import { IconBulb, IconGift, IconPersonAdd, Spinner, Toast, TopBar, TopBarIcon, type ToastMessage } from "./components";
 import { InviteScreen } from "./InviteScreen";
 import { MyListSection } from "./MyListSection";
 import { PlanEditorScreen } from "./PlanEditorScreen";
@@ -195,7 +195,6 @@ function GiverApp({ me }: { me: User }) {
           <MyListSection
             list={myList}
             people={snapshot.people}
-            planCount={planCount(snapshot)}
             onMove={async (orders) => {
               await guarded(() => updateOrder(orders), null);
             }}
@@ -348,7 +347,6 @@ function GiverApp({ me }: { me: User }) {
     }
   }
 
-  const bookingCount = snapshot?.bookings.length ?? 0;
 
   return (
     <>
@@ -357,11 +355,18 @@ function GiverApp({ me }: { me: User }) {
         onBack={back}
         actions={
           <>
-            {route.name === "board" && (
-              <a href={href.bookings()} class="btn btn-ghost btn-sm gap-2">
-                {S.myBookings}
-                {bookingCount > 0 && <span class="badge badge-secondary badge-sm">{bookingCount}</span>}
-              </a>
+            {route.name === "board" && snapshot && (
+              <>
+                <TopBarIcon href={href.planner()} label={S.plannerTitle} count={planCount(snapshot)}>
+                  <IconBulb />
+                </TopBarIcon>
+                <TopBarIcon href={href.bookings()} label={S.myBookings}>
+                  <IconGift />
+                </TopBarIcon>
+                <TopBarIcon href={href.invite()} label={S.invite}>
+                  <IconPersonAdd />
+                </TopBarIcon>
+              </>
             )}
             {accountMenu}
           </>

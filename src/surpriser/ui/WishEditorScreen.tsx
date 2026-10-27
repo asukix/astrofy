@@ -3,6 +3,7 @@ import { useState } from "preact/hooks";
 import { formatHuf, safeUrl } from "../format";
 import { isPrivate, type Person, type Wish, type WishDraft, type WishField } from "../model";
 import { S } from "../strings";
+import { OpenLinkButton } from "./components";
 
 export const MAX_PRICE_HUF = 100_000_000;
 export const URL_PATTERN = /^https?:\/\/[^\s/$.?#][^\s]*$/i;
@@ -152,8 +153,11 @@ export function WishEditorScreen({
       </EditorField>
 
       <EditorField label={S.fieldProductUrl} error={errors.productUrl} requested={requested.has("PRODUCT_URL")}>
-        <input class="input input-bordered w-full" type="url" inputMode="url" placeholder="https://" value={productUrl}
-          disabled={locked.PRODUCT_URL} onInput={(e) => { setProductUrl(e.currentTarget.value); clearError("productUrl"); }} />
+        <div class="flex items-center gap-2">
+          <input class="input input-bordered w-full" type="url" inputMode="url" placeholder="https://" value={productUrl}
+            disabled={locked.PRODUCT_URL} onInput={(e) => { setProductUrl(e.currentTarget.value); clearError("productUrl"); }} />
+          <OpenLinkButton url={productUrl} />
+        </div>
       </EditorField>
 
       {canMakePrivate && (
