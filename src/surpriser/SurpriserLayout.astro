@@ -202,6 +202,10 @@ const { title, description, noindex = false } = Astro.props;
     overflow: hidden;
     text-overflow: ellipsis;
   }
+  .sp-card__sub--wrap {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
   .sp-card__empty {
     padding: 0.5rem 1.1rem 1.1rem;
     color: oklch(var(--bc) / 0.6);
@@ -500,6 +504,37 @@ const { title, description, noindex = false } = Astro.props;
     border-radius: 0.9rem;
     background: oklch(var(--er) / 0.08);
     border: 1px solid oklch(var(--er) / 0.3);
+  }
+  .sp-owner {
+    padding: 1rem 1.1rem;
+    border-radius: var(--rounded-box);
+    background: oklch(var(--b1));
+    border: 1px solid oklch(var(--b3));
+  }
+  .sp-chip--choice {
+    cursor: pointer;
+    border-style: solid;
+    border-color: oklch(var(--b3));
+    background: oklch(var(--b1));
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+  .sp-chip--choice:hover:not(:disabled) {
+    background: oklch(var(--p) / 0.08);
+  }
+  .sp-chip--choice:focus-within {
+    outline: 2px solid oklch(var(--p));
+    outline-offset: 2px;
+  }
+  .sp-chip--choice.sp-chip--on,
+  .sp-chip--choice.sp-chip--on:hover {
+    border-color: oklch(var(--p));
+    background: oklch(var(--p) / 0.14);
+    color: oklch(var(--p));
+  }
+  .sp-chip--on::before {
+    content: "✓";
   }
   .sp-private {
     padding: 1rem 1.1rem;

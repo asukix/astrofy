@@ -1,6 +1,6 @@
 # Surpriser – webes nézet
 
-A Surpriser webes változata a sengdev.com/apps/surpriser címen: telepítés nélkül látszanak a családtagok listái, névtelenül lehet foglalni, a saját lista is kezelhető (kívánságok, sorrend, „Megkaptam”, privát kívánság, meghívás), és van ajándéktervező (`#/tervezo`) a saját, a gyerekek és a közös listákra. A gyerekek kezelése az Android-appban marad. A háttér ugyanaz a Firebase-projekt (`surpriser-d3491`), mint az Android-appé, a jogosultságokat a `firestore.rules` kényszeríti ki.
+A Surpriser webes változata a sengdev.com/apps/surpriser címen: telepítés nélkül látszanak a családtagok listái, névtelenül lehet foglalni, a saját lista is kezelhető (kívánságok, sorrend, „Megkaptam”, privát kívánság, meghívás), van ajándéktervező (`#/tervezo`) a saját, a gyerekek és a közös listákra, és a gyerekek is kezelhetők, mint az appban (gyerek hozzáadása, szerkesztése, törlése, társszülő, a gyerekek és a testvérek közös listáinak szerkesztése, „Kié?” választó a szerkesztőben). A háttér ugyanaz a Firebase-projekt (`surpriser-d3491`), mint az Android-appé, a jogosultságokat a `firestore.rules` kényszeríti ki.
 
 ## Oldalak
 
@@ -11,7 +11,7 @@ A Surpriser webes változata a sengdev.com/apps/surpriser címen: telepítés n�
 | `/apps/surpriser/meghivo?tol=…&cim=…` | `src/pages/apps/surpriser/meghivo.astro` – meghívó link céloldala (statikus, csak megjelenít) |
 | `/apps/surpriser/fiok-torlese` | `src/pages/apps/surpriser/fiok-torlese.astro` (Play Console: Delete account URL) |
 
-Az app belső útvonalai hash-alapúak (`#/kivansag/<id>`, `#/foglalasaim`, `#/uj-kivansag`, `#/sajat/<id>`, `#/meghivas`), így a Cloudflare-en nem kell átirányítás.
+Az app belső útvonalai hash-alapúak (`#/kivansag/<id>`, `#/foglalasaim`, `#/uj-kivansag[/<lista>]`, `#/sajat/<id>`, `#/meghivas`, `#/tervezo`, `#/uj-gyerek`, `#/gyerek/<id>`, `#/tarsszulo/<id>`), így a Cloudflare-en nem kell átirányítás.
 
 ## Privát kívánságok
 
@@ -22,7 +22,9 @@ Ajándékozóként tulajonként két lekérdezés fut (`audience array-contains 
 - `config.ts` – Firebase web config, adatkezelő adatai
 - `data/authService.ts` – belépés, regisztráció, megerősítés, Google (`signInWithPopup`) és fiók-összekötés
 - `data/storeService.ts` – Firestore-lekérdezések és -írások, a szabályok által elvárt alakban (az app `FirestoreDataSource`-ának megfelelői)
-- `data/board.ts` – kit lát a felhasználó (az app `buildPeopleSnapshot`-jának portja) és élő feliratkozások
+- `data/board.ts` – kit lát a felhasználó (az app `buildPeopleSnapshot`-jának portja), mely listákat szerkesztheti, és élő feliratkozások
+- `data/children.ts` – a gyerekekkel kapcsolatos ellenőrzések (az app `ChildUseCases`-ének portja)
+- `data/familyPublisher.ts` – ki láthatja a gyerekeimet (`viewerEmails`, `familyBy`), mint az app `SyncEngine`-jében
 - `ui/` – képernyők: belépés, Kívánságlisták, kívánság részletei, Foglalásaim
 
 ## Élesítés

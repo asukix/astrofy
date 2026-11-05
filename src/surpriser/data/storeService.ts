@@ -24,7 +24,7 @@ import {
   type Timestamp,
 } from "firebase/firestore";
 import { firebase } from "../firebase";
-import { AUDIENCE_PUBLIC } from "../model";
+import { AUDIENCE_PUBLIC, groupIdOf } from "../model";
 import type {
   Plan,
   Booking,
@@ -426,8 +426,16 @@ export function createWish(ownerId: string, draft: WishDraft, sortOrder: number)
   return write("creating a wish", () => setDoc(doc(col("wishes")), newWishData(ownerId, draft, sortOrder)));
 }
 
-/** [answered]: requested fields the owner just filled in; their requests are cleared. */
-export function updateWish(wishId: string, draft: WishDraft, answered: WishField[]): Promise<void> {
+/**
+ * [answered]: requested fields the owner just filled in; their requests are cleared.
+ * [move]: puts it on another list I edit (only while nobody booked or received it; the rules check it too).
+ */
+export function updateWish(
+  wishId: string,
+  draft: WishDraft,
+  answered: WishField[],
+  move?: { ownerId: string; sortOrder: number },
+): Promise<void> {
   const data: Record<string, unknown> = {
     name: draft.name,
     priceHuf: draft.priceHuf,
@@ -438,6 +446,10 @@ export function updateWish(wishId: string, draft: WishDraft, answered: WishField
     updatedAt: serverTimestamp(),
   };
   if (answered.length > 0) data.requestedFields = arrayRemove(...answered);
+  if (move) {
+    data.ownerId = move.ownerId;
+    data.sortOrder = move.sortOrder;
+  }
   return write("updating a wish", () => updateDoc(doc(db(), "wishes", wishId), data));
 }
 
@@ -584,6 +596,79 @@ export function moveWishToPlans(wish: Wish, me: User): Promise<void> {
   );
   batch.delete(doc(db(), "wishes", wish.id));
   return write("moving a wish to the planner", () => batch.commit());
+}
+
+// endregion
+
+// region Children (child profiles and shared lists; ChildUseCases and FirestoreDataSource in the app)
+
+/** Adds a child; the e-mail (optional, normalized) lets them register and take over their list later. */
+export async function createChild(me: User, name: string, email: string | null): Promise<string> {
+  const ref = doc(col("children"));
+  await write("adding a child", () =>
+    setDoc(ref, {
+      name,
+      email,
+      uid: null,
+      managers: [me.id],
+      managerNames: { [me.id]: me.displayName },
+      createdBy: me.id,
+      createdAt: serverTimestamp(),
+      // Who may see the child is published right after (familyPublisher), like in the app.
+      viewerEmails: [],
+      viewerEmailsBy: {},
+      familyBy: {},
+      familyOwnerIds: [me.id],
+    }),
+  );
+  return ref.id;
+}
+
+/** Renames the child or sets their e-mail (which can't change once they registered). */
+export function updateChild(childId: string, name: string, email: string | null): Promise<void> {
+  return write("updating a child", () => updateDoc(doc(db(), "children", childId), { name, email }));
+}
+
+/** Lets one of my connections manage the child too. */
+export function addCoParent(childId: string, coParent: { id: string; displayName: string }): Promise<void> {
+  return write("adding a co-parent", () =>
+    updateDoc(doc(db(), "children", childId), {
+      managers: arrayUnion(coParent.id),
+      [`managerNames.${coParent.id}`]: coParent.displayName,
+    }),
+  );
+}
+
+/** Deletes the child together with their wishes, plans and shared lists, in one batch. */
+export function deleteChild(childId: string, wishIds: string[], groupIds: string[], planIds: string[]): Promise<void> {
+  const batch = writeBatch(db());
+  wishIds.forEach((id) => batch.delete(doc(db(), "wishes", id)));
+  planIds.forEach((id) => batch.delete(doc(db(), "plans", id)));
+  groupIds.forEach((id) => batch.delete(doc(db(), "childGroups", id)));
+  batch.delete(doc(db(), "children", childId));
+  return write("deleting a child", () => batch.commit());
+}
+
+/**
+ * The shared list of these children (2–6, all mine), created if it doesn't exist yet. Merging keeps what the
+ * other parents already published; the parents of every member become its managers.
+ */
+export async function ensureGroup(me: User, members: ChildProfile[]): Promise<string> {
+  const memberIds = [...new Set(members.map((m) => m.id))].sort();
+  const groupId = groupIdOf(memberIds);
+  const managers = [...new Set([me.id, ...members.flatMap((m) => m.managers)])].sort();
+  await write("creating a shared list", () =>
+    setDoc(
+      doc(db(), "childGroups", groupId),
+      {
+        memberIds,
+        memberNames: Object.fromEntries(members.map((m) => [m.id, m.name])),
+        managers: arrayUnion(...managers),
+      },
+      { merge: true },
+    ),
+  );
+  return groupId;
 }
 
 // endregion

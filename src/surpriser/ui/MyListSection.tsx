@@ -5,13 +5,16 @@ import { S } from "../strings";
 import { OwnWishRow } from "./components";
 import { href } from "./router";
 
-/** "Privát: csak te látod" / "Privát: Anna, Béla"; null for a wish everyone sees. */
-export function privacyLabel(wish: Wish, people: Person[]): string | null {
+/**
+ * "Privát: csak te látod" / "Privát: Anna, Béla"; null for a wish everyone sees. [onlyEditors] is the text
+ * for a private wish nobody else was chosen for (on a child's list: only the parents).
+ */
+export function privacyLabel(wish: Wish, people: Person[], onlyEditors: string = S.privateOnlyMe): string | null {
   if (!isPrivate(wish)) return null;
   const names = (wish.audience ?? [])
     .map((id) => people.find((p) => p.id === id)?.displayName)
     .filter((n): n is string => !!n);
-  return names.length === 0 ? S.privateOnlyMe : S.privateFor(names.join(", "));
+  return names.length === 0 ? onlyEditors : S.privateFor(names.join(", "));
 }
 
 /** New sort orders after moving one wish a step (WishOrdering.move in the app): positions 0, 1, 2… */
@@ -41,6 +44,56 @@ export function MyListSection({
   onRestore: (wish: Wish) => Promise<void>;
   onClearReceived: () => Promise<void>;
 }) {
+  return (
+    <section aria-labelledby="sp-mine">
+      <div class="sp-section-head">
+        <h2 id="sp-mine" class="sp-section-title">
+          {S.myList}
+        </h2>
+        <a href={href.newWish()} class="btn btn-primary btn-sm">
+          + {S.addWish}
+        </a>
+      </div>
+
+      <article class="sp-card">
+        <EditableWishList
+          list={list}
+          emptyText={S.myListEmpty}
+          row={(wish) => ({ privacy: privacyLabel(wish, people) })}
+          onMove={onMove}
+          onRestore={onRestore}
+          onClearReceived={onClearReceived}
+        />
+      </article>
+    </section>
+  );
+}
+
+export interface RowOptions {
+  privacy: string | null;
+  to?: string;
+  bookedByMe?: boolean;
+  receivedLabel?: string;
+}
+
+/**
+ * The wishes of a list I edit, with reordering and the received gifts (my own list, a child's, a shared one).
+ */
+export function EditableWishList({
+  list,
+  emptyText,
+  row,
+  onMove,
+  onRestore,
+  onClearReceived,
+}: {
+  list: MyList;
+  emptyText: string;
+  row: (wish: Wish) => RowOptions;
+  onMove: (orders: Map<string, number>) => Promise<void>;
+  onRestore: (wish: Wish) => Promise<void>;
+  onClearReceived: () => Promise<void>;
+}) {
   const [reordering, setReordering] = useState(false);
   const [confirmClear, setConfirmClear] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -56,116 +109,108 @@ export function MyListSection({
   };
 
   return (
-    <section aria-labelledby="sp-mine">
-      <div class="sp-section-head">
-        <h2 id="sp-mine" class="sp-section-title">
-          {S.myList}
-        </h2>
-        <a href={href.newWish()} class="btn btn-primary btn-sm">
-          + {S.addWish}
-        </a>
-      </div>
+    <>
+      {list.open.length === 0 ? (
+        <p class="sp-card__empty pt-4">{emptyText}</p>
+      ) : (
+        <>
+          {reordering && <p class="sp-card__hint">{S.reorderHint}</p>}
+          <ul class="sp-wishlist">
+            {list.open.map((wish, i) => (
+              <li key={wish.id}>
+                <OwnWishRow
+                  wish={wish}
+                  {...row(wish)}
+                  trailing={
+                    reordering && (
+                      <span class="flex shrink-0">
+                        <button
+                          type="button"
+                          class="btn btn-ghost btn-sm btn-square"
+                          aria-label={S.moveUp(wish.name)}
+                          disabled={busy || i === 0}
+                          onClick={() => run(() => onMove(moveWish(list.open, wish.id, -1)))}
+                        >
+                          ↑
+                        </button>
+                        <button
+                          type="button"
+                          class="btn btn-ghost btn-sm btn-square"
+                          aria-label={S.moveDown(wish.name)}
+                          disabled={busy || i === list.open.length - 1}
+                          onClick={() => run(() => onMove(moveWish(list.open, wish.id, 1)))}
+                        >
+                          ↓
+                        </button>
+                      </span>
+                    )
+                  }
+                />
+              </li>
+            ))}
+          </ul>
+          {list.open.length > 1 && (
+            <div class="flex justify-end px-2 pb-2">
+              <button type="button" class="btn btn-ghost btn-sm text-primary" onClick={() => setReordering(!reordering)}>
+                {reordering ? S.reorderDone : S.reorder}
+              </button>
+            </div>
+          )}
+        </>
+      )}
 
-      <article class="sp-card">
-        {list.open.length === 0 ? (
-          <p class="sp-card__empty pt-4">{S.myListEmpty}</p>
-        ) : (
-          <>
-            {reordering && <p class="sp-card__hint">{S.reorderHint}</p>}
-            <ul class="sp-wishlist">
-              {list.open.map((wish, i) => (
-                <li key={wish.id}>
-                  <OwnWishRow
-                    wish={wish}
-                    privacy={privacyLabel(wish, people)}
-                    trailing={
-                      reordering && (
-                        <span class="flex shrink-0">
-                          <button
-                            type="button"
-                            class="btn btn-ghost btn-sm btn-square"
-                            aria-label={S.moveUp(wish.name)}
-                            disabled={busy || i === 0}
-                            onClick={() => run(() => onMove(moveWish(list.open, wish.id, -1)))}
-                          >
-                            ↑
-                          </button>
-                          <button
-                            type="button"
-                            class="btn btn-ghost btn-sm btn-square"
-                            aria-label={S.moveDown(wish.name)}
-                            disabled={busy || i === list.open.length - 1}
-                            onClick={() => run(() => onMove(moveWish(list.open, wish.id, 1)))}
-                          >
-                            ↓
-                          </button>
-                        </span>
-                      )
-                    }
-                  />
-                </li>
-              ))}
-            </ul>
-            {list.open.length > 1 && (
-              <div class="flex justify-end px-2 pb-2">
-                <button type="button" class="btn btn-ghost btn-sm text-primary" onClick={() => setReordering(!reordering)}>
-                  {reordering ? S.reorderDone : S.reorder}
-                </button>
-              </div>
-            )}
-          </>
-        )}
-
-        {list.received.length > 0 && (
-          <details class="sp-received">
-            <summary>{S.receivedSection(list.received.length)}</summary>
-            <ul class="sp-wishlist">
-              {list.received.map((wish) => (
-                <li key={wish.id}>
-                  <OwnWishRow
-                    wish={wish}
-                    privacy={null}
-                    trailing={
-                      <button type="button" class="btn btn-ghost btn-sm" disabled={busy} onClick={() => run(() => onRestore(wish))}>
-                        {S.restore}
-                      </button>
-                    }
-                  />
-                </li>
-              ))}
-            </ul>
-            <div class="px-4 pb-4 text-sm text-base-content/70">
-              <p>{S.receivedAutoClear}</p>
-              {confirmClear ? (
-                <div class="sp-confirm mt-3">
-                  <p class="font-semibold">{S.receivedClearTitle}</p>
-                  <p class="mt-1">{S.receivedClearMessage}</p>
-                  <div class="flex gap-2 mt-3">
-                    <button
-                      type="button"
-                      class="btn btn-error btn-sm"
-                      disabled={busy}
-                      onClick={() => run(async () => {
+      {list.received.length > 0 && (
+        <details class="sp-received">
+          <summary>{S.receivedSection(list.received.length)}</summary>
+          <ul class="sp-wishlist">
+            {list.received.map((wish) => (
+              <li key={wish.id}>
+                <OwnWishRow
+                  wish={wish}
+                  {...row(wish)}
+                  privacy={null}
+                  trailing={
+                    <button type="button" class="btn btn-ghost btn-sm" disabled={busy} onClick={() => run(() => onRestore(wish))}>
+                      {S.restore}
+                    </button>
+                  }
+                />
+              </li>
+            ))}
+          </ul>
+          <div class="px-4 pb-4 text-sm text-base-content/70">
+            <p>{S.receivedAutoClear}</p>
+            {confirmClear ? (
+              <div class="sp-confirm mt-3">
+                <p class="font-semibold">{S.receivedClearTitle}</p>
+                <p class="mt-1">{S.receivedClearMessage}</p>
+                <div class="flex gap-2 mt-3">
+                  <button
+                    type="button"
+                    class="btn btn-error btn-sm"
+                    disabled={busy}
+                    onClick={() =>
+                      run(async () => {
                         await onClearReceived();
                         setConfirmClear(false);
-                      })}
-                    >
-                      {S.receivedClear}
-                    </button>
-                    <button type="button" class="btn btn-ghost btn-sm" onClick={() => setConfirmClear(false)}>
-                      {S.cancel}
-                    </button>
-                  </div>
+                      })
+                    }
+                  >
+                    {S.receivedClear}
+                  </button>
+                  <button type="button" class="btn btn-ghost btn-sm" onClick={() => setConfirmClear(false)}>
+                    {S.cancel}
+                  </button>
                 </div>
-              ) : (
-                <button type="button" class="btn btn-ghost btn-sm text-primary mt-2 -ml-3" onClick={() => setConfirmClear(true)}>
-                  {S.receivedClear}
-                </button>
-              )}
-            </div>
-          </details>
-        )}
-      </article>
-    </section>
+              </div>
+            ) : (
+              <button type="button" class="btn btn-ghost btn-sm text-primary mt-2 -ml-3" onClick={() => setConfirmClear(true)}>
+                {S.receivedClear}
+              </button>
+            )}
+          </div>
+        </details>
+      )}
+    </>
   );
 }

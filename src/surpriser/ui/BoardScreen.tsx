@@ -8,12 +8,18 @@ import { href } from "./router";
 export function BoardScreen({
   board,
   myList,
+  managed,
+  canAddChild,
   pendingSent,
   onRespond,
 }: {
   board: Board;
   /** My own list, rendered above everyone else's. */
   myList: ComponentChildren;
+  /** My children's lists and the shared ones, which I edit; null when there are none. */
+  managed: ComponentChildren | null;
+  /** Shows the "add a child" hint at the bottom when I have no children yet. */
+  canAddChild: boolean;
   /** How many of my invitations wait for an answer. */
   pendingSent: number;
   onRespond: (invitationId: string, accept: boolean) => Promise<void>;
@@ -45,15 +51,7 @@ export function BoardScreen({
       <HomeScreenHint />
       {myList}
 
-      {board.managed.length > 0 && (
-        <section aria-labelledby="sp-children">
-          <h2 id="sp-children" class="sp-section-title">
-            {S.children}
-          </h2>
-          <p class="sp-section-hint">{S.managedHint}</p>
-          <div class="flex flex-col gap-4">{board.managed.map(card)}</div>
-        </section>
-      )}
+      {managed}
 
       <section aria-labelledby="sp-people">
         <div class="sp-section-head">
@@ -75,7 +73,14 @@ export function BoardScreen({
         )}
       </section>
 
-      <p class="text-sm text-base-content/60 text-center px-6">{S.appOnlyNote}</p>
+      {canAddChild && (
+        <div class="text-sm text-base-content/70 text-center px-6 flex flex-col items-center gap-2">
+          <p>{S.noChildrenHint}</p>
+          <a href={href.newChild()} class="btn btn-ghost btn-sm text-primary">
+            {S.addChildShort}
+          </a>
+        </div>
+      )}
     </div>
   );
 }

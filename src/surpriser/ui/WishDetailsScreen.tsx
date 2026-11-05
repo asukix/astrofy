@@ -16,6 +16,7 @@ export function WishDetailsScreen({
   onBook,
   onUnbook,
   onRequest,
+  editHref,
 }: {
   wish: ViewedWish;
   /** Not on my own children's lists: there I'm an editor, and editors fill fields in rather than ask. */
@@ -23,6 +24,8 @@ export function WishDetailsScreen({
   onBook: () => Promise<void>;
   onUnbook: () => Promise<void>;
   onRequest: (field: WishField) => Promise<void>;
+  /** On my children's lists: I edit them too. */
+  editHref?: string;
 }) {
   const [busy, setBusy] = useState(false);
   const run = async (work: () => Promise<void>) => {
@@ -74,6 +77,12 @@ export function WishDetailsScreen({
       </header>
 
       {wish.description && <p class="sp-description">{wish.description}</p>}
+
+      {editHref && (
+        <a href={editHref} class="btn btn-outline">
+          {S.editWish}
+        </a>
+      )}
 
       {link && (
         <a href={link} target="_blank" rel="noopener noreferrer nofollow" class="btn btn-outline justify-between">

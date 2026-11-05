@@ -256,27 +256,38 @@ export function TopBar({
   );
 }
 
-/** A wish on my own list, as its owner sees it: never who booked it, only that someone did. */
+/**
+ * A wish on a list I edit, as its editors see it: never who booked it, only that someone did (unless it was me,
+ * as a parent buying from my child's list). Opens the editor, or [to] (the details, on my children's lists).
+ */
 export function OwnWishRow({
   wish,
   privacy,
   trailing,
+  to,
+  bookedByMe = false,
+  receivedLabel = S.statusReceivedOwner,
 }: {
   wish: Wish;
   /** "Privát: …" when only some people see it. */
   privacy: string | null;
   trailing?: ComponentChildren;
+  to?: string;
+  bookedByMe?: boolean;
+  receivedLabel?: string;
 }) {
   const pill = wish.receivedAt
-    ? <span class="sp-pill sp-pill--done">{S.statusReceivedOwner}</span>
-    : wish.booked
-      ? <span class="sp-pill sp-pill--owner">{S.statusBookedOwner}</span>
-      : wish.requestedFields.length > 0
-        ? <span class="sp-pill sp-pill--ask">{S.statusInfoRequested}</span>
-        : null;
+    ? <span class="sp-pill sp-pill--done">{receivedLabel}</span>
+    : bookedByMe
+      ? <span class="sp-pill sp-pill--mine">{S.statusBookedByMe}</span>
+      : wish.booked
+        ? <span class="sp-pill sp-pill--owner">{S.statusBookedOwner}</span>
+        : wish.requestedFields.length > 0
+          ? <span class="sp-pill sp-pill--ask">{S.statusInfoRequested}</span>
+          : null;
   return (
     <div class="sp-wish">
-      <a href={href.editWish(wish.id)} class="sp-wish__link">
+      <a href={to ?? href.editWish(wish.id)} class="sp-wish__link">
         <Thumbnail url={wish.imageUrl} />
         <span class="min-w-0 flex-1">
           <span class="sp-wish__name">{wish.name}</span>

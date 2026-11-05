@@ -5,6 +5,7 @@ import {
   joinAsNames,
   type Board,
   type Booking,
+  type EditableList,
   type ChildGroup,
   type ChildProfile,
   type Invitation,
@@ -45,22 +46,45 @@ export interface Snapshot {
   /** Lists I can plan for: mine first, then my children's, then the shared ones. */
   planLists: PlanList[];
   plansByOwner: Map<string, Plan[]>;
+  /** The same lists, with what I may do with each. */
+  editableLists: EditableList[];
+  /** Children I'm a parent of (not my own profile, if I registered as a child), by name. */
+  managedChildren: ChildProfile[];
 }
 
+const byListName = (a: PlanList, b: PlanList) => a.name.localeCompare(b.name, "hu", { sensitivity: "base" });
+
 /** Port of editableLists in PlanUseCases: my list, my children's, and the shared ones (of my children, or that I'm in). */
-function planListsOf(me: User, s: Partial<Sources>, myListOwnerId: string): PlanList[] {
+function editableListsOf(me: User, s: Partial<Sources>, myListOwnerId: string): EditableList[] {
   const own = s.own?.[0] ?? null;
-  const byName = (a: PlanList, b: PlanList) => a.name.localeCompare(b.name, "hu", { sensitivity: "base" });
   const kids = (s.managedChildren ?? [])
     .filter((c) => c.id !== own?.id)
-    .map((c): PlanList => ({ ownerId: c.id, name: c.name, kind: "CHILD" }))
-    .sort(byName);
-  const groups = new Map<string, PlanList>();
-  for (const g of s.managedGroups ?? []) groups.set(g.id, { ownerId: g.id, name: groupName(g), kind: "SHARED" });
-  for (const g of s.visibleGroups ?? []) {
-    if (own && g.memberIds.includes(own.id)) groups.set(g.id, { ownerId: g.id, name: groupName(g), kind: "SHARED" });
+    .map((c): EditableList => ({ ownerId: c.id, name: c.name, kind: "CHILD", canMakePrivate: true, isOwn: false, child: c, group: null }))
+    .sort(byListName);
+  const groups = new Map<string, EditableList>();
+  for (const g of s.managedGroups ?? []) {
+    groups.set(g.id, { ownerId: g.id, name: groupName(g), kind: "SHARED", canMakePrivate: true, isOwn: false, child: null, group: g });
   }
-  return [{ ownerId: myListOwnerId, name: me.displayName, kind: "MINE" }, ...kids, ...[...groups.values()].sort(byName)];
+  for (const g of s.visibleGroups ?? []) {
+    if (own && g.memberIds.includes(own.id) && !groups.has(g.id)) {
+      // As a member I edit its public wishes only: private ones may be surprises for me.
+      groups.set(g.id, { ownerId: g.id, name: groupName(g), kind: "SHARED", canMakePrivate: false, isOwn: true, child: null, group: g });
+    }
+  }
+  const mine: EditableList = {
+    ownerId: myListOwnerId,
+    name: me.displayName,
+    kind: "MINE",
+    canMakePrivate: myListOwnerId === me.id,
+    isOwn: true,
+    child: null,
+    group: null,
+  };
+  return [mine, ...kids, ...[...groups.values()].sort(byListName)];
+}
+
+function planListsOf(me: User, s: Partial<Sources>, myListOwnerId: string): PlanList[] {
+  return editableListsOf(me, s, myListOwnerId).map(({ ownerId, name, kind }) => ({ ownerId, name, kind }));
 }
 
 interface Sources {
@@ -237,6 +261,10 @@ export function observeSnapshot(me: User, onChange: (snapshot: Snapshot) => void
         .map((inv) => ({ id: inv.id, inviteeEmail: inv.inviteeEmail })),
       planLists: planListsOf(me, sources, myListOwnerId()),
       plansByOwner: new Map(plansByOwner),
+      editableLists: editableListsOf(me, sources, myListOwnerId()),
+      managedChildren: (sources.managedChildren ?? [])
+        .filter((c) => c.id !== sources.own?.[0]?.id)
+        .sort((a, b) => a.name.localeCompare(b.name, "hu", { sensitivity: "base" })),
     });
   };
 
@@ -260,6 +288,10 @@ export function observeSnapshot(me: User, onChange: (snapshot: Snapshot) => void
     const owners = new Map<string, string | null>();
     owners.set(myListOwnerId(), myListOwnerId() === me.id ? null : me.id);
     for (const p of people) owners.set(p.id, p.isManaged ? null : me.id);
+    // Shared lists I'm a member of: like my own list as a registered child (public wishes and the ones for me).
+    for (const list of editableListsOf(me, sources, myListOwnerId())) {
+      if (list.kind === "SHARED" && list.isOwn) owners.set(list.ownerId, me.id);
+    }
     for (const b of sources.bookings ?? []) if (!owners.has(b.ownerId)) owners.set(b.ownerId, me.id);
 
     for (const [ownerId, listener] of wishListeners) {
@@ -419,13 +451,31 @@ export interface MyList {
   received: Wish[];
 }
 
-export function myListOf(snapshot: Snapshot): MyList {
-  const all = (snapshot.wishesByOwner.get(snapshot.myListOwnerId) ?? []).slice().sort(byListOrder);
+/** A list I edit, as its editors see it: everything on it, received gifts separately. */
+export function listOf(snapshot: Snapshot, ownerId: string): MyList {
+  const all = (snapshot.wishesByOwner.get(ownerId) ?? []).slice().sort(byListOrder);
   return {
-    ownerId: snapshot.myListOwnerId,
+    ownerId,
     open: all.filter((w) => w.receivedAt === null),
     received: all.filter((w) => w.receivedAt !== null),
   };
+}
+
+export function myListOf(snapshot: Snapshot): MyList {
+  return listOf(snapshot, snapshot.myListOwnerId);
+}
+
+export function editableList(snapshot: Snapshot, ownerId: string): EditableList | null {
+  return snapshot.editableLists.find((l) => l.ownerId === ownerId) ?? null;
+}
+
+/** A wish on a list I edit (mine, my children's, a shared one), with that list. */
+export function findEditableWish(snapshot: Snapshot, wishId: string): { wish: Wish; list: EditableList } | null {
+  for (const list of snapshot.editableLists) {
+    const wish = (snapshot.wishesByOwner.get(list.ownerId) ?? []).find((w) => w.id === wishId);
+    if (wish) return { wish, list };
+  }
+  return null;
 }
 
 /** Who I can show a private wish to: my accepted connections (accounts, not children). */
@@ -440,8 +490,9 @@ export function findOwnWish(snapshot: Snapshot, wishId: string): Wish | null {
 }
 
 export function findWish(snapshot: Snapshot, wishId: string): { wish: ViewedWish; owner: Person | null } | null {
+  const own = new Set(snapshot.editableLists.filter((l) => l.isOwn).map((l) => l.ownerId));
   for (const [ownerId, wishes] of snapshot.wishesByOwner) {
-    if (ownerId === snapshot.myListOwnerId) continue;
+    if (own.has(ownerId)) continue;
     const wish = wishes.find((w) => w.id === wishId);
     if (wish) {
       return { wish: viewWish(wish, snapshot.bookedByMe), owner: snapshot.people.find((p) => p.id === ownerId) ?? null };

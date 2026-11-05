@@ -1,7 +1,16 @@
 import type { ComponentChildren } from "preact";
 import { useState } from "preact/hooks";
 import { formatHuf } from "../format";
-import { isPrivate, type Person, type Wish, type WishDraft, type WishField } from "../model";
+import {
+  isPrivate,
+  joinAsNames,
+  type ChildProfile,
+  type Person,
+  type Wish,
+  type WishDraft,
+  type WishField,
+  type WishTarget,
+} from "../model";
 import { S } from "../strings";
 import { ImagePreview, OpenLinkButton } from "./components";
 
@@ -24,13 +33,37 @@ export function parsePrice(text: string): number | null {
 export const blankToNull = (text: string) => (text.trim() === "" ? null : text.trim());
 
 /**
- * Adding or editing a wish on my own list (WishEditorScreen in the app). Once someone booked it, only empty
- * optional fields can be filled in, and who sees it can't change: the booker buys what they agreed to buy.
+ * "Kié?": which list the wish goes to — mine, one child's, or shared by several of my children (OwnerPickerState).
+ * Exactly one of "me" and the children is chosen; two or more children make it a shared wish.
+ */
+export interface OwnerPicker {
+  myOwnerId: string;
+  children: ChildProfile[];
+  meSelected: boolean;
+  childIds: string[];
+  /** An existing shared wish stays shared: no "me", and at least two children. */
+  sharedOnly: boolean;
+  /** A booked or received wish stays on its list. */
+  locked: boolean;
+}
+
+function targetOf(picker: OwnerPicker): WishTarget {
+  if (picker.meSelected || picker.childIds.length === 0) return { kind: "single", ownerId: picker.myOwnerId };
+  if (picker.childIds.length === 1) return { kind: "single", ownerId: picker.childIds[0] };
+  return { kind: "shared", childIds: picker.childIds };
+}
+
+/**
+ * Adding or editing a wish on a list I edit (WishEditorScreen in the app): mine, a child's or a shared one.
+ * Once someone booked it, only empty optional fields can be filled in, and who sees it can't change: the
+ * booker buys what they agreed to buy.
  */
 export function WishEditorScreen({
   existing,
   candidates,
-  canMakePrivate,
+  canMakePrivate: canMakePrivateMine,
+  childList = false,
+  ownerPicker: initialPicker = null,
   onSave,
   onToggleReceived,
   onDelete,
@@ -39,8 +72,13 @@ export function WishEditorScreen({
   existing: Wish | null;
   /** Accepted connections who can be chosen to see a private wish. */
   candidates: Person[];
+  /** On my own list (a registered child can't make theirs private). */
   canMakePrivate: boolean;
-  onSave: (draft: WishDraft, answered: WishField[]) => Promise<boolean>;
+  /** Without a picker: the list is a child's or a shared one, which I edit as a parent. */
+  childList?: boolean;
+  ownerPicker?: OwnerPicker | null;
+  /** [target]: where it goes; null keeps it where it is. */
+  onSave: (draft: WishDraft, answered: WishField[], target: WishTarget | null) => Promise<boolean>;
   onToggleReceived: () => Promise<void>;
   onDelete: () => Promise<boolean>;
   /** Back to the gift planner; only offered while nobody booked or received it. */
@@ -56,6 +94,22 @@ export function WishEditorScreen({
   const [errors, setErrors] = useState<Errors>({});
   const [busy, setBusy] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [picker, setPicker] = useState<OwnerPicker | null>(initialPicker);
+
+  // A child's or a shared list (as a parent): their wishes can always be private, hidden from the child too.
+  const target = picker ? targetOf(picker) : null;
+  const forChild = target ? target.kind === "shared" || target.ownerId !== picker!.myOwnerId : childList;
+  const canMakePrivate = forChild || canMakePrivateMine;
+
+  const selectMe = () =>
+    setPicker((p) => (p && !p.locked && !p.sharedOnly ? { ...p, meSelected: true, childIds: [] } : p));
+  const toggleChild = (id: string) =>
+    setPicker((p) => {
+      if (!p || p.locked) return p;
+      const ids = p.childIds.includes(id) ? p.childIds.filter((c) => c !== id) : [...p.childIds, id];
+      if (p.sharedOnly && ids.length < 2) return p;
+      return ids.length === 0 ? { ...p, meSelected: true, childIds: [] } : { ...p, meSelected: false, childIds: ids };
+    });
 
   const clearError = (key: keyof Errors) => setErrors((current) => (current[key] ? { ...current, [key]: undefined } : current));
 
@@ -99,23 +153,58 @@ export function WishEditorScreen({
       imageUrl: blankToNull(imageUrl),
       productUrl: blankToNull(productUrl),
       // A booked wish keeps its audience as it is.
-      visibleTo: booked ? (existing && isPrivate(existing) ? existing.audience : null) : priv ? chosen : null,
+      visibleTo: booked ? (existing && isPrivate(existing) ? existing.audience : null) : priv && canMakePrivate ? chosen : null,
     };
     const answered = [...requested].filter((field) => {
       const value = field === "DESCRIPTION" ? draft.description : field === "IMAGE_URL" ? draft.imageUrl : draft.productUrl;
       return value !== null;
     });
     run(async () => {
-      await onSave(draft, answered);
+      await onSave(draft, answered, picker && !picker.locked ? targetOf(picker) : null);
     });
   };
 
 
   return (
     <form onSubmit={submit} class="flex flex-col gap-4" noValidate>
+      {picker && (
+        <fieldset class="sp-owner">
+          <legend class="label-text font-semibold mb-2">{S.editorOwnerTitle}</legend>
+          <div class="flex flex-wrap gap-2">
+            {!picker.sharedOnly && (
+              <label class={`sp-chip sp-chip--choice ${picker.meSelected ? "sp-chip--on" : ""}`}>
+                <input type="radio" class="sr-only" name="owner-me" checked={picker.meSelected} disabled={picker.locked} onChange={selectMe} />
+                {S.editorOwnerMe}
+              </label>
+            )}
+            {picker.children.map((child) => (
+              <label key={child.id} class={`sp-chip sp-chip--choice ${picker.childIds.includes(child.id) ? "sp-chip--on" : ""}`}>
+                <input
+                  type="checkbox"
+                  class="sr-only"
+                  checked={picker.childIds.includes(child.id)}
+                  disabled={picker.locked}
+                  onChange={() => toggleChild(child.id)}
+                />
+                {child.name}
+              </label>
+            ))}
+          </div>
+          <p class="text-sm text-base-content/70 mt-2">
+            {picker.locked
+              ? S.editorOwnerLocked
+              : picker.childIds.length >= 2
+                ? (picker.sharedOnly ? S.editorOwnerSharedOnly : S.editorOwnerShared)(
+                    joinAsNames(picker.children.filter((c) => picker.childIds.includes(c.id)).map((c) => c.name)),
+                  )
+                : S.editorOwnerHint}
+          </p>
+        </fieldset>
+      )}
+
       {existing && (
         <div class={`sp-booking ${booked ? "sp-booking--mine" : ""}`}>
-          <p>{received ? S.receivedInfo : booked ? S.ownStatusBooked : S.ownStatusAvailable}</p>
+          <p>{received ? (forChild ? S.receivedInfoChild : S.receivedInfo) : booked ? S.ownStatusBooked : S.ownStatusAvailable}</p>
           {booked && !received && <p class="text-sm mt-2 opacity-80">{S.bookedInfo}</p>}
           {requested.size > 0 && (
             <p class="text-sm mt-2 opacity-80">
@@ -166,13 +255,13 @@ export function WishEditorScreen({
               onChange={(e) => setPriv(e.currentTarget.checked)} />
             <span class="font-semibold">{S.editorPrivate}</span>
           </label>
-          <p class="text-sm text-base-content/70 mt-2">{booked ? S.privateLocked : S.privateInfo}</p>
+          <p class="text-sm text-base-content/70 mt-2">{booked ? S.privateLocked : forChild ? S.privateInfoChild : S.privateInfo}</p>
           {priv && !booked && (
             candidates.length === 0 ? (
               <p class="text-sm mt-3">{S.privateNoConnections}</p>
             ) : (
               <div class="mt-3">
-                <p class="text-sm font-semibold mb-2">{S.privateWho}</p>
+                <p class="text-sm font-semibold mb-2">{forChild ? S.privateWhoChild : S.privateWho}</p>
                 <ul class="flex flex-col gap-1">
                   {candidates.map((person) => (
                     <li key={person.id}>
@@ -204,7 +293,7 @@ export function WishEditorScreen({
       {existing && (
         <div class="flex flex-wrap gap-2 justify-between pt-2 border-t border-base-300">
           <button type="button" class="btn btn-ghost" disabled={busy} onClick={() => run(onToggleReceived)}>
-            {received ? S.restore : S.markReceived}
+            {received ? S.restore : forChild ? S.markReceivedChild : S.markReceived}
           </button>
           {!booked && !received && (
             <button type="button" class="btn btn-ghost" disabled={busy} onClick={() => run(onMoveToPlans)}>

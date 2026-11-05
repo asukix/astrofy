@@ -6,9 +6,11 @@ import {
   audienceCandidates,
   boardOf,
   bookingsOf,
-  findOwnWish,
+  editableList,
+  findEditableWish,
   findPlan,
   findWish,
+  listOf,
   myListOf,
   nextSortOrder,
   observeSnapshot,
@@ -16,14 +18,20 @@ import {
   plannerOf,
   type Snapshot,
 } from "../data/board";
+import { canAddCoParent, checkShared, childDeletion, coParentCandidates, isRegistered, validateChild } from "../data/children";
 import {
+  addCoParent,
   approvePlan,
   book,
   claimChildProfile,
+  createChild,
   createPlan,
   createWish,
+  deleteChild,
   deletePlan,
   deleteWish,
+  ensureGroup,
+  updateChild,
   moveWishToPlans,
   invite,
   requestInfo,
@@ -36,19 +44,21 @@ import {
   updatePlan,
   updateWish,
 } from "../data/storeService";
-import type { User, Wish, WishField } from "../model";
+import { groupIdOf, type EditableList, type User, type Wish, type WishField, type WishTarget } from "../model";
 import { S } from "../strings";
 import { AuthScreen, NameScreen } from "./AuthScreen";
 import { BoardScreen } from "./BoardScreen";
 import { BookingsScreen } from "./BookingsScreen";
+import { ChildEditorScreen, CoParentScreen } from "./ChildEditorScreen";
 import { IconBulb, IconGift, IconPersonAdd, Spinner, Toast, TopBar, TopBarIcon, type ToastMessage } from "./components";
 import { InviteScreen } from "./InviteScreen";
+import { ManagedListCard } from "./ManagedListCard";
 import { MyListSection } from "./MyListSection";
 import { PlanEditorScreen } from "./PlanEditorScreen";
 import { PlannerScreen } from "./PlannerScreen";
 import { goBack, href, useRoute } from "./router";
 import { WishDetailsScreen } from "./WishDetailsScreen";
-import { WishEditorScreen } from "./WishEditorScreen";
+import { WishEditorScreen, type OwnerPicker } from "./WishEditorScreen";
 
 export default function App() {
   if (!isConfigured) {
@@ -156,11 +166,95 @@ function GiverApp({ me }: { me: User }) {
 
   const toggleReceived = async (wish: Wish) => {
     const received = wish.receivedAt === null;
+    const mine = wish.ownerId === snapshot?.myListOwnerId;
     await guarded(
       () => setReceived(wish.id, received),
-      received ? S.receivedMessage : S.restoredMessage,
+      received ? S.receivedMessage : mine ? S.restoredMessage : S.restoredToList,
       { label: S.undo, run: () => void guarded(() => setReceived(wish.id, !received), null) },
     );
+  };
+
+  /** The list a wish goes to: a shared one is created on first use (ensureGroup). */
+  const resolveTarget = async (target: WishTarget): Promise<string> => {
+    if (target.kind === "single") return target.ownerId;
+    if (!snapshot) throw new StoreError(S.errUnknown);
+    const checked = checkShared(snapshot, target.childIds);
+    if (!checked.ok) throw new StoreError(checked.error);
+    const id = groupIdOf(target.childIds);
+    if (snapshot.editableLists.some((l) => l.ownerId === id && !l.isOwn)) return id;
+    return ensureGroup(me, checked.value);
+  };
+
+  /** "Kié?" for parents: offered when the list is mine, one of my children's, or shared by my children only. */
+  const ownerPickerFor = (list: EditableList, existing: Wish | null): OwnerPicker | null => {
+    if (!snapshot || snapshot.managedChildren.length === 0) return null;
+    const base = {
+      myOwnerId: snapshot.myListOwnerId,
+      children: snapshot.managedChildren,
+      meSelected: false,
+      childIds: [] as string[],
+      sharedOnly: false,
+      locked: existing !== null && (existing.booked || existing.receivedAt !== null),
+    };
+    const mine = new Set(snapshot.managedChildren.map((c) => c.id));
+    if (list.ownerId === snapshot.myListOwnerId) return { ...base, meSelected: true };
+    if (list.kind === "CHILD" && mine.has(list.ownerId)) return { ...base, childIds: [list.ownerId] };
+    if (list.kind === "SHARED" && !list.isOwn && list.group && list.group.memberIds.every((id) => mine.has(id))) {
+      return { ...base, childIds: list.group.memberIds.slice(), sharedOnly: existing !== null };
+    }
+    return null;
+  };
+
+  const managedCard = (list: EditableList) => {
+    if (!snapshot) return null;
+    const wishes = listOf(snapshot, list.ownerId);
+    return (
+      <ManagedListCard
+        key={list.ownerId}
+        list={list}
+        wishes={wishes}
+        people={snapshot.people}
+        bookedByMe={snapshot.bookedByMe}
+        onMove={async (orders) => {
+          await guarded(() => updateOrder(orders), null);
+        }}
+        onRestore={toggleReceived}
+        onClearReceived={async () => {
+          await guarded(() => Promise.all(wishes.received.map((w) => deleteWish(w.id))), S.receivedCleared);
+        }}
+        onDelete={
+          list.child
+            ? async () => {
+                const plan = childDeletion(snapshot, list.ownerId);
+                if (!plan.ok) {
+                  toast.show(plan.error, { error: true });
+                  return false;
+                }
+                const { wishIds, groupIds, planIds } = plan.value;
+                return guarded(() => deleteChild(list.ownerId, wishIds, groupIds, planIds), S.childDeleted);
+              }
+            : undefined
+        }
+      />
+    );
+  };
+
+  /** Saves a child's data; returns the message to show in the form, or null when it's done. */
+  const saveChild = async (childId: string | null, name: string, email: string): Promise<string | null> => {
+    const checked = validateChild(me, name, email);
+    if (!checked.ok) return checked.error;
+    const existing = childId ? snapshot?.managedChildren.find((c) => c.id === childId) ?? null : null;
+    if (childId && !existing) return S.errChildNotFound;
+    if (existing && isRegistered(existing) && checked.value.email !== existing.email) return S.errChildRegistered;
+    try {
+      if (existing) await updateChild(existing.id, checked.value.name, checked.value.email);
+      else await createChild(me, checked.value.name, checked.value.email);
+    } catch (e) {
+      return e instanceof StoreError ? e.message : S.errUnknown;
+    }
+    toast.show(existing ? S.childSaved : S.childAdded);
+    goBack();
+    return null;
   };
 
   const accountMenu = (
@@ -186,9 +280,40 @@ function GiverApp({ me }: { me: User }) {
   let content = <Spinner />;
 
   if (route.name === "board" && snapshot && board && myList) {
+    const childLists = snapshot.editableLists.filter((l) => l.kind === "CHILD");
+    const groupLists = snapshot.editableLists.filter((l) => l.kind === "SHARED");
+    const managed =
+      childLists.length + groupLists.length === 0 ? null : (
+        <>
+          {childLists.length > 0 && (
+            <section aria-labelledby="sp-children">
+              <div class="sp-section-head">
+                <h2 id="sp-children" class="sp-section-title">
+                  {S.children}
+                </h2>
+                <a href={href.newChild()} class="btn btn-outline btn-sm">
+                  {S.addChildShort}
+                </a>
+              </div>
+              <p class="sp-section-hint">{S.managedHint}</p>
+              <div class="flex flex-col gap-4">{childLists.map(managedCard)}</div>
+            </section>
+          )}
+          {groupLists.length > 0 && (
+            <section aria-labelledby="sp-shared">
+              <h2 id="sp-shared" class="sp-section-title">
+                {S.shared}
+              </h2>
+              <div class="flex flex-col gap-4">{groupLists.map(managedCard)}</div>
+            </section>
+          )}
+        </>
+      );
     content = (
       <BoardScreen
         board={board}
+        managed={managed}
+        canAddChild={childLists.length === 0 && snapshot.myListOwnerId === me.id}
         pendingSent={snapshot.sentPending.length}
         onRespond={respond}
         myList={
@@ -233,22 +358,48 @@ function GiverApp({ me }: { me: User }) {
     }
   } else if (route.name === "newWish" || route.name === "editWish") {
     back = goBack;
-    const existing = route.name === "editWish" && snapshot ? findOwnWish(snapshot, route.wishId) : null;
-    title = route.name === "newWish" ? S.editorTitleNew : S.editorTitleEdit;
-    if (snapshot?.ready && myList && (route.name === "newWish" || existing)) {
+    const found = route.name === "editWish" && snapshot ? findEditableWish(snapshot, route.wishId) : null;
+    const existing = found?.wish ?? null;
+    const list =
+      snapshot && route.name === "newWish"
+        ? editableList(snapshot, route.ownerId ?? snapshot.myListOwnerId)
+        : found?.list ?? null;
+    const picker = list ? ownerPickerFor(list, existing) : null;
+    // With the "Kié?" picker the list can still change, so the title doesn't name it.
+    title =
+      route.name === "editWish"
+        ? S.editorTitleEdit
+        : list && list.kind !== "MINE" && !picker
+          ? S.editorTitleNewFor(list.name)
+          : S.editorTitleNew;
+    if (snapshot?.ready && list && (route.name === "newWish" || existing)) {
       content = (
         <WishEditorScreen
-          key={existing?.id ?? "new"}
+          key={existing?.id ?? `new-${list.ownerId}`}
           existing={existing}
           candidates={audienceCandidates(snapshot)}
-          canMakePrivate={snapshot.canMakePrivate}
-          onSave={async (draft, answered) => {
-            const ok = existing
-              ? await guarded(() => updateWish(existing.id, draft, answered), S.saved)
-              : await guarded(() => {
-                  const last = Math.max(-1, ...myList.open.map((w) => w.sortOrder));
-                  return createWish(myList.ownerId, draft, last + 1);
-                }, S.added);
+          canMakePrivate={list.kind === "MINE" ? snapshot.canMakePrivate : list.canMakePrivate}
+          childList={!list.isOwn}
+          ownerPicker={picker}
+          onSave={async (draft, answered, target) => {
+            if (!existing) {
+              const ok = await guarded(async () => {
+                const ownerId = target ? await resolveTarget(target) : list.ownerId;
+                await createWish(ownerId, draft, nextSortOrder(snapshot, ownerId));
+              }, S.added);
+              if (ok) goBack();
+              return ok;
+            }
+            const ok = await guarded(async () => {
+              const newOwnerId = !target ? existing.ownerId : target.kind === "single" ? target.ownerId : groupIdOf(target.childIds);
+              let move: { ownerId: string; sortOrder: number } | undefined;
+              if (newOwnerId !== existing.ownerId) {
+                if (existing.booked || existing.receivedAt !== null) throw new StoreError(S.editorOwnerLocked);
+                const ownerId = await resolveTarget(target!);
+                move = { ownerId, sortOrder: nextSortOrder(snapshot, ownerId) };
+              }
+              await updateWish(existing.id, draft, answered, move);
+            }, S.saved);
             if (ok) goBack();
             return ok;
           }}
@@ -269,6 +420,42 @@ function GiverApp({ me }: { me: User }) {
       );
     } else if (snapshot?.ready) {
       content = <p class="sp-empty">{S.detailsNotFound}</p>;
+    }
+  } else if (route.name === "newChild" || route.name === "editChild") {
+    back = goBack;
+    title = route.name === "newChild" ? S.childDialogAddTitle : S.childDialogEditTitle;
+    const child = route.name === "editChild" && snapshot ? snapshot.managedChildren.find((c) => c.id === route.childId) ?? null : null;
+    if (snapshot?.ready && (route.name === "newChild" || child)) {
+      content = (
+        <ChildEditorScreen
+          key={child?.id ?? "new"}
+          existing={child}
+          onSave={(name, email) => saveChild(child?.id ?? null, name, email)}
+        />
+      );
+    } else if (snapshot?.ready) {
+      content = <p class="sp-empty">{S.errChildNotFound}</p>;
+    }
+  } else if (route.name === "coParent") {
+    back = goBack;
+    title = S.coParentTitle;
+    const child = snapshot?.managedChildren.find((c) => c.id === route.childId) ?? null;
+    if (snapshot?.ready && child) {
+      content = (
+        <CoParentScreen
+          child={child}
+          candidates={coParentCandidates(snapshot, child)}
+          onAdd={async (person) => {
+            if (!canAddCoParent(child)) {
+              toast.show(S.errChildTooManyParents, { error: true });
+              return;
+            }
+            if (await guarded(() => addCoParent(child.id, person), S.coParentAdded)) goBack();
+          }}
+        />
+      );
+    } else if (snapshot?.ready) {
+      content = <p class="sp-empty">{S.errChildNotFound}</p>;
     }
   } else if (route.name === "planner") {
     title = S.plannerTitle;
@@ -331,6 +518,7 @@ function GiverApp({ me }: { me: User }) {
         <WishDetailsScreen
           wish={found.wish}
           canRequestInfo={!found.owner?.isManaged}
+          editHref={found.owner?.isManaged ? href.editWish(found.wish.id) : undefined}
           onBook={async () => {
             await guarded(() => book(found.wish.id, me), S.bookedMessage);
           }}

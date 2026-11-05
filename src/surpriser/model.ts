@@ -56,6 +56,31 @@ export interface PlanList {
   kind: PlanListKind;
 }
 
+/** A list I can edit: its kind decides what I may do with it. */
+export interface EditableList extends PlanList {
+  /** May its wishes be private? My account's list and my children's, yes; a registered child's own list, no. */
+  canMakePrivate: boolean;
+  /** My own list, or a shared list I'm a member of (as a registered child): I don't book from it. */
+  isOwn: boolean;
+  /** The child profile behind a CHILD list. */
+  child: ChildProfile | null;
+  /** The shared list behind a SHARED list. */
+  group: ChildGroup | null;
+}
+
+/** Where a saved wish goes: one list, or shared by several of my children. */
+export type WishTarget = { kind: "single"; ownerId: string } | { kind: "shared"; childIds: string[] };
+
+export const GROUP_MIN_MEMBERS = 2;
+export const GROUP_MAX_MEMBERS = 6;
+/** A parent may share a child with at most one other parent. */
+export const MAX_PARENTS = 2;
+
+/** A shared list is identified by its members, so the same children always share one list (ChildGroup.idOf). */
+export function groupIdOf(memberIds: string[]): string {
+  return "g_" + [...new Set(memberIds)].sort().join("_");
+}
+
 export function isPrivate(wish: Wish): boolean {
   return wish.audience !== null && !wish.audience.includes(AUDIENCE_PUBLIC);
 }
@@ -136,7 +161,7 @@ export interface Person {
   isChild: boolean;
   parentNames: string[];
   isGroup: boolean;
-  /** My own child (or a shared list of my children): I may buy from it, but edit it in the app. */
+  /** My own child (or a shared list of my children): I edit it, and may buy from it too. */
   isManaged: boolean;
 }
 
