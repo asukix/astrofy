@@ -15,6 +15,7 @@ import {
   serverTimestamp,
   setDoc,
   deleteDoc,
+  deleteField,
   updateDoc,
   where,
   writeBatch,
@@ -669,6 +670,173 @@ export async function ensureGroup(me: User, members: ChildProfile[]): Promise<st
     ),
   );
   return groupId;
+}
+
+// endregion
+
+// region Account deletion (deleteAccountData / deleteEverythingOf in the app's FirestoreDataSource)
+
+interface RawChild {
+  id: string;
+  uid: string | null;
+  managers: string[];
+}
+
+interface RawGroup {
+  id: string;
+  memberIds: string[];
+}
+
+/**
+ * What happens to the children and shared lists of someone deleting their account (planAccountDeletion):
+ *  - a child only they manage, who hasn't registered, is deleted (with the shared lists they're in);
+ *  - a child with a co-parent stays with the co-parent; a registered child keeps their own profile;
+ *  - from the remaining shared lists they're simply removed as a parent;
+ *  - if they registered as a child themselves, their profile goes back to the parents, unclaimed.
+ */
+export function planAccountDeletion(myId: string, managed: RawChild[], groups: RawGroup[], ownProfile: RawChild | null) {
+  const toDelete = managed.filter((c) => c.uid === null && c.managers.every((m) => m === myId));
+  const deleted = new Set(toDelete.map((c) => c.id));
+  const groupsToDelete = groups.filter((g) => g.memberIds.some((id) => deleted.has(id)));
+  return {
+    childrenToDelete: toDelete.map((c) => c.id),
+    childrenToLeave: managed.filter((c) => !deleted.has(c.id)).map((c) => c.id),
+    groupsToDelete: groupsToDelete.map((g) => g.id),
+    groupsToLeave: groups.filter((g) => !groupsToDelete.includes(g)).map((g) => g.id),
+    ownProfileToRelease: ownProfile && ownProfile.uid === myId ? ownProfile.id : null,
+  };
+}
+
+const MAX_BATCH_WRITES = 400;
+const ACCOUNT_DELETION_TIMEOUT_MS = 120_000;
+
+async function deleteAll(refs: { path: string }[]): Promise<void> {
+  for (let i = 0; i < refs.length; i += MAX_BATCH_WRITES) {
+    const batch = writeBatch(db());
+    refs.slice(i, i + MAX_BATCH_WRITES).forEach((ref) => batch.delete(doc(db(), ref.path)));
+    await batch.commit();
+  }
+}
+
+async function deleteOwnedBy(collectionName: "wishes" | "plans", ownerId: string): Promise<void> {
+  const owned = await getDocs(query(col(collectionName), where("ownerId", "==", ownerId)));
+  await deleteAll(owned.docs.map((d) => d.ref));
+}
+
+/** Removes me as a parent of a shared list, with the viewers I published. */
+async function leaveGroup(groupId: string, userId: string): Promise<void> {
+  const ref = doc(db(), "childGroups", groupId);
+  await runTransaction(db(), async (tx) => {
+    const snap = await tx.get(ref);
+    if (!snap.exists()) return;
+    const viewersBy = { ...((snap.get("viewerEmailsBy") as Record<string, string[]> | undefined) ?? {}) };
+    delete viewersBy[userId];
+    tx.update(ref, {
+      managers: strings(snap.get("managers")).filter((m) => m !== userId),
+      viewerEmailsBy: viewersBy,
+      viewerEmails: [...new Set(Object.values(viewersBy).flatMap(strings))].sort(),
+    });
+  });
+}
+
+/** Removes me as a parent of a child, with everything I published on them. */
+async function leaveChild(childId: string, userId: string): Promise<void> {
+  const ref = doc(db(), "children", childId);
+  await runTransaction(db(), async (tx) => {
+    const snap = await tx.get(ref);
+    if (!snap.exists()) return;
+    const managers = strings(snap.get("managers"));
+    if (!managers.includes(userId)) return;
+    const remaining = managers.filter((m) => m !== userId);
+    const viewersBy = { ...((snap.get("viewerEmailsBy") as Record<string, string[]> | undefined) ?? {}) };
+    delete viewersBy[userId];
+    const familyBy = { ...((snap.get("familyBy") as Record<string, { id?: unknown }[]> | undefined) ?? {}) };
+    delete familyBy[userId];
+    const familyIds = Object.values(familyBy)
+      .flatMap((members) => (Array.isArray(members) ? members : []))
+      .map((m) => m?.id)
+      .filter((id): id is string => typeof id === "string");
+    tx.update(ref, {
+      managers: remaining,
+      [`managerNames.${userId}`]: deleteField(),
+      viewerEmailsBy: viewersBy,
+      viewerEmails: [...new Set(Object.values(viewersBy).flatMap(strings))],
+      familyBy,
+      familyOwnerIds: [...new Set([...remaining, ...familyIds])],
+    });
+  });
+}
+
+async function deleteEverythingOf(me: User): Promise<void> {
+  // Reads first: offline, this fails before anything is changed.
+  const myBookings = (await getDocs(query(col("bookings"), where("bookerId", "==", me.id)))).docs;
+  const managed = (await getDocs(query(col("children"), where("managers", "array-contains", me.id)))).docs.map(
+    (d): RawChild => ({ id: d.id, uid: (d.get("uid") as string | null) ?? null, managers: strings(d.get("managers")) }),
+  );
+  const myGroups = (await getDocs(query(col("childGroups"), where("managers", "array-contains", me.id)))).docs.map(
+    (d): RawGroup => ({ id: d.id, memberIds: strings(d.get("memberIds")) }),
+  );
+  const own = (await getDocs(query(col("children"), where("uid", "==", me.id)))).docs[0];
+  const ownProfile: RawChild | null = own
+    ? { id: own.id, uid: (own.get("uid") as string | null) ?? null, managers: strings(own.get("managers")) }
+    : null;
+  const plan = planAccountDeletion(me.id, managed, myGroups, ownProfile);
+
+  // Lets the rules accept deleting my booked wishes, and the invitations I received.
+  await setDoc(
+    doc(db(), "users", me.id),
+    { displayName: me.displayName, email: me.email, deletingAccount: true },
+    { merge: true },
+  );
+
+  // What I booked becomes free again.
+  for (const booking of myBookings) {
+    try {
+      await unbook(booking.id, me);
+    } catch {
+      // The wish is gone already: only the booking is left.
+      await deleteDoc(booking.ref);
+    }
+  }
+
+  // Shared lists before children: the rules check parenthood through the children.
+  for (const groupId of plan.groupsToDelete) {
+    await deleteOwnedBy("wishes", groupId);
+    await deleteOwnedBy("plans", groupId);
+    await deleteDoc(doc(db(), "childGroups", groupId));
+  }
+  for (const groupId of plan.groupsToLeave) await leaveGroup(groupId, me.id);
+  for (const childId of plan.childrenToDelete) {
+    await deleteOwnedBy("wishes", childId);
+    await deleteOwnedBy("plans", childId);
+    await deleteDoc(doc(db(), "children", childId));
+  }
+  for (const childId of plan.childrenToLeave) await leaveChild(childId, me.id);
+  if (plan.ownProfileToRelease) await updateDoc(doc(db(), "children", plan.ownProfileToRelease), { uid: null });
+
+  await deleteOwnedBy("wishes", me.id);
+  await deleteOwnedBy("plans", me.id);
+  const sent = await getDocs(query(col("invitations"), where("inviterUid", "==", me.id)));
+  const received = await getDocs(query(col("invitations"), where("inviteeEmail", "==", me.email)));
+  await deleteAll([...sent.docs, ...received.docs].map((d) => d.ref));
+  await deleteDoc(doc(db(), "users", me.id));
+}
+
+/** Deletes everything of mine from Firestore (the account itself is deleted after this, in authService). */
+export async function deleteAccountData(me: User): Promise<void> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const timeout = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => reject(new StoreError(S.errNetwork)), ACCOUNT_DELETION_TIMEOUT_MS);
+  });
+  try {
+    await Promise.race([deleteEverythingOf(me), timeout]);
+  } catch (e) {
+    if (e instanceof StoreError) throw e;
+    console.warn("Surpriser: deleting the account data failed", e);
+    throw new StoreError(isOffline(e) ? S.errNetwork : S.errUnknown);
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 // endregion

@@ -13,7 +13,8 @@ export type Route =
   | { name: "editPlan"; planId: string }
   | { name: "newChild" }
   | { name: "editChild"; childId: string }
-  | { name: "coParent"; childId: string };
+  | { name: "coParent"; childId: string }
+  | { name: "deleteAccount" };
 
 export function parseRoute(hash: string): Route {
   const path = hash.replace(/^#\/?/, "");
@@ -28,6 +29,7 @@ export function parseRoute(hash: string): Route {
   if (head === "terv" && id) return { name: "editPlan", planId: decodeURIComponent(id) };
   if (head === "uj-gyerek") return { name: "newChild" };
   if (head === "gyerek" && id) return { name: "editChild", childId: decodeURIComponent(id) };
+  if (head === "fiok-torlese") return { name: "deleteAccount" };
   if (head === "tarsszulo" && id) return { name: "coParent", childId: decodeURIComponent(id) };
   return { name: "board" };
 }
@@ -46,6 +48,7 @@ export const href = {
   newChild: () => "#/uj-gyerek",
   editChild: (childId: string) => `#/gyerek/${encodeURIComponent(childId)}`,
   coParent: (childId: string) => `#/tarsszulo/${encodeURIComponent(childId)}`,
+  deleteAccount: () => "#/fiok-torlese",
 };
 
 /** How many in-app steps can be undone with the browser's back. */

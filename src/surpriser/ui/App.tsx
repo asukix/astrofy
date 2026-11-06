@@ -48,6 +48,7 @@ import { groupIdOf, type EditableList, type User, type Wish, type WishField, typ
 import { S } from "../strings";
 import { AuthScreen, NameScreen } from "./AuthScreen";
 import { BoardScreen } from "./BoardScreen";
+import { AccountDeletedScreen, AccountDeletionScreen } from "./AccountDeletionScreen";
 import { BookingsScreen } from "./BookingsScreen";
 import { ChildEditorScreen, CoParentScreen } from "./ChildEditorScreen";
 import { IconBulb, IconGift, IconPersonAdd, Spinner, Toast, TopBar, TopBarIcon, type ToastMessage } from "./components";
@@ -75,10 +76,22 @@ function SignedInGate() {
   const [firebaseUser, setFirebaseUser] = useState<FirebaseUser | null | undefined>(undefined);
   // Verifying the e-mail doesn't fire an auth event; this re-reads the user after a reload.
   const [, setVerifiedTick] = useState(0);
+  const [accountDeleted, setAccountDeleted] = useState(false);
+  const route = useRoute();
 
   useEffect(() => observeUser(setFirebaseUser), []);
 
   if (firebaseUser === undefined) return <Spinner />;
+  if (firebaseUser === null && accountDeleted) {
+    return (
+      <AccountDeletedScreen
+        onDone={() => {
+          setAccountDeleted(false);
+          location.hash = href.board();
+        }}
+      />
+    );
+  }
   if (firebaseUser === null || !firebaseUser.emailVerified) {
     return (
       <AuthScreen
@@ -89,6 +102,10 @@ function SignedInGate() {
   }
   if (!firebaseUser.displayName?.trim()) {
     return <NameScreen email={firebaseUser.email ?? ""} onDone={() => setVerifiedTick((n) => n + 1)} />;
+  }
+  // Instead of the board: its listeners and the publishing stop while the data is deleted.
+  if (route.name === "deleteAccount") {
+    return <AccountDeletionScreen me={toUser(firebaseUser)} onDeleted={() => setAccountDeleted(true)} />;
   }
   return <GiverApp key={firebaseUser.uid} me={toUser(firebaseUser)} />;
 }
@@ -271,6 +288,9 @@ function GiverApp({ me }: { me: User }) {
         <button type="button" class="btn btn-sm btn-outline w-full" onClick={() => signOut()}>
           {S.logout}
         </button>
+        <a href={href.deleteAccount()} class="btn btn-sm btn-ghost text-error w-full mt-2">
+          {S.deleteAccount}
+        </a>
       </div>
     </details>
   );

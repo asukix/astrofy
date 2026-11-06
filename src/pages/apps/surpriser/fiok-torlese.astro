@@ -1,6 +1,7 @@
 ---
 // Surpriser account deletion page. Its URL goes to the Play Console (Data safety → Delete account URL).
-// For now deletion without the app is requested by e-mail; the in-app flow is FirestoreDataSource.deleteAccountData.
+// Deletion works in the Android app and in the web view (#/fiok-torlese, port of FirestoreDataSource.deleteAccountData);
+// without either, it is requested by e-mail.
 import SurpriserLayout from "../../../surpriser/SurpriserLayout.astro";
 import { CONTROLLER } from "../../../surpriser/config";
 
@@ -21,7 +22,7 @@ const body = encodeURIComponent(
     </a>
 
     <h1>A Surpriser-fiók törlése</h1>
-    <p>A fiókodat és a hozzá tartozó adatokat bármikor törölheted. Kétféleképpen teheted meg.</p>
+    <p>A fiókodat és a hozzá tartozó adatokat bármikor törölheted: az alkalmazásban, a weboldalon, vagy e-mailben kérve.</p>
 
     <h2>Az Android-alkalmazásban</h2>
     <ol>
@@ -32,7 +33,14 @@ const body = encodeURIComponent(
     </ol>
     <p>A törlés azonnal megtörténik.</p>
 
-    <h2>Az alkalmazás nélkül</h2>
+    <h2>A weboldalon</h2>
+    <ol>
+      <li>Nyisd meg a <a href="/apps/surpriser/#/fiok-torlese">Surpriser webes változatát</a>, és jelentkezz be.</li>
+      <li>Erősítsd meg a jelszavaddal, vagy válaszd ki újra a Google-fiókodat, majd nyomd meg a <strong>Végleges törlés</strong> gombot.</li>
+    </ol>
+    <p>Bejelentkezve a jobb felső sarokban lévő fiókmenüben is megtalálod a <strong>Fiók törlése</strong> pontot.</p>
+
+    <h2>Alkalmazás és weboldal nélkül</h2>
     <p>
       Írj a <a href={`mailto:${CONTROLLER.email}?subject=${subject}&body=${body}`}>{CONTROLLER.email}</a> címre arról az
       e-mail-címről, amellyel regisztráltál, „Surpriser – fiók törlése” tárggyal. A kérést legfeljebb 30 napon belül

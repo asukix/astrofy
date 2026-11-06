@@ -2,11 +2,15 @@
 
 import {
   createUserWithEmailAndPassword,
+  deleteUser,
+  EmailAuthProvider,
   getAdditionalUserInfo,
   GoogleAuthProvider,
   linkWithCredential,
   OAuthProvider,
   onAuthStateChanged,
+  reauthenticateWithCredential,
+  reauthenticateWithPopup,
   reload,
   sendEmailVerification,
   sendPasswordResetEmail,
@@ -156,6 +160,42 @@ export async function sendPasswordReset(email: string): Promise<void> {
     if (e instanceof FirebaseError && e.code === "auth/user-not-found") return;
     throw e;
   }
+}
+
+/** How the user confirms deleting their account: a password account asks for the password, others re-pick Google. */
+export function usesPassword(): boolean {
+  return firebase().auth.currentUser?.providerData.some((p) => p.providerId === "password") ?? false;
+}
+
+/**
+ * A fresh sign-in, which Firebase wants before deleting the account (reauthenticate in the app).
+ * [password]: null confirms with the Google account picker. False when the picker was closed.
+ */
+export async function reauthenticate(password: string | null): Promise<boolean> {
+  const user = firebase().auth.currentUser;
+  if (!user) throw new Error("signed out");
+  if (password !== null) {
+    await reauthenticateWithCredential(user, EmailAuthProvider.credential(user.email ?? "", password));
+    return true;
+  }
+  const provider = new GoogleAuthProvider();
+  provider.setCustomParameters({ prompt: "select_account", login_hint: user.email ?? "" });
+  try {
+    await reauthenticateWithPopup(user, provider);
+    return true;
+  } catch (e) {
+    if (e instanceof FirebaseError && (e.code === "auth/popup-closed-by-user" || e.code === "auth/cancelled-popup-request")) {
+      return false;
+    }
+    throw e;
+  }
+}
+
+/** Deletes the signed-in account itself (its data goes first, see deleteAccountData). */
+export async function deleteCurrentUser(): Promise<void> {
+  const user = firebase().auth.currentUser;
+  if (!user) throw new Error("signed out");
+  await deleteUser(user);
 }
 
 export function signOut(): Promise<void> {

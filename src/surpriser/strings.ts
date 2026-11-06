@@ -75,6 +75,19 @@ export const S = {
   homeScreenIos: "Safariban koppints a Megosztás gombra, majd a „Főképernyőhöz adás” pontra: így a Surpriser saját ikonnal, appként nyílik meg.",
   homeScreenDismiss: "Rendben",
 
+  // Account deletion (DeleteAccountDialog in the app)
+  deleteAccount: "Fiók törlése",
+  deleteAccountTitle: "Törlöd a fiókodat?",
+  deleteAccountMessage:
+    "Véglegesen törlődnek a kívánságaid, a meghívásaid és a kapcsolataid. Amit lefoglaltál, újra szabad lesz, hogy más megvehesse. Ha egy gyerekednek van társszülője, ő kezeli tovább; ha nincs, a gyerek profilja is törlődik a kívánságaival és a közös listáival együtt. Egy már regisztrált gyerek a saját profilját megtartja. Ez nem vonható vissza.",
+  deleteAccountPassword: "Jelszavad a megerősítéshez",
+  deleteAccountGoogleHint: "A megerősítéshez válaszd ki újra a Google-fiókodat.",
+  deleteAccountConfirm: "Végleges törlés",
+  deleteAccountProgress: "Törlés folyamatban… Ne zárd be az oldalt.",
+  accountDeletedTitle: "A fiókodat töröltük",
+  accountDeletedMessage: "A fiókod és az adataid törlődtek. Köszönjük, hogy használtad a Surprisert!",
+  accountDeletedOk: "Rendben",
+
   // Children (BoardScreen, ChildDialog in the app)
   addChild: "Gyerek hozzáadása",
   addChildShort: "+ Gyerek",
@@ -289,6 +302,10 @@ export const S = {
   errAlreadyConnected: "Már kapcsolatban vagytok.",
   errAlreadyInvited: "Őt már meghívtad.",
   errUnknown: "Valami hiba történt. Próbáld újra.",
+  errWrongPassword: "Hibás jelszó.",
+  errReauthMismatch: "Ezzel a Google-fiókkal nem ezt a fiókot erősítetted meg. Azt válaszd, amelyikkel beléptél.",
+  errAccountNotDeleted:
+    "Az adataid törlődtek, de magát a fiókot nem sikerült törölni. Jelentkezz be újra, és próbáld meg még egyszer.",
   errChildNameRequired: "Add meg a gyerek nevét.",
   errChildNameTooLong: "A név legfeljebb 100 karakter lehet.",
   errChildOwnEmail: "Ez a te e-mail-címed; a gyereknek saját cím kell.",
