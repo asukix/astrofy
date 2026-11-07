@@ -10,6 +10,7 @@ A Surpriser webes változata a sengdev.com/apps/surpriser címen: telepítés n�
 | `/apps/surpriser/adatvedelem` | `src/pages/apps/surpriser/adatvedelem.astro` (Play Console: Privacy policy URL) |
 | `/apps/surpriser/meghivo?tol=…&cim=…` | `src/pages/apps/surpriser/meghivo.astro` – meghívó link céloldala (statikus, csak megjelenít) |
 | `/apps/surpriser/fiok-torlese` | `src/pages/apps/surpriser/fiok-torlese.astro` (Play Console: Delete account URL) |
+| `/apps/surpriser/bovitmeny` | `src/pages/apps/surpriser/bovitmeny.astro` – a Chrome-bővítmény: leírás, letöltés (`public/apps/surpriser/surpriser-chrome-<verzió>.zip`), telepítés, könyvjelző-gomb. Verzió és bookmarklet: `src/surpriser/extension/`. A bővítmény forrása külön repó: `~/Documents/Repo/surpriser-chrome`. |
 
 Az app belső útvonalai hash-alapúak (`#/kivansag/<id>`, `#/foglalasaim`, `#/uj-kivansag[/<lista>]`, `#/sajat/<id>`, `#/meghivas`, `#/tervezo`, `#/uj-terv[/<lista>][?nev=…]`, `#/terv/<id>`, `#/uj-gyerek`, `#/gyerek/<id>`, `#/tarsszulo/<id>`, `#/fiok-torlese`), így a Cloudflare-en nem kell átirányítás.
 

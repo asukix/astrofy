@@ -1,0 +1,173 @@
+---
+// The Surpriser Chrome extension: what it does, download (unpacked, from this site) and the bookmarklet.
+// Linked from the web view's account menu and the privacy notice.
+import SurpriserLayout from "../../../surpriser/SurpriserLayout.astro";
+import { EXTENSION } from "../../../surpriser/extension/extension";
+---
+
+<SurpriserLayout
+  title="Chrome-bővítmény – Surpriser"
+  description="Webshopban böngészve egy kattintással a Surpriser ajándéktervezőjébe teheted a terméket: nevet, árat, képet és linket a bővítmény tölti ki."
+>
+  <main class="sp-doc">
+    <a href="/apps/surpriser" class="sp-doc__home inline-flex items-center gap-3">
+      <img src="/apps/surpriser/icon-192.png" width="40" height="40" alt="" class="rounded-[28%]" />
+      <span class="font-bold text-base-content">Surpriser</span>
+    </a>
+
+    <h1>Chrome-bővítmény</h1>
+    <p class="sp-doc__meta">Verzió: {EXTENSION.version} · {EXTENSION.updated}</p>
+
+    <p>
+      Webshopban böngészve egy kattintással a Surpriser <strong>ajándéktervezőjébe</strong> teheted a nyitott terméket,
+      kimásolás nélkül. A bővítmény kiolvassa a termékoldalról a nevet, az árat, a képet, a linket és a rövid leírást,
+      majd megnyitja a Surpriserben a kitöltött tervet. Ott választod ki, kinek a listájára kerüljön, és te mented el.
+    </p>
+
+    <div class="sp-ext">
+      <img
+        src="/apps/surpriser/bovitmeny-popup.png"
+        width="360"
+        height="752"
+        alt="A bővítmény ablaka: kép, megnevezés, ár, leírás, kép linkje és termék linkje, alatta a Tervezőbe gomb"
+        class="sp-ext__shot"
+        loading="lazy"
+      />
+      <div class="sp-ext__side">
+        <a href={EXTENSION.zipUrl} class="btn btn-primary" download>
+          Bővítmény letöltése (ZIP, {EXTENSION.zipSizeKb} KB)
+        </a>
+        <p class="text-sm text-base-content/70">
+          Asztali Chrome-hoz és Microsoft Edge-hez. Telefonon és tableten a böngészők nem futtatnak bővítményt.
+        </p>
+        <ul class="sp-ext__points">
+          <li>Javíthatod a kiolvasott adatokat, mezőnként törölheted őket (×).</li>
+          <li>Másik kép kell? Jobb klikk a képre → „Kép a Surpriserhez”.</li>
+          <li>Semmit nem ment és nem küld el magától.</li>
+        </ul>
+      </div>
+    </div>
+
+    <h2>Telepítés</h2>
+    <p>
+      A bővítmény (még) nincs a Chrome Web Store-ban, ezért „kicsomagolt” bővítményként kell betölteni. Egyszer kell
+      megcsinálni, kb. egy perc.
+    </p>
+    <ol>
+      <li>Töltsd le a ZIP-et a fenti gombbal, és csomagold ki. Egy <code>surpriser-chrome</code> mappát kapsz; tedd olyan helyre, ahol megmarad (pl. a Dokumentumok közé), mert a Chrome onnan futtatja.</li>
+      <li>Nyisd meg a Chrome-ban a <code>chrome://extensions</code> oldalt (Edge-ben: <code>edge://extensions</code>).</li>
+      <li>Jobb felül kapcsold be a <strong>Fejlesztői mód</strong> kapcsolót.</li>
+      <li>Kattints a <strong>Kicsomagolt bővítmény betöltése</strong> gombra, és válaszd ki a <code>surpriser-chrome</code> mappát.</li>
+      <li>Az eszköztáron a puzzle ikonra kattintva tűzd ki a Surpriser ikont, hogy mindig kéznél legyen.</li>
+    </ol>
+    <p class="text-sm text-base-content/70">
+      A Chrome időnként figyelmeztethet, hogy fejlesztői módban betöltött bővítmény fut. Ez a nem a Web Store-ból
+      telepített bővítményeknél szokásos.
+    </p>
+
+    <h2>Használat</h2>
+    <ol>
+      <li>Nyiss meg egy termékoldalt bármelyik webshopban.</li>
+      <li>Kattints a Surpriser ikonra. Megjelenik, amit a bővítmény a lapon talált.</li>
+      <li>Ellenőrizd az adatokat. Ami rossz, azt átírhatod vagy a × gombbal törölheted. Másik képet jobb klikkel választhatsz a lapon („Kép a Surpriserhez”).</li>
+      <li>Kattints a <strong>Tervezőbe</strong> gombra. Új lapon megnyílik a Surpriser kitöltött terve: válaszd ki, kinek a listájára kerüljön, és mentsd el.</li>
+    </ol>
+    <p>
+      A terv csak a lista szerkesztőinek látszik, amíg jóvá nem hagyod; ára sem kötelező. Jóváhagyva lesz belőle
+      kívánság, amit az ajándékozók is látnak.
+    </p>
+    <p>
+      Ha egy boltnál valami nem töltődik ki (például az ár), a bővítmény jelzi, és a Surpriserben pótolhatod.
+      Csak forintos árat tölt ki; más pénznemnél üresen hagyja.
+    </p>
+
+    <h2>Frissítés</h2>
+    <p>
+      A kicsomagolt bővítmény nem frissül magától. Új verziónál töltsd le újra a ZIP-et, a kicsomagolt fájlokkal írd
+      felül a <code>surpriser-chrome</code> mappát, majd a <code>chrome://extensions</code> oldalon a Surpriser
+      kártyáján kattints a ↻ (újratöltés) gombra.
+    </p>
+
+    <h2>Könyvjelző-gomb, telepítés nélkül</h2>
+    <p>
+      Ha nem szeretnél bővítményt telepíteni, vagy más böngészőt használsz (Firefox, Safari), ugyanezt egy
+      könyvjelző is tudja. Húzd az alábbi gombot a könyvjelzősávra:
+    </p>
+    <p>
+      <a href={EXTENSION.bookmarklet} class="btn btn-outline sp-ext__bookmarklet" title="Húzd a könyvjelzősávra">
+        Surpriser +
+      </a>
+    </p>
+    <p id="bookmarklet-hint" class="sp-alert" role="status" hidden>
+      Ezt a gombot ne itt kattintsd meg, hanem húzd a könyvjelzősávra, és egy termékoldalon kattints rá.
+    </p>
+    <ol>
+      <li>Kapcsold be a könyvjelzősávot (Chrome: <kbd>⌘</kbd> <kbd>Shift</kbd> <kbd>B</kbd>, Windowson <kbd>Ctrl</kbd> <kbd>Shift</kbd> <kbd>B</kbd>).</li>
+      <li>Húzd a fenti „Surpriser +” gombot a könyvjelzősávra.</li>
+      <li>Egy termékoldalon kattints a <strong>Surpriser +</strong> könyvjelzőre: új lapon megnyílik a kitöltött terv.</li>
+    </ol>
+    <p class="text-sm text-base-content/70">
+      A könyvjelző-gombnál nincs előnézet és jobb klikkes képválasztás: az adatokat a Surpriserben ellenőrzöd és javítod.
+    </p>
+
+    <h2>Adatvédelem</h2>
+    <p>
+      A bővítmény csak akkor olvassa a nyitott lapot, amikor az ikonjára vagy a „Kép a Surpriserhez” menüpontra
+      kattintasz. Nem kér hozzáférést más oldalakhoz, nem lép be a fiókodba, és semmit nem küld el: a kiolvasott
+      adatok egy linkben kerülnek a Surpriser oldalára, és csak akkor mentődnek, ha te elmented őket. A félbehagyott
+      javításaidat a böngésző bezárásáig a gépeden tárolja. Részletek az
+      <a href="/apps/surpriser/adatvedelem#bovitmeny">adatvédelmi tájékoztatóban</a>.
+    </p>
+  </main>
+</SurpriserLayout>
+
+<script>
+  // Clicked here instead of dragged: it would read this page. Say how to use it instead.
+  const link = document.querySelector<HTMLAnchorElement>(".sp-ext__bookmarklet");
+  link?.addEventListener("click", (event) => {
+    event.preventDefault();
+    document.getElementById("bookmarklet-hint")?.removeAttribute("hidden");
+  });
+</script>
+
+<style>
+  .sp-ext {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    align-items: flex-start;
+    margin: 1.5rem 0;
+  }
+  .sp-ext__shot {
+    width: 100%;
+    max-width: 280px;
+    height: auto;
+    border: 1px solid oklch(var(--b3));
+    border-radius: 14px;
+    box-shadow: 0 8px 30px oklch(var(--bc) / 0.08);
+  }
+  .sp-ext__side {
+    flex: 1 1 16rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  .sp-ext__side p,
+  .sp-ext__side ul {
+    margin: 0;
+  }
+  .sp-ext__points {
+    list-style: disc;
+    padding-left: 1.3rem;
+  }
+  .sp-ext__bookmarklet {
+    cursor: grab;
+  }
+  code,
+  kbd {
+    font-size: 0.9em;
+    padding: 0.05rem 0.35rem;
+    border-radius: 0.35rem;
+    background: oklch(var(--b2));
+  }
+</style>

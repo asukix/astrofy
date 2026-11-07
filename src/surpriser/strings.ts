@@ -206,6 +206,8 @@ export const S = {
   plannerAddShort: "+ Terv",
   planEditorTitleNew: "Új terv",
   planEditorTitleEdit: "Terv szerkesztése",
+  extensionLink: "Chrome-bővítmény",
+  extensionLinkHint: "Termék felvétele webshopból egy kattintással",
   planEditorPrefilled: "A termékoldalról töltöttük ki. Ellenőrizd az adatokat, és pótold, ami hiányzik – csak a mentéssel kerül a tervek közé.",
   planEditorOwner: "Kinek a listájára?",
   planEditorPrice: "Ár (ráér később)",

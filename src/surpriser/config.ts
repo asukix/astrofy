@@ -37,4 +37,4 @@ export const CONTROLLER = {
 };
 
 /** Date of the current privacy notice. */
-export const PRIVACY_UPDATED = "2026. október 26.";
+export const PRIVACY_UPDATED = "2026. november 7.";

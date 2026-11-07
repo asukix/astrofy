@@ -285,6 +285,10 @@ function GiverApp({ me }: { me: User }) {
         <p class="font-semibold truncate">{me.displayName}</p>
         <p class="text-sm text-base-content/60 truncate mb-3">{me.email}</p>
         {isAppleRelayEmail(me.email) && <p class="text-xs text-base-content/70 mb-3">{S.relayEmailNote(me.email)}</p>}
+        <a href="/apps/surpriser/bovitmeny" class="block rounded-btn border border-base-300 px-3 py-2 mb-3 hover:bg-base-200">
+          <span class="block text-sm font-semibold">{S.extensionLink}</span>
+          <span class="block text-xs text-base-content/60">{S.extensionLinkHint}</span>
+        </a>
         <button type="button" class="btn btn-sm btn-outline w-full" onClick={() => signOut()}>
           {S.logout}
         </button>
