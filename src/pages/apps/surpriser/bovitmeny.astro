@@ -46,6 +46,7 @@ import { EXTENSION } from "../../../surpriser/extension/extension";
         <ul class="sp-ext__points">
           <li>Javíthatod a kiolvasott adatokat, mezőnként törölheted őket (×).</li>
           <li>Másik kép kell? Jobb klikk a képre → „Kép a Surpriserhez”.</li>
+          <li>A Surpriser a termékoldal mellett, osztott nézetben nyílik (újabb Chrome-ban).</li>
           <li>Semmit nem ment és nem küld el magától.</li>
         </ul>
       </div>
@@ -58,7 +59,13 @@ import { EXTENSION } from "../../../surpriser/extension/extension";
     </p>
     <ol>
       <li>Töltsd le a ZIP-et a fenti gombbal, és csomagold ki. Egy <code>surpriser-chrome</code> mappát kapsz; tedd olyan helyre, ahol megmarad (pl. a Dokumentumok közé), mert a Chrome onnan futtatja.</li>
-      <li>Nyisd meg a Chrome-ban a <code>chrome://extensions</code> oldalt (Edge-ben: <code>edge://extensions</code>).</li>
+      <li>
+        Nyisd meg a Chrome-ban a <code>chrome://extensions</code>
+        <button type="button" class="btn btn-xs btn-outline align-middle" data-copy="chrome://extensions">Másolás</button>
+        oldalt (Edge-ben: <code>edge://extensions</code>
+        <button type="button" class="btn btn-xs btn-outline align-middle" data-copy="edge://extensions">Másolás</button>).
+        Ezt a címet a böngésző biztonsági okból nem engedi linkről megnyitni: másold ki, és illeszd be a címsorba.
+      </li>
       <li>Jobb felül kapcsold be a <strong>Fejlesztői mód</strong> kapcsolót.</li>
       <li>Kattints a <strong>Kicsomagolt bővítmény betöltése</strong> gombra, és válaszd ki a <code>surpriser-chrome</code> mappát.</li>
       <li>Az eszköztáron a puzzle ikonra kattintva tűzd ki a Surpriser ikont, hogy mindig kéznél legyen.</li>
@@ -73,7 +80,7 @@ import { EXTENSION } from "../../../surpriser/extension/extension";
       <li>Nyiss meg egy termékoldalt bármelyik webshopban.</li>
       <li>Kattints a Surpriser ikonra. Megjelenik, amit a bővítmény a lapon talált.</li>
       <li>Ellenőrizd az adatokat. Ami rossz, azt átírhatod vagy a × gombbal törölheted. Másik képet jobb klikkel választhatsz a lapon („Kép a Surpriserhez”).</li>
-      <li>Kattints a <strong>Tervezőbe</strong> gombra. Új lapon megnyílik a Surpriser kitöltött terve: válaszd ki, kinek a listájára kerüljön, és mentsd el.</li>
+      <li>Kattints a <strong>Tervezőbe</strong> gombra. Megnyílik a Surpriser kitöltött terve: válaszd ki, kinek a listájára kerüljön, és mentsd el. Az újabb Chrome-ban osztott nézetben nyílik, a termékoldal mellett, így közben is látod a terméket; máshol új lapon.</li>
     </ol>
     <p>
       A terv csak a lista szerkesztőinek látszik, amíg jóvá nem hagyod; ára sem kötelező. Jóváhagyva lesz belőle
@@ -87,7 +94,9 @@ import { EXTENSION } from "../../../surpriser/extension/extension";
     <h2>Frissítés</h2>
     <p>
       A kicsomagolt bővítmény nem frissül magától. Új verziónál töltsd le újra a ZIP-et, a kicsomagolt fájlokkal írd
-      felül a <code>surpriser-chrome</code> mappát, majd a <code>chrome://extensions</code> oldalon a Surpriser
+      felül a <code>surpriser-chrome</code> mappát, majd a <code>chrome://extensions</code>
+      <button type="button" class="btn btn-xs btn-outline align-middle" data-copy="chrome://extensions">Másolás</button>
+      oldalon a Surpriser
       kártyáján kattints a ↻ (újratöltés) gombra.
     </p>
 
@@ -131,6 +140,20 @@ import { EXTENSION } from "../../../surpriser/extension/extension";
 </SurpriserLayout>
 
 <script>
+  // chrome:// pages can't be opened from a link: copy the address for the address bar instead.
+  for (const button of document.querySelectorAll<HTMLButtonElement>("[data-copy]")) {
+    const label = button.textContent;
+    button.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(button.dataset.copy ?? "");
+        button.textContent = "Kimásolva ✓";
+      } catch {
+        button.textContent = "Nem sikerült – jelöld ki kézzel";
+      }
+      setTimeout(() => (button.textContent = label), 2500);
+    });
+  }
+
   // "Vissza": opened from the Surpriser web view → back to the very screen it came from (history);
   // opened directly (a shared link, a new tab) → the Surpriser app's start.
   for (const back of document.querySelectorAll<HTMLAnchorElement>("[data-back]")) {
