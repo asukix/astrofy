@@ -60,6 +60,7 @@ import { PlannerScreen } from "./PlannerScreen";
 import { goBack, href, useRoute } from "./router";
 import { WishDetailsScreen } from "./WishDetailsScreen";
 import { WishEditorScreen, type OwnerPicker } from "./WishEditorScreen";
+import { isPlannerRoute, PLANNER_BLOCKED_MESSAGE, PlannerBlockTerminal, PlannerLockButton, usePlannerBlock } from "../temp/plannerBlock"; // TEMP planner-block
 
 export default function App() {
   if (!isConfigured) {
@@ -136,6 +137,10 @@ function GiverApp({ me }: { me: User }) {
   const route = useRoute();
   const toast = useToast();
   const [snapshot, setSnapshot] = useState<Snapshot | null>(null);
+  const plannerBlock = usePlannerBlock(); // TEMP planner-block
+  const plannerBlocked = plannerBlock.blocked && isPlannerRoute(route); // TEMP planner-block
+  // TEMP planner-block: the planner doesn't open, a message says why.
+  useEffect(() => { if (plannerBlocked) { toast.show(PLANNER_BLOCKED_MESSAGE); goBack(); } }, [plannerBlocked]); // TEMP planner-block
 
   useEffect(() => {
     let stop: (() => void) | null = null;
@@ -437,6 +442,7 @@ function GiverApp({ me }: { me: User }) {
             return ok;
           }}
           onMoveToPlans={async () => {
+            if (plannerBlock.blocked) return toast.show(PLANNER_BLOCKED_MESSAGE); // TEMP planner-block
             if (!existing) return;
             if (await guarded(() => moveWishToPlans(existing, me), S.movedToPlans)) location.hash = href.planner();
           }}
@@ -589,8 +595,12 @@ function GiverApp({ me }: { me: User }) {
           </>
         }
       />
-      <main class="sp-container pt-5 pb-24">{content}</main>
+      <main class="sp-container pt-5 pb-24">
+        {plannerBlocked ? null : content /* TEMP planner-block: was {content} */}
+        {route.name === "planner" && !plannerBlocked && <PlannerLockButton me={me} onLock={plannerBlock.lock} /> /* TEMP planner-block */}
+      </main>
       <Toast message={toast.message} onDismiss={toast.dismiss} />
+      {plannerBlock.blocked && <PlannerBlockTerminal onRelease={plannerBlock.release} /> /* TEMP planner-block */}
     </>
   );
 }
