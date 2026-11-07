@@ -206,6 +206,7 @@ export const S = {
   plannerAddShort: "+ Terv",
   planEditorTitleNew: "Új terv",
   planEditorTitleEdit: "Terv szerkesztése",
+  planEditorPrefilled: "A termékoldalról töltöttük ki. Ellenőrizd az adatokat, és pótold, ami hiányzik – csak a mentéssel kerül a tervek közé.",
   planEditorOwner: "Kinek a listájára?",
   planEditorPrice: "Ár (ráér később)",
   planEditorSave: "Mentés tervként",

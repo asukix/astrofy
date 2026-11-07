@@ -1,6 +1,7 @@
 import { useState } from "preact/hooks";
 import { formatHuf } from "../format";
 import type { Plan, PlanList, WishDraft } from "../model";
+import type { PlanPrefill } from "../prefill";
 import { S } from "../strings";
 import { ImagePreview, OpenLinkButton } from "./components";
 import { blankToNull, EditorField, MAX_PRICE_HUF, parsePrice, URL_PATTERN } from "./WishEditorScreen";
@@ -15,6 +16,7 @@ export function PlanEditorScreen({
   existing,
   lists,
   initialOwnerId,
+  prefill = null,
   onSave,
   onApprove,
   onDelete,
@@ -23,6 +25,8 @@ export function PlanEditorScreen({
   /** The lists I can plan for; the first one is mine. */
   lists: PlanList[];
   initialOwnerId: string | null;
+  /** A new plan filled in from a product page; only the starting values, nothing is saved by itself. */
+  prefill?: PlanPrefill | null;
   onSave: (ownerId: string, draft: WishDraft) => Promise<void>;
   onApprove: (ownerId: string, draft: WishDraft) => Promise<void>;
   onDelete: () => Promise<void>;
@@ -30,11 +34,13 @@ export function PlanEditorScreen({
   const startOwner =
     existing?.ownerId ?? (initialOwnerId && lists.some((l) => l.ownerId === initialOwnerId) ? initialOwnerId : lists[0]?.ownerId);
   const [ownerId, setOwnerId] = useState(startOwner ?? "");
-  const [name, setName] = useState(existing?.name ?? "");
-  const [price, setPrice] = useState(existing?.priceHuf != null ? String(existing.priceHuf) : "");
-  const [description, setDescription] = useState(existing?.description ?? "");
-  const [imageUrl, setImageUrl] = useState(existing?.imageUrl ?? "");
-  const [productUrl, setProductUrl] = useState(existing?.productUrl ?? "");
+  const [name, setName] = useState(existing?.name ?? prefill?.name ?? "");
+  const [price, setPrice] = useState(
+    existing?.priceHuf != null ? String(existing.priceHuf) : prefill?.priceHuf != null ? String(prefill.priceHuf) : "",
+  );
+  const [description, setDescription] = useState(existing?.description ?? prefill?.description ?? "");
+  const [imageUrl, setImageUrl] = useState(existing?.imageUrl ?? prefill?.imageUrl ?? "");
+  const [productUrl, setProductUrl] = useState(existing?.productUrl ?? prefill?.productUrl ?? "");
   const [errors, setErrors] = useState<Errors>({});
   const [busy, setBusy] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -87,6 +93,11 @@ export function PlanEditorScreen({
 
   return (
     <form onSubmit={save} class="flex flex-col gap-4" noValidate>
+      {prefill && !existing && (
+        <p class="sp-alert" role="status">
+          {S.planEditorPrefilled}
+        </p>
+      )}
       {lists.length > 1 && (
         <EditorField label={S.planEditorOwner}>
           <select class="select select-bordered w-full" value={ownerId} onChange={(e) => setOwnerId(e.currentTarget.value)}>

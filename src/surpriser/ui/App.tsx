@@ -500,18 +500,23 @@ function GiverApp({ me }: { me: User }) {
     back = goBack;
     title = route.name === "newPlan" ? S.planEditorTitleNew : S.planEditorTitleEdit;
     const existing = route.name === "editPlan" && snapshot ? findPlan(snapshot, route.planId) : null;
+    const prefill = route.name === "newPlan" ? route.prefill : null;
     if (snapshot?.ready && (route.name === "newPlan" || existing)) {
       content = (
         <PlanEditorScreen
-          key={existing?.id ?? "new"}
+          // A new link (another product) starts a fresh form.
+          key={existing?.id ?? `new:${location.hash}`}
           existing={existing}
           lists={snapshot.planLists}
           initialOwnerId={route.name === "newPlan" ? route.ownerId : null}
+          prefill={prefill}
           onSave={async (ownerId, draft) => {
             const ok = existing
               ? await guarded(() => updatePlan(existing.id, ownerId, draft), S.planSaved)
               : await guarded(() => createPlan(ownerId, draft, me), S.planSaved);
-            if (ok) goBack();
+            // From a product page: on to the planner, where the new idea shows (and a reload won't refill the form).
+            if (ok && prefill) location.hash = href.planner();
+            else if (ok) goBack();
           }}
           onApprove={async (ownerId, draft) => {
             const ok = existing

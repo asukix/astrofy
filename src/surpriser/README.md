@@ -11,7 +11,7 @@ A Surpriser webes változata a sengdev.com/apps/surpriser címen: telepítés n�
 | `/apps/surpriser/meghivo?tol=…&cim=…` | `src/pages/apps/surpriser/meghivo.astro` – meghívó link céloldala (statikus, csak megjelenít) |
 | `/apps/surpriser/fiok-torlese` | `src/pages/apps/surpriser/fiok-torlese.astro` (Play Console: Delete account URL) |
 
-Az app belső útvonalai hash-alapúak (`#/kivansag/<id>`, `#/foglalasaim`, `#/uj-kivansag[/<lista>]`, `#/sajat/<id>`, `#/meghivas`, `#/tervezo`, `#/uj-gyerek`, `#/gyerek/<id>`, `#/tarsszulo/<id>`, `#/fiok-torlese`), így a Cloudflare-en nem kell átirányítás.
+Az app belső útvonalai hash-alapúak (`#/kivansag/<id>`, `#/foglalasaim`, `#/uj-kivansag[/<lista>]`, `#/sajat/<id>`, `#/meghivas`, `#/tervezo`, `#/uj-terv[/<lista>][?nev=…]`, `#/terv/<id>`, `#/uj-gyerek`, `#/gyerek/<id>`, `#/tarsszulo/<id>`, `#/fiok-torlese`), így a Cloudflare-en nem kell átirányítás.
 
 ## Privát kívánságok
 
@@ -40,6 +40,16 @@ Ajándékozóként tulajonként két lekérdezés fut (`audience array-contains 
 ## Meghívó link
 
 Az app nem küld e-mailt (a Firebase Spark csomagban a linkes belépés napi 5 e-mailre korlátozott). A meghívó a „Meghívó küldése” gombbal a telefon megosztó menüjén küldi el a linket: `https://sengdev.com/apps/surpriser/meghivo?tol=<név>&cim=<e-mail>`. A céloldal kitölti az e-mail-címet a regisztrációnál/belépésnél (`/apps/surpriser?cim=…&mod=regisztracio`). A link nem ad jogot semmihez: a meghívás a Firestore-ban van, az e-mail-címhez kötve.
+
+## Kitöltött tervszerkesztő linkből
+
+A Chrome-bővítmény és a könyvjelző-gomb (bookmarklet) a termékoldalról kiolvasott adatokkal nyitja meg az új terv szerkesztőjét:
+
+```
+/apps/surpriser/#/uj-terv[/<lista>]?nev=…&ar=…&leiras=…&kep=…&link=…
+```
+
+A paramétereket a `prefill.ts` tisztítja a szabályok korlátaira: név ≤ 200, leírás ≤ 2000 karakter (karakter közepén nem vág), ár egész forint 1–100 000 000 (`12 990 Ft`, `12.990,-`, `12 990,00 HUF` is jó), kép és link csak `http(s)`, ≤ 2000 karakter. Ami nem fér bele vagy nem értelmezhető, üresen marad. A szerkesztő tetején jelzés mutatja, hogy az adatok a termékoldalról jöttek; **semmi nem mentődik magától**. Mentés után a Tervező nyílik. Kijelentkezve a hash megmarad, belépés után a kitöltött szerkesztő jön.
 
 ## Apple-belépés
 
