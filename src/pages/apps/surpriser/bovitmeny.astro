@@ -10,7 +10,10 @@ import { EXTENSION } from "../../../surpriser/extension/extension";
   description="Webshopban böngészve egy kattintással a Surpriser ajándéktervezőjébe teheted a terméket: nevet, árat, képet és linket a bővítmény tölti ki."
 >
   <main class="sp-doc">
-    <a href="/apps/surpriser" class="sp-doc__home inline-flex items-center gap-3">
+    <a href="/apps/surpriser" class="sp-back btn btn-ghost btn-sm -ml-3 mb-2" data-back>
+      <span aria-hidden="true">←</span> Vissza
+    </a>
+    <a href="/apps/surpriser" class="sp-doc__home flex items-center gap-3">
       <img src="/apps/surpriser/icon-192.png" width="40" height="40" alt="" class="rounded-[28%]" />
       <span class="font-bold text-base-content">Surpriser</span>
     </a>
@@ -118,10 +121,34 @@ import { EXTENSION } from "../../../surpriser/extension/extension";
       javításaidat a böngésző bezárásáig a gépeden tárolja. Részletek az
       <a href="/apps/surpriser/adatvedelem#bovitmeny">adatvédelmi tájékoztatóban</a>.
     </p>
+
+    <p class="mt-10">
+      <a href="/apps/surpriser" class="btn btn-primary btn-outline" data-back>
+        <span aria-hidden="true">←</span> Vissza a Surpriserbe
+      </a>
+    </p>
   </main>
 </SurpriserLayout>
 
 <script>
+  // "Vissza": opened from the Surpriser web view → back to the very screen it came from (history);
+  // opened directly (a shared link, a new tab) → the Surpriser app's start.
+  for (const back of document.querySelectorAll<HTMLAnchorElement>("[data-back]")) {
+    back.addEventListener("click", (event) => {
+      let fromApp = false;
+      try {
+        const from = new URL(document.referrer);
+        fromApp = from.origin === location.origin && from.pathname.replace(/\/$/, "") === "/apps/surpriser";
+      } catch {
+        /* no referrer */
+      }
+      if (fromApp && history.length > 1) {
+        event.preventDefault();
+        history.back();
+      }
+    });
+  }
+
   // Clicked here instead of dragged: it would read this page. Say how to use it instead.
   const link = document.querySelector<HTMLAnchorElement>(".sp-ext__bookmarklet");
   link?.addEventListener("click", (event) => {
